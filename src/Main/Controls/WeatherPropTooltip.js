@@ -1,6 +1,7 @@
 import React from 'react';
 import {UncontrolledTooltip} from 'reactstrap';
 
+//example only
 export default function tip() {
   return (<div>
     <p>Somewhere in here is a

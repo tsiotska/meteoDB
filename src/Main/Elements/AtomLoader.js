@@ -47,6 +47,7 @@ export default class LoaderReactor extends Component {
         </div>
         <div className="text-center wload">
           <p className="load_text">Завантаження...</p>
+          {//localization???}
         </div>
         <div className="progress-x">
           <div className="progress">

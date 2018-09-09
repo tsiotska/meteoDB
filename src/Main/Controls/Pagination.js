@@ -24,9 +24,10 @@ class Pagination extends React.Component {
     // reset page if items array has changed
     if (this.props.items !== prevProps.items) {
       this.setPage(this.props.initialPage);
+    } else if (this.props.onSelected !== prevProps.onSelected) 
+      this.setPage(this.props.onSelected);
     }
-  }
-
+  
   setPage(page) {
     var items = this.props.items;
     var pager = this.state.pager;
@@ -37,7 +38,7 @@ class Pagination extends React.Component {
     var pageOfItems = items.slice(pager.startIndex, pager.endIndex + 1);
 
     this.setState({pager: pager});
-    this.props.onChangePage(pageOfItems);
+    this.props.onChangePage(pageOfItems, page);
   }
 
   getPager(totalItems, currentPage, pageSize) {

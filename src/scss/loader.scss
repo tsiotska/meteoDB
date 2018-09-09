@@ -1,0 +1,97 @@
+
+.x_loader {
+  &.top {
+    z-index: 10000;
+  }
+
+  &.fade {
+    transition: 1s all;
+    z-index: -100;
+  }
+}
+
+.st_loader-inner_reactor {
+  box-shadow: inset 1px 1px 10px 1px #2e3dff;
+  height: inherit;
+  width: inherit;
+  border: inherit;
+  border-radius: inherit;
+}
+
+.st_loader_reactor {
+  position: relative;
+  min-width: 6em;
+  min-height: 6em;
+  width: 6em;
+  height: 6em;
+  border-radius: 3em;
+  box-shadow: 0 0 9em 5em #ffffff;
+}
+
+.st_loader {
+  font-size: 2em;
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  border: 0.03em solid #000;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 3em;
+}
+
+.st_loader_core,
+.st_loader_sm {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  border: 0.03em solid #000;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 3em;
+}
+
+.st_loader_core {
+  z-index: -1;
+  width: 0.5em;
+  height: 0.5em;
+  -webkit-box-shadow: 0 0 0.12em 0.06em #046464;
+  box-shadow: 0 0 0.12em 0.06em #046464;
+  border: none;
+  background-color: #ffeaea;
+}
+
+.st_loader {
+  &.x1 {
+    width: 1.5em;
+    height: 1.5em;
+    -webkit-animation: rotator 1s linear infinite 0.3s;
+    animation: rotator 1s linear infinite 0.3s;
+  }
+
+  &.x2 {
+    width: 2em;
+    height: 2em;
+    animation: rotator 1.2s linear reverse infinite 0.1s;
+  }
+
+  &.x3 {
+    width: 2.5em;
+    height: 2.5em;
+    -webkit-animation: rotator 1.3s linear infinite 0.2s;
+    animation: rotator 1.3s linear infinite 0.2s;
+  }
+
+  &.x4 {
+    width: 3em;
+    height: 3em;
+    animation: rotator 1.6s linear reverse infinite 0.3s;
+  }
+}

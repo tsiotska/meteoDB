@@ -1,10 +1,78 @@
+.scrollable {
+  overflow-y: auto; }
+
+.btn {
+  border: none; }
+
+.page-link:focus {
+  box-shadow: none; }
+
+.col-auto label {
+  margin: 10px;
+  text-align: left;
+  justify-content: left; }
+
+.empt {
+  margin: 2em;
+  font-family: cursive;
+  font-size: 1.5em; }
+
+.st_card {
+  cursor: pointer; }
+
 .main_map {
   height: 53em; }
 
 #mapid {
   height: inherit; }
+  #mapid .marker-cluster-small {
+    background-color: rgba(182, 226, 141, 0.6); }
+  #mapid .marker-cluster-small div {
+    background-color: rgba(110, 204, 57, 0.6); }
+  #mapid .marker-cluster-custom {
+    background: #104fad;
+    border: 3px solid #ededed;
+    border-radius: 50%;
+    color: #ededed;
+    height: 40px;
+    line-height: 37px;
+    text-align: center;
+    width: 40px; }
+  #mapid .marker-cluster-medium {
+    background-color: rgba(241, 211, 87, 0.6); }
+  #mapid .marker-cluster-medium div {
+    background-color: rgba(240, 194, 12, 0.6); }
+  #mapid .marker-cluster-large {
+    background-color: rgba(253, 156, 114, 0.6); }
+  #mapid .marker-cluster-large div {
+    background-color: rgba(241, 128, 23, 0.6); }
+  #mapid .marker-cluster-small {
+    background-color: #b5e28c; }
+  #mapid .marker-cluster-small div {
+    background-color: #6ecc39; }
+  #mapid .marker-cluster-medium {
+    background-color: #f1d357; }
+  #mapid .marker-cluster-medium div {
+    background-color: #f0c20c; }
+  #mapid .marker-cluster-large {
+    background-color: #fd9c73; }
+  #mapid .marker-cluster-large div {
+    background-color: #f18017; }
   #mapid .marker-active {
     filter: hue-rotate(270deg); }
+  #mapid .marker-cluster {
+    background-clip: padding-box;
+    border-radius: 20px; }
+  #mapid .marker-cluster div {
+    width: 30px;
+    height: 30px;
+    margin-left: 5px;
+    margin-top: 5px;
+    text-align: center;
+    border-radius: 15px;
+    font: 12px Helvetica Neue,Arial,Helvetica,sans-serif; }
+  #mapid .marker-cluster span {
+    line-height: 30px; }
   #mapid .XCustTooltip {
     background-color: transparent;
     box-shadow: transparent 0 0 0;
@@ -17,26 +85,11 @@
       transition: 0.2s linear forwards;
       animation: fadeIn 0.5s forwards; }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0; }
-  to {
-    opacity: 1; } }
-
 #ctr-list {
-  max-height: 15em;
+  max-height: 20em;
   overflow-y: scroll; }
   #ctr-list li {
     min-height: 3em; }
-
-.scrollable {
-  overflow-y: auto; }
-
-.bnt {
-  border: none; }
-
-.page-link:focus {
-  box-shadow: none; }
 
 #flyn_toggle.btn.btn-secondary {
   border: none; }
@@ -186,7 +239,7 @@
 .weath .w_gaudge .badge {
   position: absolute;
   top: -2px;
-  left: 6em;
+  left: 8em;
   font-size: 0.6em;
   font-weight: 500; }
 
@@ -391,66 +444,6 @@ nav .nav-tabs {
 .fx:hover .fx2:after {
   -webkit-animation: slides 1s linear infinite;
   animation: slides 1s linear infinite; }
-
-@-webkit-keyframes slides {
-  0%,
-  100% {
-    opacity: 1;
-    -webkit-transform: translate(0) rotate(-135deg);
-    transform: translate(0) rotate(-135deg); }
-  25% {
-    opacity: 0;
-    -webkit-transform: translate(5px) rotate(-135deg);
-    transform: translate(5px) rotate(-135deg); }
-  75% {
-    opacity: 0;
-    -webkit-transform: translate(-5px) rotate(-135deg);
-    transform: translate(-5px) rotate(-135deg); } }
-
-@keyframes slides {
-  0%,
-  100% {
-    opacity: 1;
-    -webkit-transform: translate(0) rotate(-135deg);
-    transform: translate(0) rotate(-135deg); }
-  25% {
-    opacity: 0;
-    -webkit-transform: translate(5px) rotate(-135deg);
-    transform: translate(5px) rotate(-135deg); }
-  75% {
-    opacity: 0;
-    -webkit-transform: translate(-5px) rotate(-135deg);
-    transform: translate(-5px) rotate(-135deg); } }
-
-@-webkit-keyframes slides2 {
-  0%,
-  100% {
-    opacity: 1;
-    -webkit-transform: translate(0) rotate(135deg);
-    transform: translate(0) rotate(135deg); }
-  25% {
-    opacity: 0;
-    -webkit-transform: translate(5px) rotate(135deg);
-    transform: translate(5px) rotate(135deg); }
-  75% {
-    opacity: 0;
-    -webkit-transform: translate(-5px) rotate(135deg);
-    transform: translate(-5px) rotate(135deg); } }
-
-@keyframes slides2 {
-  0%,
-  100% {
-    opacity: 1;
-    -webkit-transform: translate(0) rotate(135deg);
-    transform: translate(0) rotate(135deg); }
-  25% {
-    opacity: 0;
-    -webkit-transform: translate(5px) rotate(135deg);
-    transform: translate(5px) rotate(135deg); }
-  75% {
-    opacity: 0;
-    -webkit-transform: translate(-5px) rotate(135deg);
-    transform: translate(-5px) rotate(135deg); } }
 
 #flyn_current_station {
   height: 15em;
@@ -662,6 +655,12 @@ nav .nav-tabs {
       -ms-transform: rotate(45deg);
       transform: rotate(45deg); }
 
+.container.overex {
+  box-shadow: 2px 1px 15px 1px;
+  border-radius: 1em;
+  overflow-y: scroll;
+  max-height: 40vh; }
+
 @keyframes el_innerSpin {
   from {
     transform: rotate(0) translateX(100%) rotate(0); }
@@ -679,3 +678,63 @@ nav .nav-tabs {
     opacity: 0; }
   to {
     opacity: 1; } }
+
+@-webkit-keyframes slides {
+  0%,
+  100% {
+    opacity: 1;
+    -webkit-transform: translate(0) rotate(-135deg);
+    transform: translate(0) rotate(-135deg); }
+  25% {
+    opacity: 0;
+    -webkit-transform: translate(5px) rotate(-135deg);
+    transform: translate(5px) rotate(-135deg); }
+  75% {
+    opacity: 0;
+    -webkit-transform: translate(-5px) rotate(-135deg);
+    transform: translate(-5px) rotate(-135deg); } }
+
+@keyframes slides {
+  0%,
+  100% {
+    opacity: 1;
+    -webkit-transform: translate(0) rotate(-135deg);
+    transform: translate(0) rotate(-135deg); }
+  25% {
+    opacity: 0;
+    -webkit-transform: translate(5px) rotate(-135deg);
+    transform: translate(5px) rotate(-135deg); }
+  75% {
+    opacity: 0;
+    -webkit-transform: translate(-5px) rotate(-135deg);
+    transform: translate(-5px) rotate(-135deg); } }
+
+@-webkit-keyframes slides2 {
+  0%,
+  100% {
+    opacity: 1;
+    -webkit-transform: translate(0) rotate(135deg);
+    transform: translate(0) rotate(135deg); }
+  25% {
+    opacity: 0;
+    -webkit-transform: translate(5px) rotate(135deg);
+    transform: translate(5px) rotate(135deg); }
+  75% {
+    opacity: 0;
+    -webkit-transform: translate(-5px) rotate(135deg);
+    transform: translate(-5px) rotate(135deg); } }
+
+@keyframes slides2 {
+  0%,
+  100% {
+    opacity: 1;
+    -webkit-transform: translate(0) rotate(135deg);
+    transform: translate(0) rotate(135deg); }
+  25% {
+    opacity: 0;
+    -webkit-transform: translate(5px) rotate(135deg);
+    transform: translate(5px) rotate(135deg); }
+  75% {
+    opacity: 0;
+    -webkit-transform: translate(-5px) rotate(135deg);
+    transform: translate(-5px) rotate(135deg); } }

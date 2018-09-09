@@ -1,0 +1,27 @@
+.st_ra {
+  font-weight: 500; }
+  .st_ra:before {
+    content: "-";
+    position: absolute; }
+
+.st_id:before {
+  content: "ID: ";
+  font-weight: 400; }
+
+.st_elev,
+.st_id,
+.st_lat,
+.st_lon {
+  font-weight: 700; }
+
+.st_lat:before {
+  content: "LAT: ";
+  font-weight: 400; }
+
+.st_lon:before {
+  content: "LON:";
+  font-weight: 400; }
+
+.st_elev:before {
+  content: "Elevation: ";
+  font-weight: 400; }
