@@ -39,7 +39,7 @@ export default class MapX extends Component {
     }
   }
 
-  GetMarkersInPoly = (e) => {
+  getMarkersInPoly = (e) => {
     this.props.OnPolySelected(e)
     if (this.state.MapMarkers) {
       let markers = this.state.MapMarkers
@@ -55,7 +55,7 @@ export default class MapX extends Component {
       this.setState({currentSelected: mks_sel})
     }
   }
-  InitDraw = (mymap) => {
+  initDraw = (mymap) => {
     var options = {
       position: 'topright', // toolbar position, options are 'topleft', 'topright', 'bottomleft', 'bottomright'
       drawMarker: false, // adds button to draw markers
@@ -81,19 +81,19 @@ export default class MapX extends Component {
       lastPoly.push(e)
       this.setState({lastPoly: lastPoly})
       e.layer.on('pm:dragend', () => {
-        this.GetMarkersInPoly(e)
-        this.FetchMarkers(e)
+        this.getMarkersInPoly(e)
+        this.fetchMarkers(e)
       });
       e.layer.on('pm:markerdragend', () => {
-        this.GetMarkersInPoly(e)
-        this.FetchMarkers(e)
+        this.getMarkersInPoly(e)
+        this.fetchMarkers(e)
       });
-      this.GetMarkersInPoly(e)
-      this.FetchMarkers(e)
+      this.getMarkersInPoly(e)
+      this.fetchMarkers(e)
     });
   }
   componentDidMount() {
-    this.InitDraw(mymap);
+    this.initDraw(mymap);
   }
   whenReady() {
     mymap = this;
@@ -107,14 +107,14 @@ export default class MapX extends Component {
     L.control.zoom({position: 'topright'}).addTo(mymap);
     markerGroup = L.layerGroup().addTo(mymap);
   }
-  OnMarkerClick = (e) => {
+  onMarkerClick = (e) => {
     this.props.ActiveMarker(e.target);
     $('.leaflet-marker-icon').removeClass('marker-active')
     $(e.target._icon).addClass("marker-active")
   }
-  RenderOne = (w) => {
+  renderOne = (w) => {
     return (<Marker onClick={(e) => {
-        this.OnMarkerClick(e);
+        this.onMarkerClick(e);
         w.click(e)
       }} key={w.id_cnt} position={w.position}>
       <Tooltip className="XCustTooltip">
@@ -123,7 +123,7 @@ export default class MapX extends Component {
     </Marker>);
   }
 
-  FetchMarkers = (e) => {
+  fetchMarkers = (e) => {
     e = e.layer;
     var req = "";
     var lngs = null;
@@ -143,18 +143,18 @@ export default class MapX extends Component {
         this.props.OnPolySelected(lastPoly[lastPoly.length - 1]);
       if (lastPoly.length > 0) {
         let layer = lastPoly[lastPoly.length - 1];
-        this.GetMarkersInPoly(layer)
+        this.getMarkersInPoly(layer)
       }
     });
   }
-  RenderMarkers = () => {
+  renderMarkers = () => {
     if (this.props.currentSelected) 
       return this.props.currentSelected.map((w) => {
-        return this.RenderOne(w)
+        return this.renderOne(w)
       })
     else if (this.props.markers) 
       return this.props.markers.map((w) => {
-        return this.RenderOne(w)
+        return this.renderOne(w)
       })
     return null;
   }
@@ -166,7 +166,7 @@ export default class MapX extends Component {
   }
   render() {
     const position = [this.state.lat, this.state.lng]
-    const markers = this.RenderMarkers()
+    const markers = this.renderMarkers()
 
     console.log("map redraw");
 

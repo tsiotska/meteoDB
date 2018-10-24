@@ -32,7 +32,7 @@ export default class MapComponent extends React.PureComponent {
     };
   }
   componentDidMount() {
-    this.props.SelTime(this.GetSelectedTime.bind(this))
+    this.props.SelTime(this.getSelectedTime.bind(this))
     this.ajax = $.ajax(baseUrl + "/api/db?st_count=")
     this.ajax.done((data) => {
       if (data && data.response) {
@@ -44,7 +44,7 @@ export default class MapComponent extends React.PureComponent {
           isLoading: false
         })
         this.props.SetCtrList(data.response.map((i) => {
-          return <CountryItem key={cnt++} SetQuery={this.SetQuery} e={i}/>;
+          return <CountryItem key={cnt++} setQuery={this.setQuery} e={i}/>;
         }))
       }
     })
@@ -58,25 +58,25 @@ export default class MapComponent extends React.PureComponent {
     this.props.mapSelectedIndex(index)
     this.setState({selectedPage: selectedPage});
   }
-  OnTypeChanged = (e) => {
+  onTypeChanged = (e) => {
     let p = e.target.value
     this.props.api.MainApiFetch(baseUrl + '/api/db?getTypeList&t=' + p).done((data) => {
       this.setState({querySource: data.response})
     })
   }
-  CurrentStation = () => {
+  currentStation = () => {
     return (<div id="flyn_current_station" className="w-100 d-flex flex-column">
       {this.props.currentStation}</div>);
   }
-  SetQuery = (e) => {
+  setQuery = (e) => {
     this.s_type.current.value = 'ctry_full';
     $('#querystr').val(e);
-    this.OnSearchClick(e);
+    this.onSearchClick(e);
   }
-  OnRefreshClick = (e) => {
-    this.props.OnRefreshClick(e);
+  onRefreshClick = (e) => {
+    this.props.onRefreshClick(e);
   }
-  GetPolyStr() {
+  getPolyStr() {
     let polyreq,
       e = this.state.lastPoly.layer,
       lngs = null;
@@ -90,7 +90,7 @@ export default class MapComponent extends React.PureComponent {
     }
     return polyreq
   }
-  GetSelectedTime() {
+  getSelectedTime() {
     return this.state.date.dateSet
       ? '&s=' + this.state.date.startDate.format('DD.MM.YYYY') + '&e=' + this.state.date.endDate.format('DD.MM.YYYY')
       : (
@@ -98,7 +98,7 @@ export default class MapComponent extends React.PureComponent {
         ? "&year=" + $("#years").val()
         : '');
   }
-  OnSearchClick = (e) => {
+  onSearchClick = (e) => {
     let isBigDataQuery,
       neighbors,
       querytype,
@@ -118,7 +118,7 @@ export default class MapComponent extends React.PureComponent {
       }))
     if (this.state.lastPoly) {
       //polygon data fetch
-      polyreq = this.GetPolyStr()
+      polyreq = this.getPolyStr()
     } else {
       var cntv = $('#count').val() || 0
       var offsetv = $('#offset').val() || 0
@@ -148,10 +148,10 @@ export default class MapComponent extends React.PureComponent {
 
   /// HALF PORTED PART FROM JQUERY
 
-  SetLastPoly = (e) => {
+  setLastPoly = (e) => {
     this.setState({lastPoly: e})
   }
-  OnYearsChange = () => {
+  onYearsChange = () => {
     if ($("#years").val().length === 4) {
       $("#stx .stx_l1").removeClass('fade');
       this.props.api.GetStationsIdsForYear($("#years").val()).done((data) => {
@@ -161,7 +161,7 @@ export default class MapComponent extends React.PureComponent {
       });
     }
   }
-  OnIdChange = () => {
+  onIdChange = () => {
     if ($("#id_st").val() === 'N/A' || $("#id_st").val().length === 6) {
       $("#stx .stx_l2").removeClass('fade');
       this.state.api.OfYear($("#years").val()).GetForId($("#id_st").val()).done((data) => {
@@ -171,7 +171,7 @@ export default class MapComponent extends React.PureComponent {
       });
     }
   }
-  OnWbanChange = () => {
+  onWbanChange = () => {
     if ($("#wban_st").val() === 'N/A' || $("#wban_st").val().length === 6) {
       $("#datex .cssload-container").removeClass('fade');
       this.state.api.OfYear($("#years").val()).GetForWban($("#id_st").val(), $("#wban_st").val()).done((data) => {
@@ -186,7 +186,7 @@ export default class MapComponent extends React.PureComponent {
   render() {
     console.log("map Component redraw");
     return (<div className="main_map container-fluid p-0">
-      <Map ActiveMarker={this.props.ActiveMarker} OnPolySelected={this.SetLastPoly} OnSearchFetched={this.props.OnSearchFetched} markers={this.state.selectedPage} currentSelected={this.props.markers}/>
+      <Map ActiveMarker={this.props.ActiveMarker} OnPolySelected={this.setLastPoly} OnSearchFetched={this.props.OnSearchFetched} markers={this.state.selectedPage} currentSelected={this.props.markers}/>
       <div className="cur_count_wrapper">
         <div className={"cur_count " + (
             this.props.counter
@@ -201,7 +201,7 @@ export default class MapComponent extends React.PureComponent {
 
               <div className="col-5  mb-1">
                 <label htmlFor="type">Тип поля</label>
-                <select defaultValue="ctry_full" ref={this.s_type} className="custom-select" onChange={this.OnTypeChanged} id="type">
+                <select defaultValue="ctry_full" ref={this.s_type} className="custom-select" onChange={this.onTypeChanged} id="type">
                   <option>id</option>
                   <option>wban</option>
                   <option>stname</option>
@@ -220,7 +220,7 @@ export default class MapComponent extends React.PureComponent {
               <div id="yearsx" className="col-5 mb-1">
                 <label htmlFor="years">Рік</label>
                 <div className="input-group">
-                  <input type="text" id="years" onChange={this.OnYearsChange} className="form-control typeahead" placeholder="Рік" data-provide="typeahead" readOnly="readOnly"/>
+                  <input type="text" id="years" onChange={this.onYearsChange} className="form-control typeahead" placeholder="Рік" data-provide="typeahead" readOnly="readOnly"/>
                   <div className="cssload-container fade">
                     <div className="cssload-whirlpool"></div>
                   </div>
@@ -245,8 +245,8 @@ export default class MapComponent extends React.PureComponent {
 
             </div>
             <div className="col-auto d-flex w-100">
-              <button id="reeval" onClick={this.OnSearchClick} className="btn btn-primary m-2 mb-1 mt-auto">Пошук</button>
-              <button id="refresh" onClick={this.OnRefreshClick} className="btn btn-secondary m-2 mb-1 mt-auto">Очистити</button>
+              <button id="reeval" onClick={this.onSearchClick} className="btn btn-primary m-2 mb-1 mt-auto">Пошук</button>
+              <button id="refresh" onClick={this.onRefreshClick} className="btn btn-secondary m-2 mb-1 mt-auto">Очистити</button>
             </div>
           </div>
 
@@ -255,14 +255,14 @@ export default class MapComponent extends React.PureComponent {
             <div id="stx" className="col-auto mb-1">
               <label htmlFor="id_st">ID Станції</label>
               <div className="input-group">
-                <input type="text" className="form-control typeahead" id="id_st" onChange={this.OnIdChange} placeholder="123456" data-provide="typeahead" readOnly="readOnly"/>
+                <input type="text" className="form-control typeahead" id="id_st" onChange={this.onIdChange} placeholder="123456" data-provide="typeahead" readOnly="readOnly"/>
                 <div className="stx_l1 cssload-container fade">
                   <div className="cssload-whirlpool"></div>
                 </div>
               </div>
               <label htmlFor="wban_st">WBAN Станції</label>
               <div className="input-group">
-                <input type="text" className="form-control typeahead" id="wban_st" onChange={this.OnWbanChange} placeholder="Станція" value="N/A" data-provide="typeahead" readOnly="readOnly"/>
+                <input type="text" className="form-control typeahead" id="wban_st" onChange={this.onWbanChange} placeholder="Станція" value="N/A" data-provide="typeahead" readOnly="readOnly"/>
                 <div className="stx_l2 cssload-container fade">
                   <div className="cssload-whirlpool"></div>
                 </div>
@@ -287,7 +287,7 @@ export default class MapComponent extends React.PureComponent {
           <nav aria-label="Page nav" className="mx-auto">
             <ul id="stNav" className="pagination justify-content-center"></ul>
           </nav>
-          {this.CurrentStation()}
+          {this.currentStation()}
           <Button id="flyn_toggle" className="fx btn asside btn-md" role="button" onClick={() => $('.flyn').toggleClass('active')}>
             <span className="fx1"></span>
             <span className="fx2"></span>
