@@ -11,16 +11,16 @@ let status = {
   GENERIC_ERROR: 0
 }
 export class FetchController {
-  constructor(LoadingStarted, LoadingFinished, Progress) {
+  constructor(loadingStarted, loadingFinished, Progress) {
     this.state = {
       Status: status.UNDEFINED,
       Result: null,
       Errors: null,
       ProgressCallback: Progress,
       loaderOption: {
-        xhr: this.OnFetchAjax,
-        beforeSend: LoadingStarted,
-        complete: LoadingFinished,
+        xhr: this.onFetchAjax,
+        beforeSend: loadingStarted,
+        complete: loadingFinished,
         success: (data) => {
           return data;
         },
@@ -30,13 +30,13 @@ export class FetchController {
       }
     }
   }
-  Clear = () => {
+  clear = () => {
     this.state.Status = status.UNDEFINED;
     this.state.Result = this.state.Errors = null;
   }
-  OnFetchAjax = () => {
+  onFetchAjax = () => {
     let callback = this.state.ProgressCallback
-    this.Clear();
+    this.clear();
     var xhr = new window.XMLHttpRequest(),
       lenx = 0;
     xhr.onreadystatechange = function() {
@@ -51,6 +51,7 @@ export class FetchController {
     }, false);
     return xhr;
   }
+  // Naming conflict -> refactor later
   Get = (link) => {
     return $.ajax(link, this.state.loaderOption).done((data) => {
       this.state.Status = data.code;
@@ -63,13 +64,13 @@ export class WeathComposer {
   constructor(data) {
     this.data = data
   }
-  GetDataContainers() {}
-  GetStationsContainers() {}
-  GetMarkers() {}
+  getDataContainers() {}
+  getStationsContainers() {}
+  getMarkers() {}
 }
 export class ApiController {
-  constructor(LoadingStarted, LoadingFinished, Progress) {
-    this.api = new FetchController(LoadingStarted, LoadingFinished, Progress)
+  constructor(loadingStarted, loadingFinished, Progress) {
+    this.api = new FetchController(loadingStarted, loadingFinished, Progress)
     this._time = this._year = null;
   }
 
@@ -90,65 +91,65 @@ export class ApiController {
     this._time = value;
   }
 
-  MainApiFetch = (link) => {
+  mainAPIFetch = (link) => {
     return this.api.Get(link);
   }
-  OfTimeExp = (exp) => {
+  ofTimeExp = (exp) => {
     this._time = this._year = null;
     this._year = exp
     return this;
   }
-  OfTime = (year) => {
+  ofTime = (year) => {
     this._time = this._year = null;
     this._year = '&year=' + year
     return this;
   }
-  OfRangeExp = (exp) => {
+  ofRangeExp = (exp) => {
     this._time = this._year = null;
     this._time = exp
     return this;
   }
-  OfRange = (start, end) => {
+  ofRange = (start, end) => {
     this._time = this._year = null;
     this._time = '&s=' + start + '&e=' + end
     return this;
   }
-  GetYears = () => {
+  getYears = () => {
     let link = baseUrl + "/api/db?years=";
-    return this.MainApiFetch(link)
+    return this.mainAPIFetch(link)
   }
-  GetStationsCount = () => {
+  getStationsCount = () => {
     let link = baseUrl + "/api/db?st_count="
-    return this.MainApiFetch(link)
+    return this.mainAPIFetch(link)
   }
-  GetWeathForLatLon = (type, lat, lon) => {
+  getWeathForLatLon = (type, lat, lon) => {
     let link = baseUrl + '/api/db?t=' + type + '&of=0&lat=' + lat + '&lon=' + lon + (this.year || this.time);
-    return this.MainApiFetch(link)
+    return this.mainAPIFetch(link)
   }
-  GetStations = () => {
+  getStations = () => {
     let link = baseUrl
-    return this.MainApiFetch(link)
+    return this.mainAPIFetch(link)
   }
-  GetStationsIdsForYear = (year) => {
+  getStationsIdsForYear = (year) => {
     let link = baseUrl + "/api/db?st_year=" + year
-    return this.MainApiFetch(link)
+    return this.mainAPIFetch(link)
   }
-  GetWeatherInRange = (start, end) => {
+  getWeatherInRange = (start, end) => {
     let link = baseUrl + this.time
-    return this.MainApiFetch(link)
+    return this.mainAPIFetch(link)
   }
-  GetWeatherForStatons = () => {
+  getWeatherForStations = () => {
     let link = baseUrl + ''
-    return this.MainApiFetch(link)
+    return this.mainAPIFetch(link)
   }
 
-  GetForWban = (id, wban) => {
+  getForWban = (id, wban) => {
     let link = baseUrl + "/api/db?id=" + id + "&wban=" + wban + this.year
-    return this.MainApiFetch(link)
+    return this.mainAPIFetch(link)
   }
-  GetForId = (id) => {
+  getForId = (id) => {
     let link = baseUrl + "/api/db?id=" + id + this.year
-    return this.MainApiFetch(link)
+    return this.mainAPIFetch(link)
   }
 
 }

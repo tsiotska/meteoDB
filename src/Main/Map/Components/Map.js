@@ -108,7 +108,7 @@ export default class MapX extends Component {
     markerGroup = L.layerGroup().addTo(mymap);
   }
   onMarkerClick = (e) => {
-    this.props.ActiveMarker(e.target);
+    this.props.activeMarker(e.target);
     $('.leaflet-marker-icon').removeClass('marker-active')
     $(e.target._icon).addClass("marker-active")
   }
@@ -138,7 +138,7 @@ export default class MapX extends Component {
     }
     $.ajax(req).done((data) => {
       let lastPoly = this.state.lastPoly;
-      this.props.OnSearchFetched(data, lngs, lastPoly);
+      this.props.onSearchFetched(data, lngs, lastPoly);
       if (lastPoly.length > 0) 
         this.props.OnPolySelected(lastPoly[lastPoly.length - 1]);
       if (lastPoly.length > 0) {

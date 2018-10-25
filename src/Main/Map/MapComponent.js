@@ -43,7 +43,7 @@ export default class MapComponent extends React.PureComponent {
           }),
           isLoading: false
         })
-        this.props.SetCtrList(data.response.map((i) => {
+        this.props.setCtrList(data.response.map((i) => {
           return <CountryItem key={cnt++} setQuery={this.setQuery} e={i}/>;
         }))
       }
@@ -60,7 +60,7 @@ export default class MapComponent extends React.PureComponent {
   }
   onTypeChanged = (e) => {
     let p = e.target.value
-    this.props.api.MainApiFetch(baseUrl + '/api/db?getTypeList&t=' + p).done((data) => {
+    this.props.api.mainAPIFetch(baseUrl + '/api/db?getTypeList&t=' + p).done((data) => {
       this.setState({querySource: data.response})
     })
   }
@@ -137,12 +137,12 @@ export default class MapComponent extends React.PureComponent {
       ? polyreq
       : 't=' + this.s_type.current.value + neighbors + querytype + names);
     let reqs = baseUrl + '/api/db?' + qval + time;
-    this.props.api.MainApiFetch(reqs).done((resp) => {
+    this.props.api.mainAPIFetch(reqs).done((resp) => {
 
       if (yeartime || this.state.date.dateSet) 
-        this.props.OnBigDataFetched(resp)
+        this.props.onBigDataFetched(resp)
       else 
-        this.props.OnSearchFetched(resp)
+        this.props.onSearchFetched(resp)
     });
   }
 
@@ -154,7 +154,7 @@ export default class MapComponent extends React.PureComponent {
   onYearsChange = () => {
     if ($("#years").val().length === 4) {
       $("#stx .stx_l1").removeClass('fade');
-      this.props.api.GetStationsIdsForYear($("#years").val()).done((data) => {
+      this.props.api.getStationsIdsForYear($("#years").val()).done((data) => {
         TypeaheadW($("#id_st")[0], {source: data.response});
         $("#stx .stx_l1").addClass('fade');
         $('#id_st').removeAttr('readonly');
@@ -164,7 +164,7 @@ export default class MapComponent extends React.PureComponent {
   onIdChange = () => {
     if ($("#id_st").val() === 'N/A' || $("#id_st").val().length === 6) {
       $("#stx .stx_l2").removeClass('fade');
-      this.state.api.OfYear($("#years").val()).GetForId($("#id_st").val()).done((data) => {
+      this.state.api.OfYear($("#years").val()).getForId($("#id_st").val()).done((data) => {
         TypeaheadW($("#wban_st")[0], {source: data.response});
         $("#stx .stx_l2").addClass('fade');
         $('#wban_st').removeAttr('readonly');
@@ -174,7 +174,7 @@ export default class MapComponent extends React.PureComponent {
   onWbanChange = () => {
     if ($("#wban_st").val() === 'N/A' || $("#wban_st").val().length === 6) {
       $("#datex .cssload-container").removeClass('fade');
-      this.state.api.OfYear($("#years").val()).GetForWban($("#id_st").val(), $("#wban_st").val()).done((data) => {
+      this.state.api.OfYear($("#years").val()).getForWban($("#id_st").val(), $("#wban_st").val()).done((data) => {
         TypeaheadW($("#date")[0], {source: data.response});
         $("#datex .cssload-container").addClass('fade');
         $('#date').removeAttr('readonly');
@@ -186,7 +186,7 @@ export default class MapComponent extends React.PureComponent {
   render() {
     console.log("map Component redraw");
     return (<div className="main_map container-fluid p-0">
-      <Map ActiveMarker={this.props.ActiveMarker} OnPolySelected={this.setLastPoly} OnSearchFetched={this.props.OnSearchFetched} markers={this.state.selectedPage} currentSelected={this.props.markers}/>
+      <Map activeMarker={this.props.activeMarker} OnPolySelected={this.setLastPoly} onSearchFetched={this.props.onSearchFetched} markers={this.state.selectedPage} currentSelected={this.props.markers}/>
       <div className="cur_count_wrapper">
         <div className={"cur_count " + (
             this.props.counter
