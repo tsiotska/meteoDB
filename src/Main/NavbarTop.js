@@ -12,14 +12,14 @@ export default class NavbarTop extends React.Component {
     }
   }
 
-  OnMouseMove(e) {
+  onMouseMove(e) {
     return "lat: " + e.latlng.lat + " lng: " + e.latlng.lng;
   }
   render() {
     return (<nav className="navbar sticky-to navbar-light bg-light">
       <a className="navbar-brand" onClick={handler} href="#top">X-Meteo Prototype<span className="ml-2 badge badge-info">Alfa 0.26</span>
       </a>
-      <div className="float-right small">{this.props.OnMouseMove}</div>
+      <div className="float-right small">{this.props.onMouseMove}</div>
     </nav>);
   }
 }

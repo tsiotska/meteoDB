@@ -21,10 +21,10 @@ var base = baseUrl,
   markerGroup = null,
   Typeahead = require('typeahead');
 
-function GenMaker(e, click, content, cnt, i) {
+function genMaker(e, click, content, cnt, i) {
   return {position: e, click: click, content: content, id_cnt: cnt, data: i}
 }
-export function CreativeSt(e, cnt, click) {
+export function creativeSt(e, cnt, click) {
   return <Station click={click} key={cnt} id={cnt} props={e}/>;
 }
 function flatten(arr) {
@@ -50,7 +50,7 @@ export default class Main extends Component {
       markerGroup: null,
       isVisible: false,
       loadingProgress: 0,
-      api: new ApiController(this.LoadingStarted, this.LoadingFinished, this.ProgressChanged),
+      api: new ApiController(this.loadingStarted, this.loadingFinished, this.progressChanged),
       daysItems: [],
       currentSelected: [],
       SelTimeFun: null,
@@ -58,21 +58,21 @@ export default class Main extends Component {
       stationsCounter: null,
       lockM: true
     }
-    this.OnMarkerClick = throttle(this.OnMarkerClickBase, 500)
+    this.onMarkerClick = throttle(this.onMarkerClickBase, 500)
   }
-  ProgressChanged = (amount) => {
+  progressChanged = (amount) => {
     this.setState({loadingProgress: amount});
   }
   componentDidMount() {
-    this.SetHandlers()
-    this.SetDocumentVars()
+    this.setHandlers()
+    this.setDocumentVars()
   }
 
-  LoadingStarted = () => {
+  loadingStarted = () => {
     this.setState({isVisible: true})
   }
   // react redux use???
-  LoadingFinished = () => {
+  loadingFinished = () => {
     setTimeout(() => {
       this.setState({isVisible: false})
     }, 900)
@@ -80,13 +80,13 @@ export default class Main extends Component {
       this.setState({loadingProgress: 0})
     }, 2000)
   }
-  SetMarkers = (e) => {
+  setMarkers = (e) => {
     this.setState({MapMarkers: e})
   }
-  CreativeDay(e, cnt) {
+  creativeDay(e, cnt) {
     return <WeatherControl key={cnt} data={e}/>;
   }
-  SetDocumentVars = () => {
+  setDocumentVars = () => {
     var lx = window.location.search.substr(1);
     window.history.replaceState({}, "WeatherConsole", "/#!");
     $('[data-toggle="tooltip"]').tooltip();
@@ -94,31 +94,31 @@ export default class Main extends Component {
       e.preventDefault();
     });
 
-    this.state.api.GetYears().done((data) => {
+    this.state.api.getYears().done((data) => {
       Typeahead($("#years")[0], {source: data.response});
       $("#years").removeAttr('readonly');
     });
 
     if (lx && !lx.includes('react_perf')) {
       $.ajax(base + "/api/db?" + lx).done((data) => {
-        this.SetWeathItem(data.response);
+        this.setWeathItem(data.response);
       });
     }
     //  SmothScroll();
   }
-  OnStationClick = (e) => {
+  onStationClick = (e) => {
     this.setState({
-      currentStation: CreativeSt(e, 0, this.OnStationClick)
+      currentStation: creativeSt(e, 0, this.onStationClick)
     })
-    this.GetWeathForLatLon(e);
+    this.getWeathForLatLon(e);
   }
 
-  OnSearchFetched = (resp, lngs) => {
+  onSearchFetched = (resp, lngs) => {
     console.log("Fetched search");
     this.setState({lockM: true})
     this.setState({stationsCounter: <CountCircle response={resp}/>})
     console.log(resp);
-    if (resp.code === 33) 
+    if (resp.code === 33)
       return;
     var data = (!resp.Item2)
       ? resp
@@ -128,7 +128,7 @@ export default class Main extends Component {
         return e.data
       }));
     }
-    if (markerGroup) 
+    if (markerGroup)
       mymap.removeLayer(markerGroup);
     markerGroup = L.layerGroup().addTo(mymap);
 
@@ -136,9 +136,9 @@ export default class Main extends Component {
     let fx = Array.isArray(data.response) && data.response.filter(function(i) {
       return i.lat && i.lon && i.lat !== '+00.000';
     });
-    if (fx) 
+    if (fx)
       this.setState({
-        stationsAll: fx.map((i) => CreativeSt(i, cnt++, this.OnStationClick))
+        stationsAll: fx.map((i) => creativeSt(i, cnt++, this.onStationClick))
       })
     var markers = [],
       area_latlon = [];
@@ -147,62 +147,62 @@ export default class Main extends Component {
 
       let lt = L.latLng(i.lat, i.lon)
       area_latlon.push(lt);
-      markers.push(GenMaker(lt, this.OnMarkerClick, CreativeSt(i), o, i));
+      markers.push(genMaker(lt, this.onMarkerClick, creativeSt(i), o, i));
     }
-    this.SetMarkers(markers)
+    this.setMarkers(markers)
     mymap.fitBounds(L.latLngBounds(lngs || area_latlon));
   }
-  OnMarkerClick() {
-    this.OnMarkerClick.cancel()
+  onMarkerClick() {
+    this.onMarkerClick.cancel()
   }
-  GetWeathForLatLon = (t) => {
+  getWeathForLatLon = (t) => {
     let g = this.selTimeFun();
     let isYear = g.includes('year');
     let api = isYear
-      ? this.state.api.OfTimeExp(g)
-      : this.state.api.OfRangeExp(g);
-    api.GetWeathForLatLon($('#type').val(), t.lat, t.lng).done((data) => {
-      this.SetWeathItem(data);
+      ? this.state.api.ofTimeExp(g)
+      : this.state.api.ofRangeExp(g);
+    api.getWeathForLatLon($('#type').val(), t.lat, t.lng).done((data) => {
+      this.setWeathItem(data);
     });
   }
-  OnMarkerClickBase = (e) => {
+  onMarkerClickBase = (e) => {
     var t = e.target.getLatLng();
-    this.GetWeathForLatLon(t);
+    this.getWeathForLatLon(t);
   }
-  SetWeathItem = (e) => {
+  setWeathItem = (e) => {
     var data = e.response,
       cnt = 0;
     if (data.data) {
       this.setState({
-        currentStation: CreativeSt(data.item, 0, this.OnStationClick)
+        currentStation: creativeSt(data.item, 0, this.onStationClick)
       })
       if (data.data.Item2) { // hardcoded, I know
         this.setState({
           daysItems: data.data.Item2.map((i) => {
-            return this.CreativeDay(i, cnt++);
+            return this.creativeDay(i, cnt++);
           })
         })
       }
     }
   }
-  CreatePageNavItem(name, full_href, href, cnt, active = false, disabled = false) {
+  createPageNavItem(name, full_href, href, cnt, active = false, disabled = false) {
     var hrefx = href
       ? href
       : full_href;
     return <PageNav href={hrefx} key={cnt} active={active} text={name} disabled={disabled} onClick={(e) => {
         e.preventDefault();
-        this.GetData(full_href);
+        this.getData(full_href);
         return false
       }}/>;
   }
-  GetData = (e) => {
-    this.state.api.MainApiFetch(e).done((data) => {
+  getData = (e) => {
+    this.state.api.mainAPIFetch(e).done((data) => {
       console.log(data);
-      this.SetWeathItem(data);
+      this.setWeathItem(data);
     });
   }
-  SetHandlers = () => {}
-  OnMapPageChanged = (e) => {
+  setHandlers = () => {}
+  onMapPageChanged = (e) => {
     if (this.state.lockM) {
       this.setState({lockM: false})
       return;
@@ -214,32 +214,33 @@ export default class Main extends Component {
       mymap.fitBounds(t);
     }
   }
-  ActiveMarker(e) {
+  activeMarker(e) {
     console.log("Active: " + e.options.position)
   }
-  OnMouseMove(e) {
+  onMouseMove(e) {
     return "lat: " + e.latlng.lat + " lng: " + e.latlng.lng; // wasn't applied
   }
-  OnBigDataFetched = (e) => {
+  onBigDataFetched = (e) => {
     console.log("Fetched BigData Query");
     //if (e.response && e.response[0] && !e.response[0].id)
     this.setState({DownloadList: e.response})
     //  else
-    //this.OnSearchFetched(e)
+    //this.onSearchFetched(e)
   }
-  SetCtrList = (list) => {
+  setCtrList = (list) => {
     this.setState({ctr_list: list})
   }
-  SelectedIndexChange = (e) => {
+  selectedIndexChange = (e) => {
     this.setState({mapSelectedIndex: e})
   }
-  OnRefreshClick = () => {
+  onRefreshClick = () => {
     mymap.setView([
       48.289559, 31.3205566 // Ukraine centered
     ], 6);
-    this.SetMarkers([]);
+    this.setMarkers([]);
     this.setState({lastPoly: []})
   }
+  // Naming conflict -> refactor later
   SelTimeFun = (m) => {
     this.selTimeFun = m;
   }
@@ -250,15 +251,15 @@ export default class Main extends Component {
       currentStation: this.state.currentStation,
       counter: this.state.stationsCounter,
       markers: this.state.MapMarkers,
-      SetCtrList: this.SetCtrList,
-      mapSelectedIndex: this.SelectedIndexChange,
+      setCtrList: this.setCtrList,
+      mapSelectedIndex: this.selectedIndexChange,
       OnPolySelected: this.props.OnPolySelected,
-      OnBigDataFetched: this.OnBigDataFetched,
-      OnSearchFetched: this.OnSearchFetched,
-      ActiveMarker: this.ActiveMarker,
-      PageChanged: this.OnMapPageChanged,
-      OnMarkerClick: this.OnMarkerClick,
-      OnRefreshClick: this.OnRefreshClick,
+      onBigDataFetched: this.onBigDataFetched,
+      onSearchFetched: this.onSearchFetched,
+      activeMarker: this.activeMarker,
+      PageChanged: this.onMapPageChanged,
+      onMarkerClick: this.onMarkerClick,
+      onRefreshClick: this.onRefreshClick,
       SelTime: this.SelTimeFun
     }
     let conts = {

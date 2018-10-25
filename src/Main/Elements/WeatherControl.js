@@ -5,7 +5,7 @@ export default class WeatherControl extends Component {
   componentDidMount() {
     $('[data-toggle="tooltip"]').tooltip();
   }
-  ClassVisiblityConverter(e) {
+  classVisibilityConverter(e) {
     return e === true
       ? ""
       : "disabled";
@@ -110,12 +110,12 @@ export default class WeatherControl extends Component {
 
       <div className="w_footer  d-flex mx-auto flex-column justify-content-center">
         <div className=" mt-0 w_s text-center">
-          <i className={"wi wi-fog wi-fw" + this.ClassVisiblityConverter(e.frshtt.f)} data-toggle="tooltip" data-placement="right" title="" data-original-title="Туман"></i>
-          <i className={"wi wi-rain  wi-fw " + this.ClassVisiblityConverter(e.frshtt.r)} data-toggle="tooltip" data-placement="right" title="" data-original-title="Дощ"></i>
-          <i className={"wi wi-snow wi-fw " + this.ClassVisiblityConverter(e.frshtt.s)} data-toggle="tooltip" data-placement="right" title="" data-original-title="Сніг або крижані пелети"></i>
-          <i className={"wi wi-hail wi-fw " + this.ClassVisiblityConverter(e.frshtt.h)} data-toggle="tooltip" data-placement="right" title="" data-original-title="Град"></i>
-          <i className={"wi wi-thunderstorm wi-fw " + this.ClassVisiblityConverter(e.frshtt.th)} data-toggle="tooltip" data-placement="right" title="" data-original-title="Грім"></i>
-          <i className={"wi wi-tornado wi-fw " + this.ClassVisiblityConverter(e.frshtt.tr)} data-toggle="tooltip" data-placement="right" title="" data-original-title="Торнадо"></i>
+          <i className={"wi wi-fog wi-fw" + this.classVisibilityConverter(e.frshtt.f)} data-toggle="tooltip" data-placement="right" title="" data-original-title="Туман"></i>
+          <i className={"wi wi-rain  wi-fw " + this.classVisibilityConverter(e.frshtt.r)} data-toggle="tooltip" data-placement="right" title="" data-original-title="Дощ"></i>
+          <i className={"wi wi-snow wi-fw " + this.classVisibilityConverter(e.frshtt.s)} data-toggle="tooltip" data-placement="right" title="" data-original-title="Сніг або крижані пелети"></i>
+          <i className={"wi wi-hail wi-fw " + this.classVisibilityConverter(e.frshtt.h)} data-toggle="tooltip" data-placement="right" title="" data-original-title="Град"></i>
+          <i className={"wi wi-thunderstorm wi-fw " + this.classVisibilityConverter(e.frshtt.th)} data-toggle="tooltip" data-placement="right" title="" data-original-title="Грім"></i>
+          <i className={"wi wi-tornado wi-fw " + this.classVisibilityConverter(e.frshtt.tr)} data-toggle="tooltip" data-placement="right" title="" data-original-title="Торнадо"></i>
         </div>
       </div>
     </div>);

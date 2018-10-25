@@ -3,7 +3,7 @@ import {baseUrl} from 'js/const'
 import Station from 'Main/Elements/StationTemplate'
 
 export default class DownloadList extends React.Component {
-  GetItem(e, key, miss) {
+  getItem(e, key, miss) {
     let name,
       link,
       isDwn = !1;
@@ -18,7 +18,7 @@ export default class DownloadList extends React.Component {
         ? baseUrl + link + "?saveas=" + name // don't miss query '?' identifier!!
         : null}/>);
   }
-  GetListElem = (i, key, name) => {
+  getListElem = (i, key, name) => {
     let lkey = 0;
 
     let Missing = name.includes("Miss")
@@ -26,18 +26,18 @@ export default class DownloadList extends React.Component {
       <div className="mx-auto justify-content-center row">{
           i.data.map(
             (item) => (item.id || item.item)
-            ? this.GetItem(item, ++lkey, Missing)
+            ? this.getItem(item, ++lkey, Missing)
             : null)
         }</div>
     </div>;
   }
-  Revolution = (elem, key) => {
+  revolution = (elem, key) => {
 
     return elem.data[0] && elem.data[0].item
-      ? this.GetListElem(elem, key, "Available Data Stations")
-      : this.GetListElem(elem, key, "Missing Data Stations")
+      ? this.getListElem(elem, key, "Available Data Stations")
+      : this.getListElem(elem, key, "Missing Data Stations")
   }
-  WrapR(name, e, data, id) {
+  wrapR(name, e, data, id) {
     let year = this.props.year;
     year = year
       ? '_' + year
@@ -51,15 +51,15 @@ export default class DownloadList extends React.Component {
       <div className="dataw">{data}</div>
     </div>)
   }
-  MainContainer = (e) => {
+  mainContainer = (e) => {
     let key = 0,
       id = 0;
     let d = e || this.props.list;
     if (d.data) {
-      return d.data.map((elem) => this.Revolution(elem, ++key))
+      return d.data.map((elem) => this.revolution(elem, ++key))
     } else if (Array.isArray(d)) {
       return d.map((elem) => {
-        var data = elem.data.map((elem_in) => this.WrapR(elem.item, elem_in.item, this.Revolution(elem_in, ++key), ++id));
+        var data = elem.data.map((elem_in) => this.wrapR(elem.item, elem_in.item, this.revolution(elem_in, ++key), ++id));
 
         return (<div className="container my-4 py-3" key={++id}>
           <h3>{"Data for " + elem.item}</h3>
@@ -78,7 +78,7 @@ export default class DownloadList extends React.Component {
   }
   render() {
     return (<div className="tab-pane fade" id="nav-dwn_list" role="tabpanel" aria-labelledby="nav-dwn_list-tab">
-      {this.MainContainer()}
+      {this.mainContainer()}
     </div>)
   }
 }

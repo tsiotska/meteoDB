@@ -59,11 +59,11 @@ export default class DatePicker extends React.Component {
     this.setState(e);
   }
 
-  DateName() {
+  dateName() {
     var date = this.state.startDate && this.state.startDate.format('DD.MM.YYYY') + " до " + this.state.endDate.format('DD.MM.YYYY')
     return date || "Вибрати дату"
   }
-  OnEraseClick = () => {
+  onEraseClick = () => {
     var e = {
       dateSet: false,
       startDate: null,
@@ -75,11 +75,11 @@ export default class DatePicker extends React.Component {
   render() {
     return (<div className="drp mx-auto d-flex justify-content-center w-100 m-2">
       <DateRangePicker locale={this.state.locale} onApply={this.handleChange}>
-        <button className="drp_btn btn btn-secondary">{this.DateName()}</button>
+        <button className="drp_btn btn btn-secondary">{this.dateName()}</button>
       </DateRangePicker>
       {
         this.state.dateSet
-          ? <Button onClick={this.OnEraseClick}>X</Button>
+          ? <Button onClick={this.onEraseClick}>X</Button>
           : null
       }
     </div>);
