@@ -1,4 +1,3 @@
-
 import {baseUrl} from "js/const"
 //import WeathComposer from "js/Helpers/WeathComposer"
 import FetchController from "js/Helpers/FetchController"
@@ -7,6 +6,7 @@ export class ApiController {
   constructor(loadingStarted, loadingFinished, Progress) {
     this.api = new FetchController(loadingStarted, loadingFinished, Progress)
     this._time = this._year = null;
+    this.database = "gsod" // change later
   }
 
   get time() {
@@ -50,15 +50,15 @@ export class ApiController {
     return this;
   }
   getYears = () => {
-    let link = baseUrl + "/api/db?years=";
+    let link = baseUrl + "/api/" + this.database + "/db?years=";
     return this.mainAPIFetch(link)
   }
   getStationsCount = () => {
-    let link = baseUrl + "/api/db?st_count="
+    let link = baseUrl + "/api/" + this.database + "/db?st_count="
     return this.mainAPIFetch(link)
   }
   getWeathForLatLon = (type, lat, lon) => {
-    let link = baseUrl + '/api/db?t=' + type + '&of=0&lat=' + lat + '&lon=' + lon + (this.year || this.time);
+    let link = baseUrl + '/api/' + this.database + '/db?t=' + type + '&of=0&lat=' + lat + '&lon=' + lon + (this.year || this.time);
     return this.mainAPIFetch(link)
   }
   getStations = () => {
@@ -66,7 +66,7 @@ export class ApiController {
     return this.mainAPIFetch(link)
   }
   getStationsIdsForYear = (year) => {
-    let link = baseUrl + "/api/db?st_year=" + year
+    let link = baseUrl + "/api/" + this.database + "/db?st_year=" + year
     return this.mainAPIFetch(link)
   }
   getWeatherInRange = (start, end) => {
@@ -79,11 +79,11 @@ export class ApiController {
   }
 
   getForWban = (id, wban) => {
-    let link = baseUrl + "/api/db?id=" + id + "&wban=" + wban + this.year
+    let link = baseUrl + "/api/" + this.database + "/db?id=" + id + "&wban=" + wban + this.year
     return this.mainAPIFetch(link)
   }
   getForId = (id) => {
-    let link = baseUrl + "/api/db?id=" + id + this.year
+    let link = baseUrl + "/api/" + this.database + "/db?id=" + id + this.year
     return this.mainAPIFetch(link)
   }
 
