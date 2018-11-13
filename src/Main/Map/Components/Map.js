@@ -69,17 +69,14 @@ export default class MapX extends Component {
     mymap.pm.addControls(options);
     mymap.on('pm:remove', (e) => {
       var lastPoly = this.state.lastPoly
-      var tg = lastPoly.filter((pl) => {
-        var f = pl.layer !== e.layer;
-        return f;
-      });
+      var tg = lastPoly.filter((pl) => pl.layer !== e.layer);
       this.props.OnPolySelected(null)
       this.setState({lastPoly: tg, currentSelected: null})
     });
     mymap.on('pm:create', (e) => {
       var lastPoly = this.state.lastPoly
       lastPoly.push(e)
-      this.setState({lastPoly: lastPoly})
+      this.setState({ lastPoly })
       e.layer.on('pm:dragend', () => {
         this.getMarkersInPoly(e)
         this.fetchMarkers(e)
@@ -97,7 +94,7 @@ export default class MapX extends Component {
   }
   whenReady() {
     mymap = this;
-    mymap.on('click', function() {
+    mymap.on('click', () => {
       if (mymap.scrollWheelZoom.enabled()) {
         mymap.scrollWheelZoom.disable();
       } else {
@@ -113,10 +110,12 @@ export default class MapX extends Component {
     $(e.target._icon).addClass("marker-active")
   }
   renderOne = (w) => {
-    return (<Marker onClick={(e) => {
-        this.onMarkerClick(e);
-        w.click(e)
-      }} key={w.id_cnt} position={w.position}>
+    return (<Marker onClick={
+        (e) => {
+          this.onMarkerClick(e);
+          w.click(e)
+        }
+      } key={w.id_cnt} position={w.position}>
       <Tooltip className="XCustTooltip">
         {w.content}
       </Tooltip>
@@ -125,21 +124,19 @@ export default class MapX extends Component {
 
   fetchMarkers = (e) => {
     e = e.layer;
-    var req = "";
-    var lngs = null;
+    var req = "", lngs = null;
     if (e.options.radius !== undefined) {
       let res = [e._latlng.lat, e._latlng.lng, e.getRadius()]
       req = baseUrl + "/api/db?circ=[" + res + "]";
 
     } else {
       lngs = e._latlngs;
-      var res = lngs.join('],[');
-      req = baseUrl + "/api/db?poly=[" + res + "]";
+      req = baseUrl + "/api/db?poly=[" + lngs.join('],[') + "]";
     }
     $.ajax(req).done((data) => {
       let lastPoly = this.state.lastPoly;
       this.props.onSearchFetched(data, lngs, lastPoly);
-      if (lastPoly.length > 0) 
+      if (lastPoly.length > 0)
         this.props.OnPolySelected(lastPoly[lastPoly.length - 1]);
       if (lastPoly.length > 0) {
         let layer = lastPoly[lastPoly.length - 1];
@@ -148,21 +145,23 @@ export default class MapX extends Component {
     });
   }
   renderMarkers = () => {
-    if (this.props.currentSelected) 
-      return this.props.currentSelected.map((w) => {
-        return this.renderOne(w)
-      })
-    else if (this.props.markers) 
-      return this.props.markers.map((w) => {
-        return this.renderOne(w)
-      })
+    if (this.props.currentSelected)
+      return this.props.currentSelected.map((w) => this.renderOne(w))
+    else if (this.props.markers)
+      return this.props.markers.map((w) => this.renderOne(w))
     return null;
   }
   shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.markers && nextProps.markers[0]) 
-      if (this.props.markers[0] === nextProps.markers[0]) 
+    /*
+    if (nextProps.markers && nextProps.markers[0])
+      if (this.props.markers[0] === nextProps.markers[0])
         return false;
   return true;
+    */
+    return !(
+      nextProps.markers && nextProps.markers[0] &&
+      this.props.markers[0] === nextProps.markers[0]
+    )
   }
   render() {
     const position = [this.state.lat, this.state.lng]

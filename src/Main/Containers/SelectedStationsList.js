@@ -9,7 +9,7 @@ export default class SelectedStationsList extends Component {
     }
   }
   onStationsChange = (selectedPage) => {
-    this.setState({selectedPage: selectedPage});
+    this.setState({ selectedPage });
   }
   render() {
     return (<div className="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">

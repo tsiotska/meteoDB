@@ -24,20 +24,20 @@ class Pagination extends React.Component {
     // reset page if items array has changed
     if (this.props.items !== prevProps.items) {
       this.setPage(this.props.initialPage);
-    } else if (this.props.onSelected !== prevProps.onSelected) 
+    } else if (this.props.onSelected !== prevProps.onSelected)
       this.setPage(this.props.onSelected);
     }
-  
+
   setPage(page) {
     var items = this.props.items;
     var pager = this.state.pager;
 
-    if ((page < 1 || page > pager.totalPages) && pager.totalItems === items.length) 
+    if ((page < 1 || page > pager.totalPages) && pager.totalItems === items.length)
       return;
     pager = this.getPager(items.length, page);
     var pageOfItems = items.slice(pager.startIndex, pager.endIndex + 1);
 
-    this.setState({pager: pager});
+    this.setState({ pager });
     this.props.onChangePage(pageOfItems, page);
   }
 
@@ -46,8 +46,7 @@ class Pagination extends React.Component {
     pageSize = pageSize || 10;
     var totalPages = Math.ceil(totalItems / pageSize);
 
-    var startPage,
-      endPage;
+    var startPage, endPage;
     if (totalPages <= 10) {
       startPage = 1;
       endPage = totalPages;
@@ -70,24 +69,17 @@ class Pagination extends React.Component {
     var pages = _.range(startPage, endPage + 1);
 
     return {
-      totalItems: totalItems,
-      currentPage: currentPage,
-      pageSize: pageSize,
-      totalPages: totalPages,
-      startPage: startPage,
-      endPage: endPage,
-      startIndex: startIndex,
-      endIndex: endIndex,
-      pages: pages
+      totalItems, currentPage, pageSize, totalPages,
+      startPage, endPage, startIndex, endIndex, pages
     };
   }
 
   render() {
     var pager = this.state.pager;
 
-    if (!pager.pages || pager.pages.length <= 1) 
+    if (!pager.pages || pager.pages.length <= 1)
       return null;
-    
+
     return (<ul className="pagination justify-content-center">
       <li className={"page-item " + (
           pager.currentPage === 1

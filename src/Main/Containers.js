@@ -33,8 +33,8 @@ export default class Containers extends React.Component {
           <DaysItemsList selectedPage={this.state.selectedPage} daysItems={this.props.daysItems}/>
           <DownloadList list={this.props.DownloadList}/>
           <ChartX data={{
-              datasets: this.props.daysItems.map(function(i) {
-                let el = i.props.data;
+              datasets: this.props.daysItems.map((e) => {
+                let el = e.props.data;
                 return {label: el.date, data: el.prcp.val}
               })
             }}/>
