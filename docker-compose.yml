@@ -1,8 +1,11 @@
 version: "3"
 services:
-  node:    
-    image: node
+  smdb_front:
+    build: .
+    volumes:
+      - .:/usr/app/
+      - /usr/app/node_modules
     user: ${CURRENT_UID}
-    expose:
-      - "3000"
-    command: "npm start"
+    ports:
+      - "3000:3000"
+    command: npm start
