@@ -1,0 +1,8 @@
+version: "3"
+services:
+  node:    
+    image: node
+    user: ${CURRENT_UID}
+    expose:
+      - "3000"
+    command: "npm start"
