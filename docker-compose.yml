@@ -1,6 +1,7 @@
 version: "3"
 services:
   smdb_front:
+    container_name: smdb_front
     build: .
     volumes:
       - .:/usr/app/
