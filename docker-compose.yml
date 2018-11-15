@@ -8,4 +8,4 @@ services:
     user: ${CURRENT_UID}
     ports:
       - "3000:3000"
-    command: npm start
+    command: bash -c "npm rebuild && npm start"
