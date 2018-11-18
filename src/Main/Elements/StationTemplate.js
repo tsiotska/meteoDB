@@ -1,8 +1,8 @@
 import React from 'react';
-export default(props) => {
+export default (props) => {
 
   const e = props.props;
-  return (<div onClick={() => props.click && props.click(e)} id={'XMarker' + props.id} className="cur_station m-2 d-flex flex-column">
+  return (<div onClick={ () => props.click && props.click(e) } id={'XMarker' + props.id} className="cur_station m-2 d-flex flex-column">
     <div className='st_card col-auto d-flex w_cont flex-column  b-0 st_item text-center'>
       <div className='w_header   d-flex mx-auto   justify-content-center'>
         <div className='w_dt-header px-3 flex-row col-auto mb-0 w_s text-center'>

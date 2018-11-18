@@ -38,9 +38,7 @@ export default class MapComponent extends React.PureComponent {
       if (data && data.response) {
         var cnt = 0;
         this.setState({
-          querySource: data.response.map(function(i) {
-            return i.Item1;
-          }),
+          querySource: data.response.map((i) => i.Item1),
           isLoading: false
         })
         this.props.setCtrList(data.response.map((i) => {
@@ -56,7 +54,7 @@ export default class MapComponent extends React.PureComponent {
     this.props.PageChanged(selectedPage);
     console.log("page markers change");
     this.props.mapSelectedIndex(index)
-    this.setState({selectedPage: selectedPage});
+    this.setState({ selectedPage });
   }
   onTypeChanged = (e) => {
     let p = e.target.value
@@ -139,9 +137,9 @@ export default class MapComponent extends React.PureComponent {
     let reqs = baseUrl + '/api/db?' + qval + time;
     this.props.api.mainAPIFetch(reqs).done((resp) => {
 
-      if (yeartime || this.state.date.dateSet) 
+      if (yeartime || this.state.date.dateSet)
         this.props.onBigDataFetched(resp)
-      else 
+      else
         this.props.onSearchFetched(resp)
     });
   }

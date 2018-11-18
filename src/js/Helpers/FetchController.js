@@ -22,12 +22,8 @@ export default class FetchController {
         xhr: this.onFetchAjax,
         beforeSend: loadingStarted,
         complete: loadingFinished,
-        success: (data) => {
-          return data;
-        },
-        error: function() {
-          return null;
-        }
+        success: (data) => data,
+        error: () => null
       }
     }
   }
@@ -38,7 +34,7 @@ export default class FetchController {
   onFetchAjax = () => {
     let callback = this.state.ProgressCallback
     this.clear();
-    var xhr = new window.XMLHttpRequest(),
+    let xhr = new window.XMLHttpRequest(),
       lenx = 0;
     xhr.onreadystatechange = function() {
       if (this.readyState === this.HEADERS_RECEIVED) {

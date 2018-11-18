@@ -6,9 +6,7 @@ export default class WeatherControl extends Component {
     $('[data-toggle="tooltip"]').tooltip();
   }
   classVisibilityConverter(e) {
-    return e === true
-      ? ""
-      : "disabled";
+    return e === true ? "" : "disabled";
   }
   render() {
     const e = this.props.data;

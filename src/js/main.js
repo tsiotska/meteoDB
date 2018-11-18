@@ -17,18 +17,19 @@ import {baseUrl} from "js/const"
 import Footer from 'Main/Elements/Footer'
 import {ApiController} from 'js/apicontroller'
 import 'js/map_extensions'
-var base = baseUrl,
-  markerGroup = null,
-  Typeahead = require('typeahead');
+
+const Typeahead = require('typeahead');
+
+var base = baseUrl, markerGroup = null;
 
 function genMaker(e, click, content, cnt, i) {
-  return {position: e, click: click, content: content, id_cnt: cnt, data: i}
+  return {position: e, click, content, id_cnt: cnt, data: i}
 }
 export function creativeSt(e, cnt, click) {
   return <Station click={click} key={cnt} id={cnt} props={e}/>;
 }
 function flatten(arr) {
-  return arr.reduce(function(flat, toFlatten) {
+  return arr.reduce((flat, toFlatten) => {
     return flat.concat(
       Array.isArray(toFlatten)
       ? flatten(toFlatten)
@@ -54,7 +55,7 @@ export default class Main extends Component {
       daysItems: [],
       currentSelected: [],
       SelTimeFun: null,
-      Typeahead: Typeahead,
+      Typeahead,
       stationsCounter: null,
       lockM: true
     }
@@ -73,12 +74,8 @@ export default class Main extends Component {
   }
   // react redux use???
   loadingFinished = () => {
-    setTimeout(() => {
-      this.setState({isVisible: false})
-    }, 900)
-    setTimeout(() => {
-      this.setState({loadingProgress: 0})
-    }, 2000)
+    setTimeout(this.setState, 900, { isVisible: false })
+    setTimeout(this.setState, 2000, { loadingProgress: 0 })
   }
   setMarkers = (e) => {
     this.setState({MapMarkers: e})
@@ -90,7 +87,7 @@ export default class Main extends Component {
     var lx = window.location.search.substr(1);
     window.history.replaceState({}, "WeatherConsole", "/#!");
     $('[data-toggle="tooltip"]').tooltip();
-    $('nav a').click(function(e) {
+    $('nav a').click((e) => {
       e.preventDefault();
     });
 
@@ -118,22 +115,17 @@ export default class Main extends Component {
     this.setState({lockM: true})
     this.setState({stationsCounter: <CountCircle response={resp}/>})
     console.log(resp);
-    if (resp.code === 33)
-      return;
-    var data = (!resp.Item2)
-      ? resp
-      : resp.Item2; // hardcoded. maybe review API models
+    if (resp.code === 33) return;
+    var data = !resp.Item2 ? resp : resp.Item2; // hardcoded. maybe review API models
     if (data.response && Array.isArray(data.response) && data.response[0].item) {
-      data.response = flatten(data.response.map(function(e) {
-        return e.data
-      }));
+      data.response = flatten(data.response.map((e) => e.data));
     }
     if (markerGroup)
       mymap.removeLayer(markerGroup);
     markerGroup = L.layerGroup().addTo(mymap);
 
     let cnt = 0;
-    let fx = Array.isArray(data.response) && data.response.filter(function(i) {
+    let fx = Array.isArray(data.response) && data.response.filter((i) => {
       return i.lat && i.lon && i.lat !== '+00.000';
     });
     if (fx)
@@ -207,9 +199,7 @@ export default class Main extends Component {
       this.setState({lockM: false})
       return;
     }
-    var t = e.map((r) => {
-      return r.position;
-    });
+    var t = e.map((r) => r.position);
     if (t.length > 0) {
       mymap.fitBounds(t);
     }

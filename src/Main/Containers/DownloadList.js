@@ -52,8 +52,7 @@ export default class DownloadList extends React.Component {
     </div>)
   }
   mainContainer = (e) => {
-    let key = 0,
-      id = 0;
+    let key = 0, id = 0;
     let d = e || this.props.list;
     if (d.data) {
       return d.data.map((elem) => this.revolution(elem, ++key))
@@ -71,10 +70,7 @@ export default class DownloadList extends React.Component {
     return null
   }
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.props.list) 
-      if (this.props.list === nextProps.list) 
-        return false;
-  return true;
+    return !(this.props.list && this.props.list === nextProps.list)
   }
   render() {
     return (<div className="tab-pane fade" id="nav-dwn_list" role="tabpanel" aria-labelledby="nav-dwn_list-tab">
