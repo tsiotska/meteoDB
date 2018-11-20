@@ -33,7 +33,7 @@ export default class MapComponent extends React.PureComponent {
   }
   componentDidMount() {
     this.props.SelTime(this.getSelectedTime.bind(this))
-    this.ajax = $.ajax(baseUrl + "/api/db?st_count=")
+    this.ajax = $.ajax(baseUrl + "/api/gsod/db?st_count=")
     this.ajax.done((data) => {
       if (data && data.response) {
         var cnt = 0;
@@ -58,7 +58,7 @@ export default class MapComponent extends React.PureComponent {
   }
   onTypeChanged = (e) => {
     let p = e.target.value
-    this.props.api.mainAPIFetch(baseUrl + '/api/db?getTypeList&t=' + p).done((data) => {
+    this.props.api.mainAPIFetch(baseUrl + '/api/gsod/db?getTypeList&t=' + p).done((data) => {
       this.setState({querySource: data.response})
     })
   }
@@ -134,7 +134,7 @@ export default class MapComponent extends React.PureComponent {
       polyreq
       ? polyreq
       : 't=' + this.s_type.current.value + neighbors + querytype + names);
-    let reqs = baseUrl + '/api/db?' + qval + time;
+    let reqs = baseUrl + '/api/gsod/db?' + qval + time;
     this.props.api.mainAPIFetch(reqs).done((resp) => {
 
       if (yeartime || this.state.date.dateSet)
