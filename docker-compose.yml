@@ -2,11 +2,7 @@ version: "3"
 services:
   smdb_front:
     container_name: smdb_front
-    build: .
-    volumes:
-      - .:/usr/app/
-      - ./node_modules:/node_modules
-    user: ${CURRENT_UID}
+    build: .  
     ports:
       - "3000:3000"
-    command: bash -c "npm rebuild && npm start"
+    command: bash -c "npm start"
