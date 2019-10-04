@@ -1,6 +1,6 @@
 import React from 'react';
-import {baseUrl} from 'js/const'
-import Station from 'Main/Elements/StationTemplate'
+import {baseUrl} from '../../js/const'
+import Station from '../../Main/Elements/StationTemplate'
 
 export default class DownloadList extends React.Component {
   getItem(e, key, miss) {

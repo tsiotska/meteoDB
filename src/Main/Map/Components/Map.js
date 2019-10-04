@@ -4,7 +4,7 @@ import L from 'leaflet';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import $ from 'jquery';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
-import {baseUrl} from 'js/const';
+import {baseUrl} from '../../../js/const';
 export var mymap = null,
   markerGroup;
 

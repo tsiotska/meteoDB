@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {empt} from 'js/const'
+import {empt} from '../../js/const'
 export default class CountryList extends Component {
   render() {
     return (<div className="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import Pagination from 'Main/Controls/Pagination'
-import {empt} from 'js/const'
+import Pagination from '../../Main/Controls/Pagination'
+import {empt} from '../../js/const'
 export default class DaysItemsList extends Component {
   constructor(props) {
     super(props)

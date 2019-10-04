@@ -1,12 +1,12 @@
 import React from 'react';
 import {Button} from 'reactstrap';
 import Map from './Components/Map';
-import Pagination from 'Main/Controls/Pagination';
-import {baseUrl} from 'js/const';
-import DatePicker from 'Main/Controls/DatePicker'
+import Pagination from '../../Main/Controls/Pagination';
+import {baseUrl} from '../../js/const';
+import DatePicker from '../../Main/Controls/DatePicker'
 import $ from 'jquery';
 import {Typeahead} from 'react-bootstrap-typeahead';
-import CountryItem from 'Main/Elements/CountryItemTemplate';
+import CountryItem from '../../Main/Elements/CountryItemTemplate';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-daterangepicker/daterangepicker.css';
@@ -182,7 +182,7 @@ export default class MapComponent extends React.PureComponent {
   }
 
   render() {
-    console.log("map Component redraw");
+    console.log("map Component!!!");
     return (<div className="main_map container-fluid p-0">
       <Map activeMarker={this.props.activeMarker} OnPolySelected={this.setLastPoly} onSearchFetched={this.props.onSearchFetched} markers={this.state.selectedPage} currentSelected={this.props.markers}/>
       <div className="cur_count_wrapper">

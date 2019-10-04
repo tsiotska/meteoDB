@@ -3,12 +3,12 @@ const path = require('path');
 const app = express();
 
 function getIPAddress() {
-  var interfaces = require('os').networkInterfaces();
-  for (var devName in interfaces) {
-    var iface = interfaces[devName];
+  const interfaces = require('os').networkInterfaces();
+  for (const devName in interfaces) {
+    const iface = interfaces[devName];
 
-    for (var i = 0; i < iface.length; i++) {
-      var alias = iface[i];
+    for (let i = 0; i < iface.length; i++) {
+      const alias = iface[i];
       if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal)
         return alias.address;
     }
@@ -24,5 +24,5 @@ app.get('/', function (req, res) {
 });
 
 process.env.XIP = getIPAddress();
-console.log(process.env.XIP )
+console.log(process.env.XIP);
 app.listen(3000);

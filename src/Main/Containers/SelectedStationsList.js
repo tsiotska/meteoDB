@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import Pagination from 'Main/Controls/Pagination'
-import {empt} from 'js/const'
+import Pagination from '../../Main/Controls/Pagination'
+import {empt} from '../../js/const'
 export default class SelectedStationsList extends Component {
   constructor(props) {
     super(props)
@@ -10,7 +10,7 @@ export default class SelectedStationsList extends Component {
   }
   onStationsChange = (selectedPage) => {
     this.setState({ selectedPage });
-  }
+  };
   render() {
     return (<div className="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
       {
