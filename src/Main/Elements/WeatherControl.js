@@ -10,6 +10,8 @@ export default class WeatherControl extends Component {
   }
   render() {
     const e = this.props.data;
+    console.log("WeatherControl: ");
+    console.log(this.props)
     return (<div className="col-sm col-lg-6 d-flex flex-column  weath my-2">
       <div className="w_header   d-flex mx-auto   justify-content-center">
         <div className="w_dt-header px-4 flex-row col-auto mb-0 w_s text-center">
@@ -20,31 +22,31 @@ export default class WeatherControl extends Component {
       <div className="row mx-auto  w_cont justify-content-center p-3">
         <div className="w_out">
           <div className="w_selector"><input type="checkbox"/>
-            <span className="w_mark"></span>
+            <span className="w_mark"/>
           </div>
         </div>
         <div className="w_fx col-xs col-xs-12 align-self-center">
           <div className=" d-flex">
-            <i className="wi wi-stars wi-fw"></i>
+            <i className="wi wi-stars wi-fw"/>
             <p data-toggle="tooltip" data-placement="right" title="" data-original-title="Видимість">{e.vis.val}</p>
             <p>
               <span className="badge badge-primary badge-pill" data-toggle="tooltip" data-placement="right" title="" data-original-title="Кількість вимірювань">{e.vis.flag}</span>
             </p>
           </div>
           <div className="d-flex">
-            <i className="wi wi-raindrops wi-fw"></i>
+            <i className="wi wi-raindrops wi-fw"/>
             <p data-toggle="tooltip" data-placement="right" title="" data-original-title="Опади">{e.prcp.val}mm</p>
             <p>
               <span className="badge badge-primary badge-pill" data-toggle="tooltip" data-placement="right" title="" data-original-title="Кількість вимірювань">{e.prcp.flag}</span>
             </p>
           </div>
           <div className="d-flex">
-            <i className="wi  wi-cloud-down wi-fw"></i>
+            <i className="wi  wi-cloud-down wi-fw"/>
             <p data-toggle="tooltip" data-placement="right" title="" data-original-title="Глибина снігу">{e.sndp}mm</p>
           </div>
           <div className="d-flex">
-            <i className="wi wi-horizon wi-fw"></i>
-            <i className="wi wi-barometer wi-fw"></i>
+            <i className="wi wi-horizon wi-fw"/>
+            <i className="wi wi-barometer wi-fw"/>
             <p data-toggle="tooltip" data-placement="right" title="" data-original-title="Атмосферний тиск на рівні моря">{e.slp.val}mm</p>
             <p>
               <span className="badge badge-primary badge-pill" data-toggle="tooltip" data-placement="right" title="" data-original-title="Кількість вимірювань">{e.slp.flag}</span>
@@ -52,8 +54,8 @@ export default class WeatherControl extends Component {
           </div>
           <div className="d-flex">
             <p data-toggle="tooltip" data-placement="right" title="" data-original-title="Атмосферний тиск на станції">
-              <i className="wi wi-small-craft-advisory wi-fw"></i>
-              <i className="wi wi-barometer wi-fw"></i>{e.stp.val}</p>
+              <i className="wi wi-small-craft-advisory wi-fw"/>
+              <i className="wi wi-barometer wi-fw"/>{e.stp.val}</p>
             <p>
               <span className="badge badge-primary badge-pill" data-toggle="tooltip" data-placement="right" title="" data-original-title="Кількість вимірювань">{e.stp.flag}</span>
             </p>

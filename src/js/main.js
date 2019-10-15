@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import $ from 'jquery';
+import axios from 'axios';
 import {mymap} from '../Main/Map/Components/Map';
 import L from 'leaflet';
 import WeatherControl from "../Main/Elements/WeatherControl";
@@ -20,14 +21,13 @@ import 'js/map_extensions'
 
 const Typeahead = require('typeahead');
 
-const base = baseUrl;
-let markerGroup = null;
+var base = baseUrl, markerGroup = null;
 
 function genMaker(e, click, content, cnt, i) {
   return {position: e, click, content, id_cnt: cnt, data: i}
 }
 
-export function creativeSt(e, cnt, click) {
+export function createStation(e, cnt, click) {
   return <Station click={click} key={cnt} id={cnt} props={e}/>;
 }
 
@@ -59,10 +59,10 @@ export default class Main extends Component {
       daysItems: [],
       currentSelected: [],
       SelTimeFun: null,
-      Typeahead,
       stationsCounter: null,
-      lockM: true
+      lockM: true,
     };
+
     this.onMarkerClick = throttle(this.onMarkerClickBase, 500)
   }
 
@@ -73,44 +73,69 @@ export default class Main extends Component {
 
   setDocumentVars = () => {
     const lx = window.location.search.substr(1);
-    console.log("My address: ");
-    console.log(lx);
 
     window.history.replaceState({}, "WeatherConsole", "/#!");
     $('[data-toggle="tooltip"]').tooltip();
     $('nav a').click((e) => {
       e.preventDefault();
     });
-    //FIRST REQUEST!
-    this.state.api.getYears().done((data) => {
-      Typeahead($("#years")[0], {source: data.response});
-      $("#years").removeAttr('readonly');
-    });
 
-    if (lx && !lx.includes('react_perf')) {
-      $.ajax(base + "/api/db?" + lx).done((data) => {
-        console.log("if have address ");
-        console.log(data.response);
-        this.setWeathItem(data.response);
-      });
+    //Invalid запит на /gsod/years
+    /* this.state.api.getYears().done((data) => {
+       Typeahead($("#years")[0], {source: data.response});
+       $("#years").removeAttr('readonly');
+     });*/
+
+    // Можна було б здобути локацію пользоватєля і збросити його колишні запити станцій на його країну
+    /* axios.get("https://ipinfo.io")
+       .then((response) => {
+         console.log("Your adress...");
+         console.log(response.city, response.country);
+       }).catch((error) => console.log(error));*/
+
+    //Тут навєрно наварив
+    //Можливо убери lx.includes('stations')
+    if (lx.includes('stations') && !lx.includes('react_perf')) {
+      //Будь-який запит на станцію
+      axios.get(base + '/api/gsod/stations/?' + lx)
+        .then((station) => {
+          console.log(station);
+          //І втулю йому свіжі погодні дані
+          let date = new Date();
+          let weatherLink = base + '/api/gsod/stations?' + lx + '&year='
+            + date.getFullYear() + '&month=' + date.getMonth() + '&day=' + date.getDate();
+          axios.get(weatherLink)
+            .then((weather) => {
+              console.log();
+              if (station.data.response != null || weather.data.response != null) {
+                this.setWeathItem(station.data.response[0], weather.data.response);
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
     }
   };
 
-  setWeathItem = (e) => {
-    var data = e.response,
-      cnt = 0;
-    if (data.data) {
-      this.setState({
-        currentStation: creativeSt(data.item, 0, this.onStationClick)
-      });
-      if (data.data.Item2) { // hardcoded, I know
-        this.setState({
-          daysItems: data.data.Item2.map((i) => {
-            return this.creativeDay(i, cnt++);
-          })
-        })
-      }
-    }
+  setWeathItem = (station, weather) => {
+    console.log(station);
+    let cnt = 0;
+    //Чого тільки одна станція може бути
+    this.setState({currentStation: createStation(station, 0, this.onStationClick)});
+
+    this.setState({
+      daysItems: weather.map((i) => {
+        return this.creativeDay(i, cnt++);
+      })
+    })
+  };
+
+  creativeDay = (e, cnt) => {
+    return <WeatherControl key={cnt} data={e}/>;
   };
 
   progressChanged = (amount) => {
@@ -120,7 +145,7 @@ export default class Main extends Component {
   loadingStarted = () => {
     this.setState({isVisible: true});
   };
-  // react redux use???
+
   loadingFinished = () => {
     setTimeout(this.setState, 900, {isVisible: false});
     setTimeout(this.setState, 2000, {loadingProgress: 0});
@@ -130,93 +155,92 @@ export default class Main extends Component {
     this.setState({MapMarkers: e})
   };
 
-  creativeDay(e, cnt) {
-    return <WeatherControl key={cnt} data={e}/>;
-  }
-
-
   onStationClick = (e) => {
     this.setState({
-      currentStation: creativeSt(e, 0, this.onStationClick)
+      currentStation: createStation(e, 0, this.onStationClick)
     });
-    this.getWeathForLatLon(e);
+    this.getStationsData(e, 'circle', 1);
   };
 
-  onSearchFetched = (resp, lngs) => {
-    console.log("Fetched search");
-    this.setState({lockM: true});
-    this.setState({stationsCounter: <CountCircle response={resp}/>})
-    console.log(resp);
-    if (resp.code === 33) return;
-    var data = !resp.Item2 ? resp : resp.Item2; // hardcoded. maybe review API models
-    if (data.response && Array.isArray(data.response) && data.response[0].item) {
-      data.response = flatten(data.response.map((e) => e.data));
-    }
-    if (markerGroup)
-      mymap.removeLayer(markerGroup);
-    markerGroup = L.layerGroup().addTo(mymap);
+  getStationsData = (t, type, radius) => {
+    console.log("FUCK")
+    console.log(t)
+    let g = this.selTimeFun();
+    let isYear = g.includes('year');
+    isYear ? this.state.api.ofTimeExp(g) : this.state.api.ofRangeExp(g);
 
-    let cnt = 0;
-    let fx = Array.isArray(data.response) && data.response.filter((i) => {
-      return i.lat && i.lon && i.lat !== '+00.000';
+    let lat = t.lat;
+    let lon = t.lon || t.lng; //
+
+    this.state.api.getStationByLatLon(type, lat, lon, radius).then((station) => {
+      console.log("Station");
+      console.log(station);
+      this.state.api.getWeathByLatLon(type, lat, lon, radius).then((weather) => {
+        console.log("Weather!");
+        console.log(weather);
+        this.setWeathItem(station.response[0], weather.response);
+      }).catch((error) => console.log(error))
     });
-    if (fx)
-      this.setState({
-        stationsAll: fx.map((i) => creativeSt(i, cnt++, this.onStationClick))
-      });
-    var markers = [],
-      area_latlon = [];
-    for (var o = 0; o < fx.length; o++) {
-      var i = fx[o];
-
-      let lt = L.latLng(i.lat, i.lon);
-      area_latlon.push(lt);
-      markers.push(genMaker(lt, this.onMarkerClick, creativeSt(i), o, i));
-    }
-    this.setMarkers(markers);
-    mymap.fitBounds(L.latLngBounds(lngs || area_latlon));
   };
 
   onMarkerClick() {
     this.onMarkerClick.cancel()
   }
 
-  getWeathForLatLon = (t) => {
-    let g = this.selTimeFun();
-    let isYear = g.includes('year');
-    let api = isYear
-      ? this.state.api.ofTimeExp(g)
-      : this.state.api.ofRangeExp(g);
-    api.getWeathForLatLon($('#type').val(), t.lat, t.lng).done((data) => {
-      this.setWeathItem(data);
-    });
-  };
-
   onMarkerClickBase = (e) => {
-    var t = e.target.getLatLng();
-    this.getWeathForLatLon(t);
+    const t = e.target.getLatLng();
+    this.getStationsData(t, "circle", 1);
   };
 
-  createPageNavItem(name, full_href, href, cnt, active = false, disabled = false) {
-    var hrefx = href
-      ? href
-      : full_href;
-    return <PageNav href={hrefx} key={cnt} active={active} text={name} disabled={disabled} onClick={(e) => {
-      e.preventDefault();
-      this.getData(full_href);
-      return false
-    }}/>;
-  }
-
-  getData = (e) => {
-    this.state.api.mainAPIFetch(e).done((data) => {
-      //console.log(data);
-      this.setWeathItem(data);
+  onStationsData = (station, lngs) => {
+    this.setState({lockM: true});
+    this.setState({stationsCounter: <CountCircle response={station}/>});
+    if (station.code === 33) return;
+    //Не понімаю.
+    // const data = !resp.Item2 ? resp : resp.Item2; // hardcoded. maybe review API models
+    const data = station;
+    if (data.response && Array.isArray(data.response) && data.response[0].item) {
+      data.response = flatten(data.response.map((e) => e.data));
+    }
+    if (markerGroup) mymap.removeLayer(markerGroup);
+    markerGroup = L.layerGroup().addTo(mymap);
+    let cnt = 0;
+    let fx = Array.isArray(data.response) && data.response.filter((i) => {
+      return i.lat && i.lon && i.lat !== '+00.000';
     });
+    if (fx)
+      this.setState({
+        stationsAll: fx.map((i) => createStation(i, cnt++, this.onStationClick))
+      });
+    const markers = [], area_latlon = [];
+    for (let o = 0; o < fx.length; o++) {
+      let i = fx[o];
+      let lt = L.latLng(i.lat, i.lon);
+      area_latlon.push(lt);
+      markers.push(genMaker(lt, this.onMarkerClick, createStation(i), o, i));
+    }
+    this.setMarkers(markers);
+    mymap.fitBounds(L.latLngBounds(lngs || area_latlon));
   };
 
-  setHandlers = () => {
-  };
+  /* createPageNavItem(name, full_href, href, cnt, active = false, disabled = false) {
+     var hrefx = href
+       ? href
+       : full_href;
+     return <PageNav href={hrefx} key={cnt} active={active} text={name} disabled={disabled} onClick={(e) => {
+       e.preventDefault();
+       this.getData(full_href);
+       return false
+     }}/>;
+   }
+
+   getData = (e) => {
+     this.state.api.fetchData(e).then((data) => {
+       this.setWeathItem(data);
+     }).catch((error) => console.log(error))
+   };*/
+
+  setHandlers = () => {};
 
   onMapPageChanged = (e) => {
     if (this.state.lockM) {
@@ -229,20 +253,46 @@ export default class Main extends Component {
     }
   };
 
-  activeMarker(e) {
+  activeMarker = (e) => {
     console.log("Active: " + e.options.position)
-  }
+  };
 
-  onMouseMove(e) {
+  onMouseMove = (e) => {
     return "lat: " + e.latlng.lat + " lng: " + e.latlng.lng; // wasn't applied
-  }
+  };
 
-  onBigDataFetched = (e) => {
-    console.log("Fetched BigData Query");
-    //if (e.response && e.response[0] && !e.response[0].id)
-    this.setState({DownloadList: e.response})
-    //  else
-    //this.onSearchFetched(e)
+  onStationsAndWeathersData = (station, weather) => {
+    console.log("Get station and weather");
+    /*const data = station;
+    if (data.response && Array.isArray(data.response) && data.response[0].item) {
+      data.response = flatten(data.response.map((e) => e.data));
+    }
+    if (markerGroup) mymap.removeLayer(markerGroup);
+    markerGroup = L.layerGroup().addTo(mymap);
+    let cnt = 0;
+    let fx = Array.isArray(data.response) && data.response.filter((i) => {
+      return i.lat && i.lon && i.lat !== '+00.000';
+    });
+    if (fx)
+      this.setState({
+        stationsAll: fx.map((i) => creativeSt(i, cnt++, this.onStationClick))
+      });
+    const markers = [], area_latlon = [];
+    for (let o = 0; o < fx.length; o++) {
+      let i = fx[o];
+      let lt = L.latLng(i.lat, i.lon);
+      area_latlon.push(lt);
+      markers.push(genMaker(lt, this.onMarkerClick, creativeSt(i), o, i));
+    }
+    this.setMarkers(markers);
+    mymap.fitBounds(L.latLngBounds(lngs || area_latlon));*/
+
+    /* this.setState({
+       daysItems: weather.map((i) => {
+         return this.creativeDay(i, cnt++);
+       })
+     })*/
+    //this.setState({DownloadList: e.response})
   };
 
   setCtrList = (list) => {
@@ -267,7 +317,6 @@ export default class Main extends Component {
   };
 
   render() {
-
     let comp = {
       api: this.state.api,
       currentSelected: this.state.currentSelected,
@@ -277,14 +326,14 @@ export default class Main extends Component {
       setCtrList: this.setCtrList,
       mapSelectedIndex: this.selectedIndexChange,
       OnPolySelected: this.props.OnPolySelected,
-      onBigDataFetched: this.onBigDataFetched,
-      onSearchFetched: this.onSearchFetched,
+      onStationsAndWeathersData: this.onStationsAndWeathersData,
+      onStationsData: this.onStationsData,
       activeMarker: this.activeMarker,
       PageChanged: this.onMapPageChanged,
       onMarkerClick: this.onMarkerClick,
       onRefreshClick: this.onRefreshClick,
       SelTime: this.SelTimeFun
-    }
+    };
 
     let conts = {
       ctr_list: this.state.ctr_list,
@@ -293,7 +342,7 @@ export default class Main extends Component {
       selectedStations: this.state.stationsAll,
       stations: this.state.stationsAll,
       daysItems: this.state.daysItems
-    }
+    };
 
     return (<div className="container-fluid p-0">
       <Nav/>
@@ -304,3 +353,4 @@ export default class Main extends Component {
     </div>)
   }
 };
+

@@ -1,12 +1,13 @@
 import {baseUrl} from "../js/const"
-import WeathComposer from "js/Helpers/WeathComposer"
+//import WeathComposer from "js/Helpers/WeathComposer"
 import FetchController from "../js/Helpers/FetchController"
+import axios from 'axios';
 
 export class ApiController {
   constructor(loadingStarted, loadingFinished, Progress) {
     this.api = new FetchController(loadingStarted, loadingFinished, Progress);
     this._time = this._year = null;
-    this.database = "gsod" // change later
+    this.database = "gsod"; // change later
   }
 
   get time() {
@@ -29,20 +30,9 @@ export class ApiController {
     this._time = value;
   }
 
-  mainAPIFetch = (link) => {
-    return this.api.Get(link);
-  };
-
-
   ofTimeExp = (exp) => {
     this._time = this._year = null;
     this._year = exp;
-    return this;
-  };
-
-  ofTime = (year) => {
-    this._time = this._year = null;
-    this._year = '&year=' + year;
     return this;
   };
 
@@ -52,56 +42,49 @@ export class ApiController {
     return this;
   };
 
-  ofRange = (start, end) => {
-    this._time = this._year = null;
-    this._time = '&s=' + start + '&e=' + end;
-    return this;
+  fetchData = (link) => {
+    return this.api.Get(link);
   };
 
-
-  getYears = () => {
-    let link = baseUrl + "/api/" + this.database + "years";
-    return this.mainAPIFetch(link)
+  getYears = () => { //Беремо просто роки
+    let link = baseUrl + "/api/" + this.database + "/years";
+    return this.fetchData(link);
   };
 
-  getStationsCount = () => {
-    let link = baseUrl + "/api/" + this.database + "/db?st_count=";
-    return this.mainAPIFetch(link)
+  getStationByLatLon = (type, lat, lon, rad) => {
+    let radius = rad + 'km';
+    let link = baseUrl + '/api/' + this.database + '/poly?type=' + type + '&value=[' + lat + ',' + lon + ',' + radius + ']';
+    return this.fetchData(link)
   };
 
-  getWeathForLatLon = (type, lat, lon) => {
-    let link = baseUrl + '/api/' + this.database + '/db?t=' + type + '&of=0&lat=' + lat + '&lon=' + lon + (this.year || this.time);
-    return this.mainAPIFetch(link)
-  };
-
-  getStations = () => {
-    let link = baseUrl
-    return this.mainAPIFetch(link)
+  getWeathByLatLon = (type, lat, lon, rad) => {
+    if (!this.time && !this.year) {
+      console.log("TIME is undefined ");
+      this.year = '&year=2016'
+    } else {
+      console.log("TIME: ");
+      console.log(this.year);
+      console.log(this.time)
+    }
+    let radius = rad + 'km';
+    let link = baseUrl + '/api/' + this.database + '/poly?type=' + type + '&value=[' + lat + ',' + lon + ',' + radius + ']' + (this.year || this.time);
+    return this.fetchData(link)
   };
 
   getStationsIdsForYear = (year) => {
-    let link = baseUrl + "/api/" + this.database + "/db?st_year=" + year;
-    return this.mainAPIFetch(link)
-  };
-
-  getWeatherInRange = (start, end) => {
-    let link = baseUrl + this.time
-    return this.mainAPIFetch(link)
-  };
-
-  getWeatherForStations = () => {
-    let link = baseUrl + ''
-    return this.mainAPIFetch(link)
+    ///api/gsod/stations?limit=1&year=2018
+    let link = baseUrl + "/api/" + this.database + "stations?limit=1&year=" + year;
+    return this.fetchData(link)
   };
 
   getForWban = (id, wban) => {
     let link = baseUrl + "/api/" + this.database + "/db?id=" + id + "&wban=" + wban + this.year;
-    return this.mainAPIFetch(link)
+    return this.fetchData(link)
   };
 
   getForId = (id) => {
     let link = baseUrl + "/api/" + this.database + "/db?id=" + id + this.year;
-    return this.mainAPIFetch(link)
+    return this.fetchData(link)
   }
 
 }

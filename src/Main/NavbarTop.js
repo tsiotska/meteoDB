@@ -12,9 +12,9 @@ export default class NavbarTop extends React.Component {
     }
   }
 
-  onMouseMove(e) {
+  onMouseMove=(e)=> {
     return "lat: " + e.latlng.lat + " lng: " + e.latlng.lng;
-  }
+  };
   // [TASK] Load name, version from manifest
   render() {
     return (<nav className="navbar sticky-to navbar-light bg-light">

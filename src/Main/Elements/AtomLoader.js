@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 export default class LoaderReactor extends Component {
   render() {
     return (<div className={"x_loader " + (
-      this.props.isVisible
+        this.props.isVisible
         ? 'top'
         : 'fade')}>
       <div className="st_loader_reactor m-auto">
@@ -52,8 +52,8 @@ export default class LoaderReactor extends Component {
         <div className="progress-x">
           <div className="progress">
             <div className="progress-bar" role="progressbar" style={{
-              width: this.props.progress * 100 + "%"
-            }} aria-valuemin="0" aria-valuemax="100"/>
+  width: this.props.progress * 100 + "%"
+}} aria-valuemin="0" aria-valuemax="100"/>
           </div>
         </div>
       </div>

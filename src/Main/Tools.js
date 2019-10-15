@@ -1,5 +1,6 @@
 import turf from 'turf'
 import L from 'leaflet';
+
 export L.Polygon.include({
   contains: function(latLng) {
     return turf.inside(new L.Marker(latLng).toGeoJSON(), this.toGeoJSON());

@@ -3,15 +3,18 @@ import Pagination from '../../Main/Controls/Pagination'
 import {empt} from '../../js/const'
 export default class DaysItemsList extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       selectedPage: []
     }
   }
   onChangePage = (selectedPage) => {
     this.setState({ selectedPage });
-  }
+  };
+
   render() {
+    console.log("DaysItemsList: ");
+    console.log(this.props);
     return (<div className="tab-pane fade" id="nav-res" role="tabpanel" aria-labelledby="nav-res-tab">
       <div className="container d-flex  flex-column justify-content-center">
         {
