@@ -6,7 +6,7 @@ import L from 'leaflet';
 import WeatherControl from "../Main/Elements/WeatherControl";
 import PageNav from '../Main/Controls/PageNavItem';
 import Station from '../Main/Elements/StationTemplate';
-import MapComponent from '../Main/Map/MapComponent'
+import MenuComponent from '../Main/Map/MenuComponent'
 import 'leaflet-selectareafeature';
 import throttle from 'lodash/throttle';
 import Nav from '../Main/NavbarTop';
@@ -54,103 +54,54 @@ export default class Main extends Component {
       togglerSelect: false,
       markerGroup: null,
       isVisible: false,
-      loadingProgress: 0,
-      api: new ApiController(this.loadingStarted, this.loadingFinished, this.progressChanged),
+      //loadingProgress: 0,
+      api: new ApiController(this.loaderVisibility), //this.loadingStarted, this.loadingFinished, this.progressChanged,
       daysItems: [],
       currentSelected: [],
       SelTimeFun: null,
       stationsCounter: null,
       lockM: true,
+      readyToDownload: false
     };
 
     this.onMarkerClick = throttle(this.onMarkerClickBase, 500)
   }
 
-  componentDidMount() {
-    this.setHandlers();
-    this.setDocumentVars();
-  }
-
-  setDocumentVars = () => {
-    const lx = window.location.search.substr(1);
-
-    window.history.replaceState({}, "WeatherConsole", "/#!");
-    $('[data-toggle="tooltip"]').tooltip();
-    $('nav a').click((e) => {
-      e.preventDefault();
-    });
-
-    //Invalid запит на /gsod/years
-    /* this.state.api.getYears().done((data) => {
-       Typeahead($("#years")[0], {source: data.response});
-       $("#years").removeAttr('readonly');
-     });*/
-
-    // Можна було б здобути локацію пользоватєля і збросити його колишні запити станцій на його країну
-    /* axios.get("https://ipinfo.io")
-       .then((response) => {
-         console.log("Your adress...");
-         console.log(response.city, response.country);
-       }).catch((error) => console.log(error));*/
-
-    //Тут навєрно наварив
-    //Можливо убери lx.includes('stations')
-    if (lx.includes('stations') && !lx.includes('react_perf')) {
-      //Будь-який запит на станцію
-      axios.get(base + '/api/gsod/stations/?' + lx)
-        .then((station) => {
-          console.log(station);
-          //І втулю йому свіжі погодні дані
-          let date = new Date();
-          let weatherLink = base + '/api/gsod/stations?' + lx + '&year='
-            + date.getFullYear() + '&month=' + date.getMonth() + '&day=' + date.getDate();
-          axios.get(weatherLink)
-            .then((weather) => {
-              console.log();
-              if (station.data.response != null || weather.data.response != null) {
-                this.setWeathItem(station.data.response[0], weather.data.response);
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-            })
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-    }
+  loaderVisibility = (flag) => {
+    this.setState({isVisible: flag});
   };
 
-  setWeathItem = (station, weather) => {
+  setCardItem = (station, weather) => {
     console.log(station);
     let cnt = 0;
-    //Чого тільки одна станція може бути
     this.setState({currentStation: createStation(station, 0, this.onStationClick)});
 
-    this.setState({
-      daysItems: weather.map((i) => {
-        return this.creativeDay(i, cnt++);
+    if (weather) {
+      this.setState({
+        daysItems: weather.map((i) => {
+          return this.creativeDay(i, cnt++);
+        })
       })
-    })
+    }
   };
 
   creativeDay = (e, cnt) => {
     return <WeatherControl key={cnt} data={e}/>;
   };
+  /*
+    progressChanged = (amount) => {
+      this.setState({loadingProgress: amount});
+    };
 
-  progressChanged = (amount) => {
-    this.setState({loadingProgress: amount});
-  };
+    loadingStarted = () => {
+      this.setState({isVisible: true});
+    };
 
-  loadingStarted = () => {
-    this.setState({isVisible: true});
-  };
-
-  loadingFinished = () => {
-    setTimeout(this.setState, 900, {isVisible: false});
-    setTimeout(this.setState, 2000, {loadingProgress: 0});
-  };
-
+    loadingFinished = () => {
+      setTimeout(this.setState, 900, {isVisible: false});
+      setTimeout(this.setState, 2000, {loadingProgress: 0});
+    };
+  */
   setMarkers = (e) => {
     this.setState({MapMarkers: e})
   };
@@ -163,25 +114,35 @@ export default class Main extends Component {
   };
 
   getStationsData = (t, type, radius) => {
-    console.log("FUCK")
-    console.log(t)
-    let g = this.selTimeFun();
-    let isYear = g.includes('year');
-    isYear ? this.state.api.ofTimeExp(g) : this.state.api.ofRangeExp(g);
+    console.log("Clicked!");
+    let time = this.selTimeFun();
+    let isYear = time.includes('year');
+    isYear ? this.state.api.ofTimeExp(time) : this.state.api.ofRangeExp(time);
 
     let lat = t.lat;
     let lon = t.lon || t.lng; //
 
     this.state.api.getStationByLatLon(type, lat, lon, radius).then((station) => {
-      console.log("Station");
-      console.log(station);
-      this.state.api.getWeathByLatLon(type, lat, lon, radius).then((weather) => {
-        console.log("Weather!");
-        console.log(weather);
-        this.setWeathItem(station.response[0], weather.response);
-      }).catch((error) => console.log(error))
+      if (time) {
+        this.state.api.getWeathByLatLon(type, lat, lon, radius).then((weather) => {
+          this.setCardItem(station.response[0], weather.response);
+        }).catch((error) => console.log(error))
+      } else {
+        this.setCardItem(station.response[0]);
+      }
     });
+
+    let link = baseUrl + '/api/gsod/poly?type=' + type + '&value=[' + lat + ',' + lon + ',' + radius + ']';
+      this.createPackLink(link);
   };
+
+  createPackLink = (link) => {
+    this.state.api.getPack(link).then((data) => {
+      this.setState({packLink: data.response[0]});
+    }).catch((error) => console.log(error));
+    this.setState({readyToDownload: true})
+  };
+
 
   onMarkerClick() {
     this.onMarkerClick.cancel()
@@ -236,18 +197,16 @@ export default class Main extends Component {
 
    getData = (e) => {
      this.state.api.fetchData(e).then((data) => {
-       this.setWeathItem(data);
+       this.setCardItem(data);
      }).catch((error) => console.log(error))
    };*/
 
-  setHandlers = () => {};
-
   onMapPageChanged = (e) => {
     if (this.state.lockM) {
-      this.setState({lockM: false})
+      this.setState({lockM: false});
       return;
     }
-    var t = e.map((r) => r.position);
+    let t = e.map((r) => r.position);
     if (t.length > 0) {
       mymap.fitBounds(t);
     }
@@ -259,40 +218,6 @@ export default class Main extends Component {
 
   onMouseMove = (e) => {
     return "lat: " + e.latlng.lat + " lng: " + e.latlng.lng; // wasn't applied
-  };
-
-  onStationsAndWeathersData = (station, weather) => {
-    console.log("Get station and weather");
-    /*const data = station;
-    if (data.response && Array.isArray(data.response) && data.response[0].item) {
-      data.response = flatten(data.response.map((e) => e.data));
-    }
-    if (markerGroup) mymap.removeLayer(markerGroup);
-    markerGroup = L.layerGroup().addTo(mymap);
-    let cnt = 0;
-    let fx = Array.isArray(data.response) && data.response.filter((i) => {
-      return i.lat && i.lon && i.lat !== '+00.000';
-    });
-    if (fx)
-      this.setState({
-        stationsAll: fx.map((i) => creativeSt(i, cnt++, this.onStationClick))
-      });
-    const markers = [], area_latlon = [];
-    for (let o = 0; o < fx.length; o++) {
-      let i = fx[o];
-      let lt = L.latLng(i.lat, i.lon);
-      area_latlon.push(lt);
-      markers.push(genMaker(lt, this.onMarkerClick, creativeSt(i), o, i));
-    }
-    this.setMarkers(markers);
-    mymap.fitBounds(L.latLngBounds(lngs || area_latlon));*/
-
-    /* this.setState({
-       daysItems: weather.map((i) => {
-         return this.creativeDay(i, cnt++);
-       })
-     })*/
-    //this.setState({DownloadList: e.response})
   };
 
   setCtrList = (list) => {
@@ -332,7 +257,10 @@ export default class Main extends Component {
       PageChanged: this.onMapPageChanged,
       onMarkerClick: this.onMarkerClick,
       onRefreshClick: this.onRefreshClick,
-      SelTime: this.SelTimeFun
+      SelTime: this.SelTimeFun,
+      createPackLink: this.createPackLink,
+      packLink: this.state.packLink,
+      readyToDownload: this.state.readyToDownload
     };
 
     let conts = {
@@ -346,11 +274,10 @@ export default class Main extends Component {
 
     return (<div className="container-fluid p-0">
       <Nav/>
-      <MapComponent {...comp}/>
-      <Loader progress={this.state.loadingProgress} isVisible={this.state.isVisible}/>
+      <MenuComponent {...comp}/>
+      {this.state.isVisible && <Loader isVisible={this.state.isVisible}/>}
       <Containers {...conts}/>
       <Footer/>
     </div>)
   }
 };
-

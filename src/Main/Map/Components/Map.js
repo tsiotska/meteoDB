@@ -24,7 +24,7 @@ const createClusterCustomIcon = function (cluster) {
 
 export default class MapX extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       currentSelected: [],
       lastPoly: [],
@@ -133,6 +133,7 @@ export default class MapX extends Component {
   };
 
   fetchMarkers = (e) => {
+    console.log("SELECTED");
     e = e.layer;
     var req = "", lngs = null;
     if (e.options.radius !== undefined) {
@@ -145,7 +146,7 @@ export default class MapX extends Component {
 
     this.props.api.fetchData(req).then((data) => {
       let lastPoly = this.state.lastPoly;
-      this.props.onStationsData(data, lngs); //(data, lngs, lastPoly)
+      this.props.onStationsData(data, lngs);
       if (lastPoly.length > 0)
         this.props.OnPolySelected(lastPoly[lastPoly.length - 1]);
       if (lastPoly.length > 0) {
@@ -153,6 +154,8 @@ export default class MapX extends Component {
         this.getMarkersInPoly(layer)
       }
     }).catch((error) => console.log(error));
+
+    this.props.createPackLink(req);
   };
 
   renderMarkers = () => {

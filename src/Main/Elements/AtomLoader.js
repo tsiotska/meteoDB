@@ -49,13 +49,6 @@ export default class LoaderReactor extends Component {
           <p className="load_text">Завантаження...</p>
           {/* localization??? */}
         </div>
-        <div className="progress-x">
-          <div className="progress">
-            <div className="progress-bar" role="progressbar" style={{
-  width: this.props.progress * 100 + "%"
-}} aria-valuemin="0" aria-valuemax="100"/>
-          </div>
-        </div>
       </div>
     </div>);
   }

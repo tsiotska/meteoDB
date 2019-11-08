@@ -1,19 +1,18 @@
 import React from 'react';
 
 export default(props) => {
-  console.log(props)
-  const handler = (e) => {
-    e.preventDefault();
-    console.log("COuntryItemTemplate, e:");
-    console.log(e);
 
-    props.setQuery(props.e);
+  const handler = (e) => {
+    console.log(props);
+    e.preventDefault();
+    props.setQuery(props.e.name);
     return false;
   }, e = props.e;
+
   return (<li className="list-group-item mx-auto w-50 d-flex justify-content-between align-items-center">
-    <a href="" onClick={handler}>{e || "Unknown"}</a>
+    <a href="" onClick={handler}>{e.name || "Unknown"}</a>
     <h4>
-      <span className="badge badge-primary">{e}</span>
+      <span className="badge badge-primary">{e.value}</span>
     </h4>
   </li>);
 };

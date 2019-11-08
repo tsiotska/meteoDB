@@ -1,11 +1,12 @@
 import {baseUrl} from "../js/const"
 //import WeathComposer from "js/Helpers/WeathComposer"
-import FetchController from "../js/Helpers/FetchController"
+import FetchController from "../js/Helpers/FetchController";
+
 import axios from 'axios';
 
 export class ApiController {
-  constructor(loadingStarted, loadingFinished, Progress) {
-    this.api = new FetchController(loadingStarted, loadingFinished, Progress);
+  constructor(loaderVisibility) { //loadingStarted, loadingFinished, Progress,
+    this.api = new FetchController(loaderVisibility); //loadingStarted, loadingFinished, Progress,
     this._time = this._year = null;
     this.database = "gsod"; // change later
   }
@@ -46,6 +47,11 @@ export class ApiController {
     return this.api.Get(link);
   };
 
+  getPack = (req) => {
+    let link = req + '&pack';
+    return this.fetchData(link);
+  };
+
   getYears = () => { //Беремо просто роки
     let link = baseUrl + "/api/" + this.database + "/years";
     return this.fetchData(link);
@@ -58,24 +64,33 @@ export class ApiController {
   };
 
   getWeathByLatLon = (type, lat, lon, rad) => {
-    if (!this.time && !this.year) {
-      console.log("TIME is undefined ");
-      this.year = '&year=2016'
-    } else {
-      console.log("TIME: ");
-      console.log(this.year);
-      console.log(this.time)
-    }
     let radius = rad + 'km';
     let link = baseUrl + '/api/' + this.database + '/poly?type=' + type + '&value=[' + lat + ',' + lon + ',' + radius + ']' + (this.year || this.time);
     return this.fetchData(link)
   };
 
-  getStationsIdsForYear = (year) => {
-    ///api/gsod/stations?limit=1&year=2018
-    let link = baseUrl + "/api/" + this.database + "stations?limit=1&year=" + year;
+  //extractors
+  getByTypeAndYear = (year, type) => {
+    let link = baseUrl + "/api/" + this.database + "/stations?extract=" + type + "&year=" + year;
     return this.fetchData(link)
   };
+
+  getByType = (type, offsetValue, countValue) => {
+    let offset = "", count = "";
+    if (offsetValue) {
+      offset = "&offset=" + offsetValue;
+    }
+    if (countValue) {
+      count = "&limit=" + countValue;
+    }
+    let link = baseUrl + "/api/" + this.database + "/stations?extract=" + type + offset + count;
+    return this.fetchData(link)
+  };
+
+  /*getStationsIdsForYear = (year) => {
+    let link = baseUrl + "/api/" + this.database + "/stations?limit=3&year=" + year;
+    return this.fetchData(link)
+  };*/
 
   getForWban = (id, wban) => {
     let link = baseUrl + "/api/" + this.database + "/db?id=" + id + "&wban=" + wban + this.year;

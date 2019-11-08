@@ -5,6 +5,8 @@ import Station from '../../Main/Elements/StationTemplate'
 export default class DownloadList extends React.Component {
 
   getItem = (e, key, miss) => {
+    console.log(e);
+
     let name,
       link,
       isDwn = !1;
@@ -59,11 +61,14 @@ export default class DownloadList extends React.Component {
   mainContainer = (e) => {
     let key = 0, id = 0;
     let d = e || this.props.list;
+
+    console.log(e || this.props.list);
+
     if (d.data) {
       return d.data.map((elem) => this.revolution(elem, ++key))
     } else if (Array.isArray(d)) {
       return d.map((elem) => {
-        var data = elem.data.map((elem_in) => this.wrapR(elem.item, elem_in.item, this.revolution(elem_in, ++key), ++id));
+        let data = elem.data.map((elem_in) => this.wrapR(elem.item, elem_in.item, this.revolution(elem_in, ++key), ++id));
 
         return (<div className="container my-4 py-3" key={++id}>
           <h3>{"Data for " + elem.item}</h3>

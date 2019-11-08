@@ -13,8 +13,6 @@ export default class DaysItemsList extends Component {
   };
 
   render() {
-    console.log("DaysItemsList: ");
-    console.log(this.props);
     return (<div className="tab-pane fade" id="nav-res" role="tabpanel" aria-labelledby="nav-res-tab">
       <div className="container d-flex  flex-column justify-content-center">
         {
