@@ -5,7 +5,9 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 import $ from 'jquery';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import {baseUrl} from '../../../js/const';
+import connect from "react-redux/es/connect/connect";
 
+import 'leaflet.pm';
 
 export var mymap = null,
   markerGroup;
@@ -22,11 +24,12 @@ const createClusterCustomIcon = function (cluster) {
   });
 };
 
-export default class MapX extends Component {
+class MapX extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      currentSelected: [],
+      innerMarker: [],
       lastPoly: [],
       tcontent: null,
       lat: 48.289559,
@@ -41,26 +44,24 @@ export default class MapX extends Component {
     }
   }
 
-  getMarkersInPoly = (e) => {
-    this.props.OnPolySelected(e)
-    if (this.state.MapMarkers) {
-      let markers = this.state.MapMarkers
-      let res = []
-      markers.forEach(function (marker) {
-        if (e.layer.contains(marker.position)) {
-          res.push(marker.position)
-        }
-      });
-      var mks_sel = this.state.MapMarkers.filter(function (m) {
-        return res.includes(m.position)
-      });
-      this.setState({currentSelected: mks_sel})
-    }
-  };
-
+  /* getMarkersInPoly = (e) => {
+     if (this.state.MapMarkers) {
+       let markers = this.state.MapMarkers;
+       let res = [];
+       markers.forEach(function (marker) {
+         if (e.layer.contains(marker.position)) {
+           res.push(marker.position)
+         }
+       });
+       var mks_sel = this.state.MapMarkers.filter(function (m) {
+         return res.includes(m.position)
+       });
+       this.setState({innerMarker: mks_sel})
+     }
+   };*/
 
   initDraw = (mymap) => {
-    var options = {
+    let options = {
       position: 'topright', // toolbar position, options are 'topleft', 'topright', 'bottomleft', 'bottomright'
       drawMarker: false, // adds button to draw markers
       drawPolyline: false, // adds button to draw a polyline
@@ -72,26 +73,26 @@ export default class MapX extends Component {
     };
 
     mymap.pm.addControls(options);
+
     mymap.on('pm:remove', (e) => {
-      var lastPoly = this.state.lastPoly
-      var tg = lastPoly.filter((pl) => pl.layer !== e.layer);
-      this.props.OnPolySelected(null)
-      this.setState({lastPoly: tg, currentSelected: null})
+      console.log(e);
+      let lastPoly = this.state.lastPoly;
+      let tg = lastPoly.filter((pl) => pl.layer !== e.layer);
+      this.setState({lastPoly: tg});
+      this.props.PolySelected(false);
+      this.clearCardAndMarkers();
     });
 
     mymap.on('pm:create', (e) => {
-      var lastPoly = this.state.lastPoly
-      lastPoly.push(e)
+      let lastPoly = this.state.lastPoly
+      lastPoly.push(e);
       this.setState({lastPoly})
       e.layer.on('pm:dragend', () => {
-        this.getMarkersInPoly(e)
         this.fetchMarkers(e)
       });
       e.layer.on('pm:markerdragend', () => {
-        this.getMarkersInPoly(e)
         this.fetchMarkers(e)
       });
-      this.getMarkersInPoly(e)
       this.fetchMarkers(e)
     });
   };
@@ -99,6 +100,11 @@ export default class MapX extends Component {
   componentDidMount() {
     this.initDraw(mymap);
   }
+
+  clearCardAndMarkers = () => {
+    this.props.setCardItem([]);
+    this.props.clearMarkers();
+  };
 
   whenReady() {
     mymap = this;
@@ -114,8 +120,9 @@ export default class MapX extends Component {
   }
 
   onMarkerClick = (e) => {
+    console.log("ON MARKER CLICK!");
     this.props.activeMarker(e.target);
-    $('.leaflet-marker-icon').removeClass('marker-active')
+    $('.leaflet-marker-icon').removeClass('marker-active');
     $(e.target._icon).addClass("marker-active")
   };
 
@@ -132,10 +139,14 @@ export default class MapX extends Component {
     </Marker>);
   };
 
+
+  //Спрацьовує коли виділяєш полігон, працює з часом.
   fetchMarkers = (e) => {
     console.log("SELECTED");
+    this.props.PolySelected(true);
+
     e = e.layer;
-    var req = "", lngs = null;
+    let req = "", lngs = null;
     if (e.options.radius !== undefined) {
       let res = [e._latlng.lat, e._latlng.lng, e.getRadius() / 1000];
       req = baseUrl + "/api/gsod/poly?type=circle&value=[" + res + "km" + "]";
@@ -143,27 +154,34 @@ export default class MapX extends Component {
       lngs = e._latlngs;
       req = baseUrl + "/api/gsod/poly?type=poly&value=[" + lngs.join('],[') + "]";
     }
+    this.props.setPolyRequest(req);
+
+    //Запити станцій і погода (якщо час), нехай асинхронно
 
     this.props.api.fetchData(req).then((data) => {
-      let lastPoly = this.state.lastPoly;
       this.props.onStationsData(data, lngs);
-      if (lastPoly.length > 0)
-        this.props.OnPolySelected(lastPoly[lastPoly.length - 1]);
-      if (lastPoly.length > 0) {
-        let layer = lastPoly[lastPoly.length - 1];
-        this.getMarkersInPoly(layer)
-      }
     }).catch((error) => console.log(error));
 
+
+    let time = this.props.getSelectedTime();
+    if (time) {
+      this.props.api.fetchData(req + time).then((weather) => {
+        this.props.setWeather(weather.response);
+      }).catch((error) => console.log(error));
+    }
     this.props.createPackLink(req);
   };
 
+
   renderMarkers = () => {
-    if (this.props.currentSelected)
+    if (this.props.currentSelected) {
       return this.props.currentSelected.map((w) => this.renderOne(w));
-    else if (this.props.markers)
+    } else if (this.props.markers) {
       return this.props.markers.map((w) => this.renderOne(w));
-    return null;
+    } else if (!this.props.currentSelected) {
+      console.log(this.props.currentSelected);
+      return null;
+    }
   };
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -180,8 +198,8 @@ export default class MapX extends Component {
   }
 
   render() {
-    const position = [this.state.lat, this.state.lng]
-    const markers = this.renderMarkers()
+    const position = [this.state.lat, this.state.lng];
+    const markers = this.renderMarkers();
 
     return (<Map id="mapid" className="markercluster-map" whenReady={this.whenReady} center={position} style={{
       height: "100%",
@@ -189,9 +207,22 @@ export default class MapX extends Component {
       position: "relative"
     }} zoom={this.state.zoom} preferCanvas="True" scrollWheelZoom={false} zoomControl={false}>
       <TileLayer attribution={this.state.attribution} url={this.state.tiles}/>
-      <MarkerClusterGroup chunkedLoadind={true} showCoverageOnHover={true} iconCreateFunction={createClusterCustomIcon}>
+      {markers &&
+      <MarkerClusterGroup chunkedLoadind={true} showCoverageOnHover={true}
+                          iconCreateFunction={createClusterCustomIcon}>
         {markers}
       </MarkerClusterGroup>
+      }
     </Map>);
   }
 }
+
+const mapStateToProps = state => ({});
+
+const mapDispatchToProps = dispatch => ({
+  PolySelected: (flag) => {
+    dispatch({type: "IF_POLY_SELECTED", flag: flag})
+  }
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(MapX);

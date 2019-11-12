@@ -8,7 +8,7 @@ export default (props) => {
   console.log("props:");
   console.log(props);*/
 
-  return (<div onClick={() => props.click && props.click(e)} id={'XMarker' + props.id}
+  return (<div  id={'XMarker' + props.id}
                className="cur_station m-2 d-flex flex-column">
     <div className='st_card col-auto d-flex w_cont flex-column  b-0 st_item text-center'>
       <div className='w_header   d-flex mx-auto   justify-content-center'>

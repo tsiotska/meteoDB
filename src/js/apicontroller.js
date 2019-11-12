@@ -1,14 +1,11 @@
 import {baseUrl} from "../js/const"
-//import WeathComposer from "js/Helpers/WeathComposer"
 import FetchController from "../js/Helpers/FetchController";
 
-import axios from 'axios';
-
 export class ApiController {
-  constructor(loaderVisibility) { //loadingStarted, loadingFinished, Progress,
-    this.api = new FetchController(loaderVisibility); //loadingStarted, loadingFinished, Progress,
+  constructor(loaderVisibility) {
+    this.api = new FetchController(loaderVisibility);
     this._time = this._year = null;
-    this.database = "gsod"; // change later
+    this.database = "gsod";
   }
 
   get time() {

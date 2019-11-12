@@ -1,27 +1,24 @@
 import React, {Component} from 'react';
-import $ from 'jquery';
-import axios from 'axios';
-import {mymap} from '../Main/Map/Components/Map';
+import {mymap} from './Map/Components/Map';
+import {connect} from 'react-redux';
 import L from 'leaflet';
-import WeatherControl from "../Main/Elements/WeatherControl";
-import PageNav from '../Main/Controls/PageNavItem';
-import Station from '../Main/Elements/StationTemplate';
-import MenuComponent from '../Main/Map/MenuComponent'
+import WeatherControl from "./Elements/WeatherControl";
+import Station from './Elements/StationTemplate';
+import MenuComponent from './Map/MenuComponent'
 import 'leaflet-selectareafeature';
 import throttle from 'lodash/throttle';
-import Nav from '../Main/NavbarTop';
-import Loader from '../Main/Elements/AtomLoader';
-import Containers from "../Main/Containers";
-import CountCircle from '../Main/Elements/CountCircle';
+import Nav from './NavbarTop';
+import Loader from './Elements/AtomLoader';
+import Containers from "./Containers";
+import CountCircle from './Elements/CountCircle';
 import 'leaflet.pm';
 import {baseUrl} from "../js/const"
-import Footer from '../Main/Elements/Footer'
+import Footer from './Elements/Footer'
 import {ApiController} from '../js/apicontroller'
 import 'js/map_extensions'
 
-const Typeahead = require('typeahead');
 
-var base = baseUrl, markerGroup = null;
+var markerGroup = null;
 
 function genMaker(e, click, content, cnt, i) {
   return {position: e, click, content, id_cnt: cnt, data: i}
@@ -40,7 +37,7 @@ function flatten(arr) {
   }, []);
 }
 
-export default class Main extends Component {
+class Main extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -48,6 +45,7 @@ export default class Main extends Component {
         lat: null,
         lng: null
       },
+
       stationsAll: [],
       DownloadList: [],
       ctr_list: [],
@@ -55,7 +53,7 @@ export default class Main extends Component {
       markerGroup: null,
       isVisible: false,
       //loadingProgress: 0,
-      api: new ApiController(this.loaderVisibility), //this.loadingStarted, this.loadingFinished, this.progressChanged,
+      api: new ApiController(this.loaderVisibility),
       daysItems: [],
       currentSelected: [],
       SelTimeFun: null,
@@ -67,74 +65,53 @@ export default class Main extends Component {
     this.onMarkerClick = throttle(this.onMarkerClickBase, 500)
   }
 
+//Цю функцію в рєдакс не прокинеш
   loaderVisibility = (flag) => {
     this.setState({isVisible: flag});
   };
 
-  setCardItem = (station, weather) => {
-    console.log(station);
-    let cnt = 0;
-    this.setState({currentStation: createStation(station, 0, this.onStationClick)});
 
-    if (weather) {
-      this.setState({
-        daysItems: weather.map((i) => {
-          return this.creativeDay(i, cnt++);
-        })
-      })
-    }
+  clearMarkers = () => {
+    const markers = [];
+    markers.push(genMaker([]));
+    this.setState({MapMarkers: []})
   };
 
-  creativeDay = (e, cnt) => {
-    return <WeatherControl key={cnt} data={e}/>;
-  };
-  /*
-    progressChanged = (amount) => {
-      this.setState({loadingProgress: amount});
-    };
-
-    loadingStarted = () => {
-      this.setState({isVisible: true});
-    };
-
-    loadingFinished = () => {
-      setTimeout(this.setState, 900, {isVisible: false});
-      setTimeout(this.setState, 2000, {loadingProgress: 0});
-    };
-  */
   setMarkers = (e) => {
     this.setState({MapMarkers: e})
   };
 
-  onStationClick = (e) => {
-    this.setState({
-      currentStation: createStation(e, 0, this.onStationClick)
-    });
-    this.getStationsData(e, 'circle', 1);
-  };
 
-  getStationsData = (t, type, radius) => {
-    console.log("Clicked!");
+  checkTime = () => {
     let time = this.selTimeFun();
     let isYear = time.includes('year');
     isYear ? this.state.api.ofTimeExp(time) : this.state.api.ofRangeExp(time);
+    return time;
+  };
 
+  getStationsData = (t, type, radius) => {
+    this.props.MarkerSelected(true);
+
+    let time = this.checkTime();
     let lat = t.lat;
-    let lon = t.lon || t.lng; //
+    let lon = t.lon || t.lng;
 
     this.state.api.getStationByLatLon(type, lat, lon, radius).then((station) => {
       if (time) {
         this.state.api.getWeathByLatLon(type, lat, lon, radius).then((weather) => {
-          this.setCardItem(station.response[0], weather.response);
+          this.setCardItem(station.response[0]);
+          console.log(weather);
+          this.setWeather(weather.response);
         }).catch((error) => console.log(error))
       } else {
         this.setCardItem(station.response[0]);
       }
     });
 
-    let link = baseUrl + '/api/gsod/poly?type=' + type + '&value=[' + lat + ',' + lon + ',' + radius + ']';
-      this.createPackLink(link);
+    let link = baseUrl + '/api/gsod/poly?type=' + type + '&value=[' + lat + ',' + lon + ',' + radius + 'km' + ']';
+    this.createPackLink(link);
   };
+
 
   createPackLink = (link) => {
     this.state.api.getPack(link).then((data) => {
@@ -143,35 +120,60 @@ export default class Main extends Component {
     this.setState({readyToDownload: true})
   };
 
+  setCardItem = (station) => {
+    console.log(station);
+    //  let cnt = 0;
+    this.setState({currentStation: createStation(station, 0)});
+  };
+
+  setWeather = (weather) => {
+    console.log(weather);
+    let cnt = 0;
+    this.setState({
+      daysItems: weather.map((i) => {
+        return this.creativeDay(i, cnt++);
+      })
+    })
+  };
+
+  creativeDay = (e, cnt) => {
+    return <WeatherControl key={cnt} data={e}/>;
+  };
 
   onMarkerClick() {
     this.onMarkerClick.cancel()
   }
 
   onMarkerClickBase = (e) => {
+    console.log(e);
+    let coords = [e._latlng.lat, e._latlng.lng, "1km"];
+    let request = baseUrl + '/api/gsod/poly?type=circle&value=[' + coords + ']';
+
+    this.props.MarkerSelected(true, request);
     const t = e.target.getLatLng();
     this.getStationsData(t, "circle", 1);
   };
 
-  onStationsData = (station, lngs) => {
+  onStationsData = (station) => {
     this.setState({lockM: true});
     this.setState({stationsCounter: <CountCircle response={station}/>});
     if (station.code === 33) return;
-    //Не понімаю.
     // const data = !resp.Item2 ? resp : resp.Item2; // hardcoded. maybe review API models
     const data = station;
+
     if (data.response && Array.isArray(data.response) && data.response[0].item) {
       data.response = flatten(data.response.map((e) => e.data));
     }
     if (markerGroup) mymap.removeLayer(markerGroup);
     markerGroup = L.layerGroup().addTo(mymap);
+
     let cnt = 0;
     let fx = Array.isArray(data.response) && data.response.filter((i) => {
       return i.lat && i.lon && i.lat !== '+00.000';
     });
     if (fx)
       this.setState({
-        stationsAll: fx.map((i) => createStation(i, cnt++, this.onStationClick))
+        stationsAll: fx.map((i) => createStation(i, cnt++))
       });
     const markers = [], area_latlon = [];
     for (let o = 0; o < fx.length; o++) {
@@ -181,25 +183,9 @@ export default class Main extends Component {
       markers.push(genMaker(lt, this.onMarkerClick, createStation(i), o, i));
     }
     this.setMarkers(markers);
-    mymap.fitBounds(L.latLngBounds(lngs || area_latlon));
+
+    mymap.fitBounds(L.latLngBounds(area_latlon));
   };
-
-  /* createPageNavItem(name, full_href, href, cnt, active = false, disabled = false) {
-     var hrefx = href
-       ? href
-       : full_href;
-     return <PageNav href={hrefx} key={cnt} active={active} text={name} disabled={disabled} onClick={(e) => {
-       e.preventDefault();
-       this.getData(full_href);
-       return false
-     }}/>;
-   }
-
-   getData = (e) => {
-     this.state.api.fetchData(e).then((data) => {
-       this.setCardItem(data);
-     }).catch((error) => console.log(error))
-   };*/
 
   onMapPageChanged = (e) => {
     if (this.state.lockM) {
@@ -236,10 +222,10 @@ export default class Main extends Component {
     this.setState({lastPoly: []})
   };
 
-  // Naming conflict -> refactor later
   SelTimeFun = (m) => {
     this.selTimeFun = m;
   };
+
 
   render() {
     let comp = {
@@ -250,8 +236,7 @@ export default class Main extends Component {
       markers: this.state.MapMarkers,
       setCtrList: this.setCtrList,
       mapSelectedIndex: this.selectedIndexChange,
-      OnPolySelected: this.props.OnPolySelected,
-      onStationsAndWeathersData: this.onStationsAndWeathersData,
+      setWeather: this.setWeather,
       onStationsData: this.onStationsData,
       activeMarker: this.activeMarker,
       PageChanged: this.onMapPageChanged,
@@ -260,7 +245,9 @@ export default class Main extends Component {
       SelTime: this.SelTimeFun,
       createPackLink: this.createPackLink,
       packLink: this.state.packLink,
-      readyToDownload: this.state.readyToDownload
+      readyToDownload: this.state.readyToDownload,
+      clearMarkers: this.clearMarkers,
+      setCardItem: this.setCardItem
     };
 
     let conts = {
@@ -275,9 +262,22 @@ export default class Main extends Component {
     return (<div className="container-fluid p-0">
       <Nav/>
       <MenuComponent {...comp}/>
-      {this.state.isVisible && <Loader isVisible={this.state.isVisible}/>}
+
       <Containers {...conts}/>
       <Footer/>
     </div>)
   }
-};
+}
+
+const mapStateToProps = state => ({
+  isMarkerSelected: state.conditionReducer.isMarkerSelected
+});
+
+const mapDispatchToProps = dispatch => ({
+  MarkerSelected: (flag, req) => {
+    dispatch({type: "IF_MARKER_SELECTED", flag: flag, req: req})
+  }
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Main);
+//{this.state.isVisible && <Loader isVisible={this.state.isVisible}/>}

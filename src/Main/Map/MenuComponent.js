@@ -5,33 +5,34 @@ import {baseUrl} from '../../js/const';
 import DatePicker from '../../Main/Controls/DatePicker'
 import $ from 'jquery';
 import {Button, Input} from 'reactstrap';
-
 import {Typeahead} from 'react-bootstrap-typeahead';
 import CountryItem from '../../Main/Elements/CountryItemTemplate';
-
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-daterangepicker/daterangepicker.css';
+import {connect} from 'react-redux';
 
-var TypeaheadW = require('typeahead'),
-  initdate = {
-    dateSet: false,
-    startDate: null,
-    endDate: null
-  };
+let initdate = {
+  dateSet: false,
+  startDate: null,
+  endDate: null
+};
 
-export default class MenuComponent extends React.Component {
+class MenuComponent extends React.Component {
   constructor(props) {
     super(props);
     this.axios = null;
     this.s_type = React.createRef();
     this.state = {
+      markerRequest: "",
+      polyRequest: "",
+      year: null,
       packLink: null,
       offset: null,
-      count: null,
+      limit: null,
       isLoading: true,
       selectedPage: [],
       source: [],
-      queryParam: null,
+      queryParam: [],
       ctr_list: [],
       lastPoly: null,
       date: initdate,
@@ -66,94 +67,95 @@ export default class MenuComponent extends React.Component {
      }))*/
   }
 
+  setMarkerRequest = (req) => {
+    this.setState({markerRequest: req})
+  };
+
+  setPolyRequest = (req) => {
+    this.setState({polyRequest: req})
+  };
+
+  //isPolySelected має пріорітет
   onSearchClick = () => {
-    let isBigDataQuery, neighbors, queryType, polyreq, limit, offset;
-    let searchType = this.s_type.current.value;
-    let yearTime = ($("#years").val() ? "&year=" + $("#years").val() : '');
+    console.log("onSearchCLICK!");
+    //Якщо з календаря то since & until else беремо роки
 
-    //Якщо взяти з календаря то since until else беремо рік
+    let yearTime = (this.state.year ? "&year=" + this.state.year : '');
     let time = this.state.date.dateSet
-      ? '&since=' + this.state.date.startDate.format('DD.MM.YYYY') + '&until=' + this.state.date.endDate.format('DD.MM.YYYY')
-      : yearTime;
+      ? '&since=' + this.state.date.startDate.format('DD.MM.YYYY') + '&until=' +
+      this.state.date.endDate.format('DD.MM.YYYY') : yearTime;
 
-    let names = this.state.queryParam;
-    if (names != null) {
-      names = (
-        typeof names === 'string'
-          ? names
-          : (this.state.queryParam && this.state.queryParam.join(',')) || this.props.markers.map((i) => {
-          return i.data[this.s_type.current.value]
-        })
-      );
+    //Єслі виділили маркер/полігон і хочєм погоду
+    console.log('isMarkerSelected?');
+    console.log(this.props.isMarkerSelected);
+    console.log('isPolySelected?');
+    console.log(this.props.isPolySelected);
+    if  (this.props.isMarkerSelected && time) {
+      this.props.api.fetchData(this.state.markerRequest + time).then((weather) => {
+        this.props.setWeather(weather.response);
+      }).catch((error) => console.log(error));
+    } else if (this.props.isPolySelected && time) {
+      console.log("We are in POLY processing section!");
+      this.props.api.fetchData(this.state.polyRequest + time).then((weather) => {
+        this.props.setWeather(weather.response);
+      }).catch((error) => console.log(error));
+    } else if (this.props.isPolySelected || this.props.isMarkerSelected){
+      alert("Nothing to search...")
     }
-
-    if (this.state.lastPoly) {
-      polyreq = 'poly?type=' + this.getPolyStr();
-    } else {
-      limit = $('#count').val() || undefined //Це ліміт
-      offset = $('#offset').val() || undefined //Це оффсет
-
-      isBigDataQuery = names.toString().includes(',');
-      //||(this.state.queryParam && this.state.queryParam.length > 1);
-
+    //Звичайний запит за типом і query.
+    else {
+      let neighbors, queryType, polyreq, limit, offset,
+        searchType = this.s_type.current.value;
+      //Запит або Poly або вручну вбивали
+      limit = this.state.limit || undefined;
+      offset = this.state.offset || undefined;
       neighbors = (
         $('#nbs_chk').prop('checked')
           ? '&nbs' : '');
+      let names = this.state.queryParam;
+      queryType = (names ? '&query=' + names : '');
 
-      queryType = (isBigDataQuery ? '&query=' + names : '');
-    }
 
-    let queryValue = (polyreq ? polyreq : 'stations?field=' + searchType + queryType + neighbors);
+      let queryValue = (polyreq ? polyreq : 'stations?field=' + searchType + queryType + neighbors);
 
-    if (limit !== undefined) {
-      queryValue += '&limit=' + limit
-    } //offset може бути і без ліміта.
-    if (offset !== undefined) {
-      queryValue += '&offset=' + offset
-    }
+      if (limit !== undefined) {
+        queryValue += '&limit=' + limit
+      } //offset може бути і без ліміта.
+      if (offset !== undefined) {
+        queryValue += '&offset=' + offset
+      }
 
-    let stationRequest = baseUrl + '/api/gsod/' + queryValue;
-    if (yearTime || this.state.date.dateSet) { //Якщо є час, то потрібна і погода!
-      this.props.api.fetchData(stationRequest).then((station) => {
-        this.props.api.fetchData(stationRequest + time).then((weather) => {
-          this.props.onStationsAndWeathersData(station, weather);
+      let stationRequest = baseUrl + '/api/gsod/' + queryValue;
+      if (yearTime || this.state.date.dateSet) { //Якщо є час, то потрібна і погода!
+
+        this.props.api.fetchData(stationRequest).then((station) => {
+          this.props.onStationsData(station);
+
+          this.props.api.fetchData(stationRequest + time)
+            .then((weather) => {
+              this.props.setWeather(weather);
+            })
+            .catch((error) => {
+              console.log(error)
+            });
+        }).catch((error) => {
+          console.log(error)
         });
-      }).catch((error) => {
-        console.log(error)
-      });
-    } else {
-      this.props.api.fetchData(stationRequest).then((station) => {
-        this.props.onStationsData(station);
-      })
+
+
+      } else {
+        this.props.api.fetchData(stationRequest).then((station) => {
+          this.props.onStationsData(station);
+        })
+      }
     }
   };
-
-  getPolyStr() {
-    console.log("SELECTED")
-    let polyreq,
-      e = this.state.lastPoly.layer,
-      lngs = null;
-    if (e.options.radius !== undefined) {
-      let res = [e._latlng.lat, e._latlng.lng, e.getRadius()];
-      polyreq = "circle&value=[" + res + "]";
-    } else {
-      lngs = e._latlngs;
-      var res = lngs.join('],[');
-      polyreq = "poly&value=[" + res + "]";
-    }
-    return polyreq
-  }
-
-  componentWillUnmount() {
-    // this.axios.abort()
-  }
 
   onChangePage = (selectedPage, index) => {
     this.props.PageChanged(selectedPage);
     this.props.mapSelectedIndex(index);
     this.setState({selectedPage});
   };
-
 
   currentStation = () => {
     return (<div id="flyn_current_station" className="w-100 d-flex flex-column">
@@ -163,9 +165,6 @@ export default class MenuComponent extends React.Component {
   setQuery = (e) => {
     this.s_type.current.value = 'ctry_full';
     $('#querystr').val(e);
-
-    console.log("SetQuery");
-    console.log(e);
     this.onSearchClick(e);
   };
 
@@ -173,40 +172,47 @@ export default class MenuComponent extends React.Component {
     this.props.onRefreshClick(e);
   };
 
-
   getSelectedTime() {
     return this.state.date.dateSet
       ? '&since=' + this.state.date.startDate.format('DD.MM.YYYY') + '&until=' + this.state.date.endDate.format('DD.MM.YYYY')
-      : (
-        $("#years").val()
-          ? "&year=" + $("#years").val()
-          : '');
+      : (this.state.year ? "&year=" + this.state.year : '');
   }
 
+  enableButton = () => {
+    let time = this.getSelectedTime();
 
-  /// HALF PORTED PART FROM JQUERY
-
-  setLastPoly = (e) => {
-    this.setState({lastPoly: e})
-  };
-
-  onYearsChange = () => {
-    if ($("#years").val().length === 4) {
-      this.setState({year: $("#years").val()});
-      $("#stx .stx_l1").removeClass('fade');
-      /* this.props.api.getByTypeAndYear($("#years").val(), this.s_type.current.value).then((data) => {
-         TypeaheadW($("#id_st")[0], {source: data.response});
-         $("#stx .stx_l1").addClass('fade');
-         $('#id_st').removeAttr('readonly');
-       });*/
+    if (this.state.queryParam.length > 0 || (time && this.props.isPolySelected || time && this.props.isMarkerSelected)) {
+      this.setState({enableSearchButton: true});
     } else {
-      this.setState({year: ""})
+      this.setState({enableSearchButton: false})
     }
   };
 
-  onTypeChanged = (e) => {
-    this.s_type.current.value = e.target.value;
-    let p = e.target.value;
+  onYearsChange = (event) => {
+    let year = event.target.value;
+    if (year.length === 4) {
+      this.setState({year: year});
+    } else {
+      this.setState({year: ""});
+    }
+    //Треба юзати сагу/транк
+    setTimeout(this.enableButton, 250)
+  };
+
+  clearSource = () => {
+    //this.setState({source: [], queryParam: []});
+    this.typeahead.getInstance().clear();
+  };
+
+  onTypeChanged = () => {
+    this.clearSource();
+    let type = this.s_type.current.value;
+    //disable limit and offset
+    if (type === "stname" || type === "id" || type === "wban") {
+      this.props.disableLimitAndOffset(true);
+    } else {
+      this.props.disableLimitAndOffset(false)
+    }
 
     if (this.state.year) {
       this.props.api.getByTypeAndYear(this.state.year, this.s_type.current.value)
@@ -215,7 +221,7 @@ export default class MenuComponent extends React.Component {
           //  this.setState({source: data.response})
         }).catch((error) => console.log(error))
     } else {
-      this.props.api.getByType(this.s_type.current.value, this.state.offset, this.state.count)
+      this.props.api.getByType(this.s_type.current.value, this.state.offset, this.state.limit)
         .then((data) => {
 
           //Валідаційна дічь
@@ -239,57 +245,37 @@ export default class MenuComponent extends React.Component {
     this.setState({offset: event.target.value})
   };
 
-  onCountChange = (event) => {
-    this.setState({count: event.target.value})
+  onLimitChange = (event) => {
+    this.setState({limit: event.target.value})
   };
 
-  onIdChange = () => {
-    console.log("onIdChange");
-    if ($("#id_st").val() === 'N/A' || $("#id_st").val().length === 6) {
-      $("#stx .stx_l2").removeClass('fade');
-      this.state.api.OfYear($("#years").val()).getForId($("#id_st").val()).done((data) => { //2
-        TypeaheadW($("#wban_st")[0], {source: data.response});
-        $("#stx .stx_l2").addClass('fade');
-        $('#wban_st').removeAttr('readonly');
-      });
-    }
+  ApplyCalendarDate = (e) => {
+    this.setState({date: e});
+    setTimeout(this.enableButton, 250);
   };
 
-  onWbanChange = () => {
-    if ($("#wban_st").val() === 'N/A' || $("#wban_st").val().length === 6) {
-      $("#datex .cssload-container").removeClass('fade');
-      this.state.api.OfYear($("#years").val()).getForWban($("#id_st").val(), $("#wban_st").val()).then((data) => {
-        TypeaheadW($("#date")[0], {source: data.response});
-        $("#datex .cssload-container").addClass('fade');
-        $('#date').removeAttr('readonly');
-      });
-    }
+  unControlledInput = (searchParam) => {
+    this.setState({queryParam: searchParam});
+    setTimeout(this.enableButton, 500);
   };
-
-  controlledInput = (event) => {
-    console.log(event);
-    this.setState({queryParam: event});
-    if (!event) {
-      this.setState({enableSearchButton: false})
-    } else {
-      this.setState({enableSearchButton: true});
-    }
-  };
-
 
   render() {
-
+    //Це деструктуризація, можеш писати її ще зі стейтом
+    const {areLimitAndOffsetDisabled, counter, readyToDownload, packLink, markers} = this.props;
 
     return (<div className="main_map container-fluid p-0">
-      <Map api={this.props.api} createPackLink={this.props.createPackLink} activeMarker={this.props.activeMarker}
-           OnPolySelected={this.setLastPoly}
+      <Map setPolyRequest={this.setPolyRequest} setWeather={this.props.setWeather}
+           getSelectedTime={this.getSelectedTime.bind(this)}
+           clearMarkers={this.props.clearMarkers} api={this.props.api}
+           createPackLink={this.props.createPackLink} activeMarker={this.props.activeMarker}
            onStationsData={this.props.onStationsData} markers={this.state.selectedPage}
-           currentSelected={this.props.markers}/>
+           currentSelected={this.props.markers} setCardItem={this.props.setCardItem}/>
+
       <div className="cur_count_wrapper">
         <div className={"cur_count " + (
-          this.props.counter
+          counter
             ? ""
-            : "fade")} id="result-info">{this.props.counter}</div>
+            : "fade")} id="result-info">{counter}</div>
       </div>
       <div className="panel flyn active  card card-body">
         <div className="scrollable">
@@ -299,7 +285,8 @@ export default class MenuComponent extends React.Component {
 
               <div className="col-5  mb-1">
                 <label htmlFor="type">Тип поля</label>
-                <select defaultValue="ctry_full" ref={this.s_type} className="custom-select"
+                <select defaultValue="ctry_full" ref={this.s_type} disabled={this.props.isPolySelected}
+                        className="custom-select"
                         onChange={this.onTypeChanged} id="type">
                   <option>id</option>
                   <option>wban</option>
@@ -330,15 +317,16 @@ export default class MenuComponent extends React.Component {
               </div>
 
               <div id="datex" className="col-auto  mb-1 ">
-                <DatePicker OnClear={(e) => this.setState({date: e})} OnApply={(e) => this.setState({date: e})}/>
+                <DatePicker OnClear={(e) => this.setState({date: e})} OnApply={this.ApplyCalendarDate}/>
               </div>
             </div>
             <div className="col-auto mb-1">
               <label htmlFor="querystr">Пошуковий параметр</label>
-              <div className="input-group disabled">
+              <div className={"input-group"}>
 
-                <Typeahead multiple={true} isLoading={this.state.isLoading} placeholder="Пошуковий параметр"
-                           onChange={this.controlledInput} options={this.state.source}/>
+                <Typeahead disabled={true} multiple={true} isLoading={this.state.isLoading} placeholder="Пошуковий параметр"
+                           onChange={this.unControlledInput} ref={(typeahead) => this.typeahead = typeahead}
+                           options={this.state.source}/>
               </div>
 
 
@@ -360,39 +348,20 @@ export default class MenuComponent extends React.Component {
           </div>
 
           <div className="form-inline mx-auto">
-
-            <div id="stx" className="col-auto mb-1">
-              <label htmlFor="id_st">ID Станції</label>
-              <div className="input-group">
-                <Input type="text" className="form-control typeahead" id="id_st" onChange={this.onIdChange}
-                       placeholder="123456" data-provide="typeahead" readOnly="readOnly"/>
-                <div className="stx_l1 cssload-container fade">
-                  <div className="cssload-whirlpool"/>
-                </div>
-              </div>
-              <label htmlFor="wban_st">WBAN Станції</label>
-              <div className="input-group">
-                <Input type="text" className="form-control typeahead" id="wban_st" onChange={this.onWbanChange}
-                       placeholder="Станція" value="N/A" data-provide="typeahead" readOnly="readOnly"/>
-                <div className="stx_l2 cssload-container fade">
-                  <div className="cssload-whirlpool"/>
-                </div>
-              </div>
-            </div>
             <div className="row m-2">
               <div className="input-group  col-6 p-1">
                 <div className="input-group-prepend">
                   <span className="input-group-text">Count</span>
                 </div>
                 <Input type="text" id="count" className="form-control typeahead" placeholder="Count"
-                       data-provide="typeahead" onChange={this.onCountChange}/>
+                       data-provide="typeahead" onChange={this.onLimitChange} disabled={areLimitAndOffsetDisabled}/>
               </div>
               <div className="input-group  col-6 p-1">
                 <div className="input-group-prepend">
                   <span className="input-group-text">Offset</span>
                 </div>
                 <Input type="text" id="offset" className="form-control typeahead" placeholder="Offset"
-                       data-provide="typeahead" onChange={this.onOffsetChange}/>
+                       data-provide="typeahead" onChange={this.onOffsetChange} disabled={areLimitAndOffsetDisabled}/>
               </div>
             </div>
           </div>
@@ -401,25 +370,38 @@ export default class MenuComponent extends React.Component {
             <ul id="stNav" className="pagination justify-content-center"/>
           </nav>
 
-          {this.props.readyToDownload &&
+          {readyToDownload &&
           <a download className="" target="_blank" role="button"
-             href={"http://192.168.42.185:3001" + this.props.packLink + "?saveas=Stations.json"}>
+             href={baseUrl + packLink + "?saveas=Stations.json"}>
             СКАЧАЙ МЕНЕ
           </a>}
 
           {this.currentStation()}
+
           <Button id="flyn_toggle" className="fx btn asside btn-md" role="button"
                   onClick={() => $('.flyn').toggleClass('active')}>
             <span className="fx1"/>
             <span className="fx2"/>
           </Button>
-
-
         </div>
       </div>
 
       <div className="m-2">
-        <Pagination items={this.props.markers} onChangePage={this.onChangePage}/></div>
+        <Pagination items={markers} onChangePage={this.onChangePage}/></div>
     </div>);
   }
 }
+
+const mapStateToProps = state => ({
+  isPolySelected: state.conditionReducer.isPolySelected,
+  isMarkerSelected: state.conditionReducer.isMarkerSelected,
+  areLimitAndOffsetDisabled: state.conditionReducer.areLimitAndOffsetDisabled,
+});
+
+const mapDispatchToProps = dispatch => ({
+  disableLimitAndOffset: (flag) => {
+    dispatch({type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag})
+  }
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(MenuComponent);
