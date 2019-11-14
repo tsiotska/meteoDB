@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Pagination from '../../Main/Controls/Pagination'
-import {empt} from '../../js/const'
+import {emptyContainer} from '../../js/const'
 export default class SelectedStationsList extends Component {
   constructor(props) {
     super(props);
@@ -25,7 +25,7 @@ export default class SelectedStationsList extends Component {
           ? (<div className="container row mx-auto justify-content-center" id="result">
             {this.state.selectedPage}
           </div>)
-          : empt
+          : emptyContainer
       }
     </div>)
   }

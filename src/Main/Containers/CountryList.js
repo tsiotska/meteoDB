@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {empt} from '../../js/const'
+import {emptyContainer} from '../../js/const'
 
 export default class CountryList extends Component {
   render() {
@@ -9,7 +9,7 @@ export default class CountryList extends Component {
           ? <div className="container">
             <ul className="text-center list-group" id="ctr-list">{this.props.ctr_list}</ul>
           </div>
-          : empt
+          : emptyContainer
       }*
     </div>)
   }

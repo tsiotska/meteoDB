@@ -39,13 +39,12 @@
     text-align: center;
     width: 40px; }
   #mapid .marker-cluster-medium {
-    background-color: rgba(241, 211, 87, 0.6); }
-  #mapid .marker-cluster-medium div {
-    background-color: rgba(240, 194, 12, 0.6); }
+    background-color: rgba(241, 211, 87, 0.6) div;
+      background-color-background-color: rgba(240, 194, 12, 0.6); }
   #mapid .marker-cluster-large {
     background-color: rgba(253, 156, 114, 0.6); }
-  #mapid .marker-cluster-large div {
-    background-color: rgba(241, 128, 23, 0.6); }
+    #mapid .marker-cluster-large .marker-cluster-large div {
+      background-color: rgba(241, 128, 23, 0.6); }
   #mapid .marker-cluster-small {
     background-color: #b5e28c; }
   #mapid .marker-cluster-small div {
@@ -70,7 +69,7 @@
     margin-top: 5px;
     text-align: center;
     border-radius: 15px;
-    font: 12px Helvetica Neue,Arial,Helvetica,sans-serif; }
+    font: 12px Helvetica Neue, Arial, Helvetica, sans-serif; }
   #mapid .marker-cluster span {
     line-height: 30px; }
   #mapid .XCustTooltip {

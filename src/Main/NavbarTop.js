@@ -18,7 +18,7 @@ export default class NavbarTop extends React.Component {
   // [TASK] Load name, version from manifest
   render() {
     return (<nav className="navbar sticky-to navbar-light bg-light">
-      <a className="navbar-brand" onClick={handler} href="#top">X-Meteo Prototype<span className="ml-2 badge badge-info">Alfa 0.26</span>
+      <a className="navbar-brand" onClick={handler} href="#top">Lametsy<span className="ml-2 badge badge-info">RC 1.1</span>
       </a>
       <div className="float-right small">{this.props.onMouseMove}</div>
     </nav>);

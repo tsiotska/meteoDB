@@ -84,12 +84,13 @@ export class ApiController {
     return this.fetchData(link)
   };
 
+  // old api
   /*getStationsIdsForYear = (year) => {
     let link = baseUrl + "/api/" + this.database + "/stations?limit=3&year=" + year;
     return this.fetchData(link)
   };*/
 
-  getForWban = (id, wban) => {
+  /* getForWban = (id, wban) => {
     let link = baseUrl + "/api/" + this.database + "/db?id=" + id + "&wban=" + wban + this.year;
     return this.fetchData(link)
   };
@@ -97,6 +98,6 @@ export class ApiController {
   getForId = (id) => {
     let link = baseUrl + "/api/" + this.database + "/db?id=" + id + this.year;
     return this.fetchData(link)
-  }
+  } */
 
 }

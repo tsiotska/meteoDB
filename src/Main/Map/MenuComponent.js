@@ -45,9 +45,7 @@ class MenuComponent extends React.Component {
     this.props.api.fetchData(baseUrl + "/api/gsod/countries/stationsCount")
       .then((data) => {
         if (data && data.response) {
-          let cnt = 0;
-          console.log("COUNTS OF STATION: ");
-          console.log(data.response);
+          let cnt = 0; 
 
           this.setState({
             source: data.response.map((i) => i.name), //.item1
@@ -58,13 +56,7 @@ class MenuComponent extends React.Component {
             return <CountryItem key={cnt++} setQuery={this.setQuery} e={i}/>;
           }))
         }
-      });
-    /* let arr = [{Name: 'hello', Value: 'world'}, {Name: 'world', Value: 'baby'}];
-     let cnt = 0;
-     this.props.setCtrList(arr.map((i) => {
-
-       return <CountryItem key={cnt++} setQuery={this.setQuery} e={i}/>;
-     }))*/
+      }); 
   }
 
   setMarkerRequest = (req) => {
@@ -324,7 +316,7 @@ class MenuComponent extends React.Component {
               <label htmlFor="querystr">Пошуковий параметр</label>
               <div className={"input-group"}>
 
-                <Typeahead disabled={true} multiple={true} isLoading={this.state.isLoading} placeholder="Пошуковий параметр"
+                <Typeahead disabled={false} multiple={true} isLoading={this.state.isLoading} placeholder="Пошуковий параметр"
                            onChange={this.unControlledInput} ref={(typeahead) => this.typeahead = typeahead}
                            options={this.state.source}/>
               </div>
@@ -371,10 +363,10 @@ class MenuComponent extends React.Component {
           </nav>
 
           {readyToDownload &&
-          <a download className="" target="_blank" role="button"
+          <button download className="" target="_blank" role="button"
              href={baseUrl + packLink + "?saveas=Stations.json"}>
             СКАЧАЙ МЕНЕ
-          </a>}
+          </button>}
 
           {this.currentStation()}
 

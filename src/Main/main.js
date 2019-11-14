@@ -262,7 +262,7 @@ class Main extends Component {
     return (<div className="container-fluid p-0">
       <Nav/>
       <MenuComponent {...comp}/>
-
+       {this.state.isVisible && <Loader isVisible={this.state.isVisible}/>}
       <Containers {...conts}/>
       <Footer/>
     </div>)
@@ -280,4 +280,3 @@ const mapDispatchToProps = dispatch => ({
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Main);
-//{this.state.isVisible && <Loader isVisible={this.state.isVisible}/>}
