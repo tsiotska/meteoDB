@@ -55,8 +55,7 @@ class Main extends Component {
       //loadingProgress: 0,
       api: new ApiController(this.loaderVisibility),
       daysItems: [],
-      currentSelected: [],
-      SelTimeFun: null,
+      currentSelected: [], 
       stationsCounter: null,
       lockM: true,
       readyToDownload: false
@@ -82,23 +81,24 @@ class Main extends Component {
   };
 
 
-  checkTime = () => {
-    let time = this.selTimeFun();
+  checkTime = () => { 
+    let time = this.state.api.time; 
     let isYear = time.includes('year');
     isYear ? this.state.api.ofTimeExp(time) : this.state.api.ofRangeExp(time);
     return time;
   };
 
-  getStationsData = (t, type, radius) => {
+  getStationsData = (location, polygonType, radius) => {
     this.props.MarkerSelected(true);
 
-    let time = this.checkTime();
-    let lat = t.lat;
-    let lon = t.lon || t.lng;
+    let lat = location.lat;
+    let lon = location.lon || location.lng;
 
-    this.state.api.getStationByLatLon(type, lat, lon, radius).then((station) => {
+    this.state.api.getStationByLatLon(polygonType, lat, lon, radius).then((station) => {
+    
+      let time = this.checkTime();
       if (time) {
-        this.state.api.getWeathByLatLon(type, lat, lon, radius).then((weather) => {
+        this.state.api.getWeathByLatLon(polygonType, lat, lon, radius).then((weather) => {
           this.setCardItem(station.response[0]);
           console.log(weather);
           this.setWeather(weather.response);
@@ -107,9 +107,8 @@ class Main extends Component {
         this.setCardItem(station.response[0]);
       }
     });
-
-    let link = baseUrl + '/api/gsod/poly?type=' + type + '&value=[' + lat + ',' + lon + ',' + radius + 'km' + ']';
-    this.createPackLink(link);
+ 
+    this.createPackLink(this.state.api.createLatLonWithRadiusLink(polygonType, lat,lon, radius));
   };
 
 
@@ -146,7 +145,7 @@ class Main extends Component {
 
   onMarkerClickBase = (e) => {
     console.log(e);
-    let coords = [e._latlng.lat, e._latlng.lng, "1km"];
+    let coords = [e.latlng.lat, e.latlng.lng, "1km"];
     let request = baseUrl + '/api/gsod/poly?type=circle&value=[' + coords + ']';
 
     this.props.MarkerSelected(true, request);
@@ -157,7 +156,8 @@ class Main extends Component {
   onStationsData = (station) => {
     this.setState({lockM: true});
     this.setState({stationsCounter: <CountCircle response={station}/>});
-    if (station.code === 33) return;
+    if (station.code === 33)
+      return; // not found
     // const data = !resp.Item2 ? resp : resp.Item2; // hardcoded. maybe review API models
     const data = station;
 
@@ -221,11 +221,7 @@ class Main extends Component {
     this.setMarkers([]);
     this.setState({lastPoly: []})
   };
-
-  SelTimeFun = (m) => {
-    this.selTimeFun = m;
-  };
-
+ 
 
   render() {
     let comp = {
@@ -241,8 +237,7 @@ class Main extends Component {
       activeMarker: this.activeMarker,
       PageChanged: this.onMapPageChanged,
       onMarkerClick: this.onMarkerClick,
-      onRefreshClick: this.onRefreshClick,
-      SelTime: this.SelTimeFun,
+      onRefreshClick: this.onRefreshClick, 
       createPackLink: this.createPackLink,
       packLink: this.state.packLink,
       readyToDownload: this.state.readyToDownload,

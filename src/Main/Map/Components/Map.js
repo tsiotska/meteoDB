@@ -145,30 +145,29 @@ class MapX extends Component {
     this.props.PolySelected(true);
 
     e = e.layer;
-    let req = "", lngs = null;
-    if (e.options.radius !== undefined) {
-      let res = [e._latlng.lat, e._latlng.lng, e.getRadius() / 1000];
-      req = baseUrl + "/api/gsod/poly?type=circle&value=[" + res + "km" + "]";
-    } else {
-      lngs = e._latlngs;
-      req = baseUrl + "/api/gsod/poly?type=poly&value=[" + lngs.join('],[') + "]";
-    }
-    this.props.setPolyRequest(req);
+
+    this.props.api.FromMapEvent(e)
+    .then((data) => {
+      this.props.onStationsData(data, e._latlngs);
+    }).catch((error) => console.log(error));
+    
+    
+   // this.props.setPolyRequest(req);
 
     //Запити станцій і погода (якщо час), нехай асинхронно
 
-    this.props.api.fetchData(req).then((data) => {
+/*     this.props.api.fetchData(req).then((data) => {
       this.props.onStationsData(data, lngs);
     }).catch((error) => console.log(error));
+ */
 
-
-    let time = this.props.getSelectedTime();
+/*     let time = this.props.getSelectedTime();
     if (time) {
       this.props.api.fetchData(req + time).then((weather) => {
         this.props.setWeather(weather.response);
       }).catch((error) => console.log(error));
     }
-    this.props.createPackLink(req);
+    this.props.createPackLink(req); */
   };
 
 

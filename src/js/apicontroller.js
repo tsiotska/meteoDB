@@ -54,21 +54,46 @@ export class ApiController {
     return this.fetchData(link);
   };
 
-  getStationByLatLon = (type, lat, lon, rad) => {
-    let radius = rad + 'km';
-    let link = baseUrl + '/api/' + this.database + '/poly?type=' + type + '&value=[' + lat + ',' + lon + ',' + radius + ']';
-    return this.fetchData(link)
+  createLatLonWithRadiusLink = (type,lat,lon,rad)=>{ 
+    // TODO: Polygon does not have radius!!!
+    return baseUrl + '/api/' + this.database + '/poly?type=' + type +
+     '&value=[' + lat + ',' + lon + ',' + rad + 'km]';
+  }
+  getStationByLatLon = (type, lat, lon, rad) => { 
+    return this.fetchData(this.createLatLonWithRadiusLink(type,lat,lon,rad)) 
   };
 
   getWeathByLatLon = (type, lat, lon, rad) => {
-    let radius = rad + 'km';
-    let link = baseUrl + '/api/' + this.database + '/poly?type=' + type + '&value=[' + lat + ',' + lon + ',' + radius + ']' + (this.year || this.time);
-    return this.fetchData(link)
-  };
+    //TODO: append date
+    return this.fetchData(this.createLatLonWithRadiusLink(type,lat,lon,rad) )
+  }
+  
+  getTimeAmplifiers(state) {
+    return  state.date.dateSet
+      ? ('&since=' + state.date.startDate.format('DD.MM.YYYY') +
+       '&until=' + state.date.endDate.format('DD.MM.YYYY'))
+      : (state.year ? "&year=" + state.year : '');
+  }
+
+  fromMapEvent(e){
+    let req = "", lngs = null;
+
+    // create circle or poly request
+    if (e.options.radius !== undefined) {
+      let res = [e._latlng.lat, e._latlng.lng, e.getRadius() / 1000];
+      req = baseUrl + '/api/'+this.database+'/poly?type=circle&value=[' + res + "km" + ']';
+    } else {
+      lngs = e._latlngs;
+      req = baseUrl + '/api/'+this.database+'/poly?type=poly&value=[' + lngs.join('],[') + ']';
+    }
+
+
+
+  }
   getStationsCount(){
     return this.fetchData(baseUrl + "/api/gsod/countries/stationsCount")
   }
-  getWithOptions(options){
+  WithOptions(options){
     if(options.locations){
 
     }
