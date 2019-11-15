@@ -18,6 +18,6 @@ body {
 }
 
 @import 'css-build/weather-icons.min.css';
-@import "css-build/typeahead.css";
+@import "css/typeahead.css";
 
 @import "css/styles.css";
