@@ -17,7 +17,7 @@ body {
        url('font/weathericons-regular-webfont.svg') format('svg'); /* Legacy iOS */
 }
 
-@import 'css/weather-icons.min.css';
+@import 'css-build/weather-icons.min.css';
 @import "css-build/typeahead.css";
 
-@import "css-build/styles.css";
+@import "css/styles.css";
