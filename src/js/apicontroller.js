@@ -65,9 +65,24 @@ export class ApiController {
     let link = baseUrl + '/api/' + this.database + '/poly?type=' + type + '&value=[' + lat + ',' + lon + ',' + radius + ']' + (this.year || this.time);
     return this.fetchData(link)
   };
+  getStationsCount(){
+    return this.fetchData(baseUrl + "/api/gsod/countries/stationsCount")
+  }
+  getWithOptions(options){
+    if(options.locations){
+
+    }
+
+    if (options.year || options.date){
+      // fetching weather data
+      
+    }
+  }
 
   //extractors
-  getByTypeAndYear = (year, type) => {
+
+  // IT'S WRONG - we can't do it in this way
+ /*  getByTypeAndYear = (year, type) => {
     let link = baseUrl + "/api/" + this.database + "/stations?extract=" + type + "&year=" + year;
     return this.fetchData(link)
   };
@@ -83,7 +98,7 @@ export class ApiController {
     let link = baseUrl + "/api/" + this.database + "/stations?extract=" + type + offset + count;
     return this.fetchData(link)
   };
-
+ */
   // old api
   /*getStationsIdsForYear = (year) => {
     let link = baseUrl + "/api/" + this.database + "/stations?limit=3&year=" + year;

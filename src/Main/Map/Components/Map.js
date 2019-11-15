@@ -141,8 +141,7 @@ class MapX extends Component {
 
 
   //Спрацьовує коли виділяєш полігон, працює з часом.
-  fetchMarkers = (e) => {
-    console.log("SELECTED");
+  fetchMarkers = (e) => { 
     this.props.PolySelected(true);
 
     e = e.layer;
@@ -184,13 +183,7 @@ class MapX extends Component {
     }
   };
 
-  shouldComponentUpdate(nextProps, nextState) {
-    /*
-    if (nextProps.markers && nextProps.markers[0])
-      if (this.props.markers[0] === nextProps.markers[0])
-        return false;
-  return true;
-    */
+  shouldComponentUpdate(nextProps, nextState) { 
     return !(
       nextProps.markers && nextProps.markers[0] &&
       this.props.markers[0] === nextProps.markers[0]

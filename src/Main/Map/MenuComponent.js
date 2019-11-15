@@ -42,7 +42,7 @@ class MenuComponent extends React.Component {
 
   componentDidMount() {
     this.props.SelTime(this.getSelectedTime.bind(this));
-    this.props.api.fetchData(baseUrl + "/api/gsod/countries/stationsCount")
+    this.props.api.getStationsCount()
       .then((data) => {
         if (data && data.response) {
           let cnt = 0; 
@@ -69,19 +69,16 @@ class MenuComponent extends React.Component {
 
   //isPolySelected має пріорітет
   onSearchClick = () => {
-    console.log("onSearchCLICK!");
-    //Якщо з календаря то since & until else беремо роки
-
-    let yearTime = (this.state.year ? "&year=" + this.state.year : '');
-    let time = this.state.date.dateSet
-      ? '&since=' + this.state.date.startDate.format('DD.MM.YYYY') + '&until=' +
-      this.state.date.endDate.format('DD.MM.YYYY') : yearTime;
-
+    console.log("onSearchCLICK!");  
+    this.props.api.WithOptions({...this.state, neighbors: $('#nbs_chk').prop('checked')})
+  
+    let time = this.getSelectedTime();
     //Єслі виділили маркер/полігон і хочєм погоду
     console.log('isMarkerSelected?');
     console.log(this.props.isMarkerSelected);
     console.log('isPolySelected?');
     console.log(this.props.isPolySelected);
+
     if  (this.props.isMarkerSelected && time) {
       this.props.api.fetchData(this.state.markerRequest + time).then((weather) => {
         this.props.setWeather(weather.response);
@@ -118,7 +115,7 @@ class MenuComponent extends React.Component {
       }
 
       let stationRequest = baseUrl + '/api/gsod/' + queryValue;
-      if (yearTime || this.state.date.dateSet) { //Якщо є час, то потрібна і погода!
+      if (/* yearTime || */ this.state.date.dateSet) { //Якщо є час, то потрібна і погода!
 
         this.props.api.fetchData(stationRequest).then((station) => {
           this.props.onStationsData(station);
@@ -199,12 +196,9 @@ class MenuComponent extends React.Component {
   onTypeChanged = () => {
     this.clearSource();
     let type = this.s_type.current.value;
-    //disable limit and offset
-    if (type === "stname" || type === "id" || type === "wban") {
-      this.props.disableLimitAndOffset(true);
-    } else {
-      this.props.disableLimitAndOffset(false)
-    }
+    //disable limit and offset 
+    
+    this.props.disableLimitAndOffset(type === "stname" || type === "id" || type === "wban"); 
 
     if (this.state.year) {
       this.props.api.getByTypeAndYear(this.state.year, this.s_type.current.value)
@@ -364,8 +358,8 @@ class MenuComponent extends React.Component {
 
           {readyToDownload &&
           <button download className="" target="_blank" role="button"
-             href={baseUrl + packLink + "?saveas=Stations.json"}>
-            СКАЧАЙ МЕНЕ
+             href={baseUrl + packLink + "?saveas=stations.json"}>
+            Download
           </button>}
 
           {this.currentStation()}
