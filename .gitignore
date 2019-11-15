@@ -4,6 +4,7 @@ DockerPublish/
 archived_log/
 errors/
 log/
+css/
 # User-specific files
 *.suo
 *.user
