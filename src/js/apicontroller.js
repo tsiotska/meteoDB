@@ -5,8 +5,11 @@ export class ApiController {
   constructor(loaderVisibility) {
     this.api = new FetchController(loaderVisibility)
     this.database = "gsod";
-    this.markerRequest = "";
-    this.resetController()
+    this.resetController();
+    let date = {
+      time: "",
+      year: ""
+    }
   }
 
   resetController = () => {
@@ -17,11 +20,10 @@ export class ApiController {
             this._pack =
               this._nearest =
                 this._hasNeighbours = null;
-  }
+  };
 
   YieldsToWeatherRequest = () => this.year || this.time;
 
-  // Getters & setters
   get time() {
     return this._time === null
       ? ''
@@ -39,7 +41,24 @@ export class ApiController {
   }
 
   set year(value) {
-    this._time = value;
+    console.log("Setter of year")
+    this._year = value;
+  }
+
+  set markerRequest(value) {
+    this._markerRequest = value;
+  }
+
+  get markerRequest() {
+    return this._markerRequest === null ? '' : this._markerRequest;
+  }
+
+  set polyRequest(value) {
+    this._markerRequest = value;
+  }
+
+  get polyRequest() {
+    return this._markerRequest === null ? '' : this._markerRequest;
   }
 
   // Fluent api region
@@ -47,18 +66,19 @@ export class ApiController {
     this._time = null;
     this._year = value;
     return this;
-  }
+  };
 
   withNeighbors = (value) => {
     this._hasNeighbours = value;
     return this;
-  }
+  };
 
   withTimeRange = (value) => {
     this._year = null;
     this._time = value;
     return this;
   }
+
   withOffset = (value) => {
     this._offset = value;
     return this;
@@ -69,17 +89,16 @@ export class ApiController {
     return this;
   }
 
-
   // Link builders
   addNeighbours = () => {
     return this._hasNeighbours ? '&nbs' : ''
   }
 
-  addTime = () => {
-    return this._time
-      ? ('&since=' + this._time.startDate.format('DD.MM.YYYY') +
-        '&until=' + this._time.endDate.format('DD.MM.YYYY'))
-      : (this._year ? "&year=" + this._year : '');
+  getTime = () => {
+    return this.time
+      ? ('&since=' + this.time.startDate.format('DD.MM.YYYY') +
+        '&until=' + this.time.endDate.format('DD.MM.YYYY'))
+      : (this.year ? "&year=" + this.year : '');
   }
 
   addPack = () => {
@@ -104,24 +123,14 @@ export class ApiController {
   createLatLonWithRadiusLink = (lat, lon, rad) => {
     return baseUrl + '/api/' + this.database +
       '/poly?type=circle&value=[' + lat + ',' + lon + ',' + rad + 'km]';
-  }
-
+  };
 
   // Final builder
   fetchData = (link) => {
-    return this.api.Get(
-      link +
-      this.addLimiters() +
-      this.addNearestStations() +
-      this.addNeighbours() +
-      this.addTime() +
-      this.addStatistics() +
-      this.addPack());
+    return this.api.Get(link)
   };
 
-
   // Fetch region. Each method will reset controller
-
   getPack = (link) => {
     this.resetController()
     this._pack = true
@@ -144,76 +153,76 @@ export class ApiController {
     return this.fetchData(this.createLatLonWithRadiusLink(lat, lon, rad))
   };
 
-  fromMapEvent(e) {
+  getStationsFromMapEvent(e) {
     console.log(e);
-
     let req = "", lngs = null;
-
-    // TODO : build request from map
-    // create circle or poly request
     if (e.options.radius !== undefined) {
-      let res = [e._latlng.lat, e._latlng.lng, e.getRadius()/1000 + 'km'];
+      let res = [e._latlng.lat, e._latlng.lng, e.getRadius() / 1000 + 'km'];
       req = baseUrl + '/api/' + this.database + '/poly?type=circle&value=[' + res + ']';
     } else {
       lngs = e._latlngs;
       req = baseUrl + '/api/' + this.database + '/poly?type=poly&value=[' + lngs.join('],[') + ']';
     }
+    this.polyRequest = req;
+    //createPackLink
     return this.fetchData(req);
   }
 
-  getStationsCount() {
-    return this.fetchData(baseUrl + "/api/gsod/countries/stationsCount")
-  }
+  getWeatherFromMapEvent = () => {
+
+    let time = this.getTime();
+    let link = this.polyRequest + time;
+    console.log(link);
+    if (time) {
+      return this.fetchData(link);
+    } else return [];
+  };
 
   ChooseFromContext(context) {
     console.log(context);
-
-
     context.date && (this.time = context.date) || context.year && (this.year = context.year);
-   console.log(this._time);
-
+    this.polyRequest = context.polyRequest;
+    this.markerRequest = context.markerRequest;
 
     let isWeatherRequest = this.YieldsToWeatherRequest();
+
     if (context.isMarkerSelected && isWeatherRequest) {
-
-      this.fetchData( markerRequest)
+      this.fetchData(this.markerRequest)
         .then((weather) => {
           context.setWeather(weather.response);
         }).catch((error) => console.log(error));
 
-    } else if (this.props.isPolySelected && isWeatherRequest) {
-
-      this.fetchData(this.state.polyRequest)
+    } else if (context.isPolySelected && isWeatherRequest) {
+      this.fetchData(this.polyRequest)
         .then((weather) => {
           context.setWeather(weather.response);
         }).catch((error) => console.log(error));
 
-    } else if (this.props.isPolySelected || this.props.isMarkerSelected) {
+    } else if (context.isPolySelected || context.isMarkerSelected) {
       alert("Nothing to search...")
     }
     //Звичайний запит за типом і query.
     else {
       let neighbors, queryType, polyreq, limit, offset,
-        searchType = this.selectorByField.current.value;
+        searchType = context.selectedField;
       //Запит або Poly або вручну вбивали
-      limit = this.state.limit || undefined;
-      offset = this.state.offset || undefined;
+      limit = context.limit || undefined;
+      offset = context.offset || undefined;
       neighbors = context.neighbors;
-      let names = this.state.queryParam;
+      let names = context.queryParam;
       queryType = (names ? '&query=' + names : '');
-
 
       let queryValue = (polyreq ? polyreq : 'stations?field=' + searchType + queryType + neighbors);
 
       if (limit !== undefined) {
         queryValue += '&limit=' + limit
-      } //offset може бути і без ліміта.
+      }
       if (offset !== undefined) {
         queryValue += '&offset=' + offset
       }
 
       let stationRequest = baseUrl + '/api/gsod/' + queryValue;
-      if (/* yearTime || */ this.state.date.dateSet) { //Якщо є час, то потрібна і погода!
+      if (context.year || context.date.dateSet) {
 
         this.fetchData(stationRequest).then((station) => {
           this.props.onStationsData(station);
@@ -238,26 +247,7 @@ export class ApiController {
     }
   }
 
-
-  // IT'S WRONG - we can't do it in this way
-  // THIS REQUESTS WILL FETCH DATA FOR ALL STATIONS
-
-  /*  getByTypeAndYear = (year, type) => {
-     let link = baseUrl + "/api/" + this.database + "/stations?extract=" + type + "&year=" + year;
-     return this.fetchData(link)
-   };
- 
-   getByType = (type, offsetValue, countValue) => {
-     let offset = "", count = "";
-     if (offsetValue) {
-       offset = "&offset=" + offsetValue;
-     }
-     if (countValue) {
-       count = "&limit=" + countValue;
-     }
-     let link = baseUrl + "/api/" + this.database + "/stations?extract=" + type + offset + count;
-     return this.fetchData(link)
-   };
-  */
-
+  getStationsCount() {
+    return this.fetchData(baseUrl + "/api/gsod/countries/stationsCount")
+  }
 }

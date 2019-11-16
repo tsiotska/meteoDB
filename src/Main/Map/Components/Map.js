@@ -106,6 +106,7 @@ class MapX extends Component {
      }*/
 
   };
+
   whenReady() {
     mymap = this;
     mymap.on('click', () => {
@@ -139,33 +140,19 @@ class MapX extends Component {
     </Marker>);
   };
 
-  //Спрацьовує коли виділяєш полігон, працює з часом.
-  fetchMarkers = (e) => { 
+  fetchMarkers = (e) => {
     this.props.PolySelected(true);
-
     e = e.layer;
 
-    this.props.api.fromMapEvent(e).then((data) => {
-      this.props.onStationsData(data, e._latlngs);
+    this.props.api.getStationsFromMapEvent(e) .then((stations) => {
+      this.props.onStationsData(stations, e._latlngs);
     }).catch((error) => console.log(error));
-    
-    
-   // this.props.setPolyRequest(req);
 
-    //Запити станцій і погода (якщо час), нехай асинхронно
 
-/*     this.props.api.fetchData(req).then((data) => {
-      this.props.onStationsData(data, lngs);
-    }).catch((error) => console.log(error));
- */
-
-/*     let time = this.props.getSelectedTime();
-    if (time) {
-      this.props.api.fetchData(req + time).then((weather) => {
-        this.props.setWeather(weather.response);
-      }).catch((error) => console.log(error));
-    }
-    this.props.createPackLink(req); */
+    this.props.api.getWeatherFromMapEvent()
+      .then((weather) => {
+      this.props.setWeather(weather.response);
+    }) .catch((error) => console.log(error));
   };
 
 
@@ -180,7 +167,7 @@ class MapX extends Component {
     }
   };
 
-  shouldComponentUpdate(nextProps, nextState) { 
+  shouldComponentUpdate(nextProps, nextState) {
     return !(
       nextProps.markers && nextProps.markers[0] &&
       this.props.markers[0] === nextProps.markers[0]

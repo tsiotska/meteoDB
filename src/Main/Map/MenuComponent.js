@@ -122,12 +122,13 @@ class MenuComponent extends React.Component {
 
   onYearsChange = (event) => {
     let year = event.target.value;
+    this.props.api.year = year;
+
     if (year.length === 4) {
       this.setState({year: year});
     } else {
       this.setState({year: ""});
     }
-    //Треба юзати сагу/транк
     setTimeout(this.enableButton, 250)
   };
 
@@ -178,8 +179,12 @@ class MenuComponent extends React.Component {
     this.setState({limit: event.target.value})
   };
 
+  //Поки що нехай дублюється менеджер реакта і api.controller.
   ApplyCalendarDate = (e) => {
+    //тобто записуєм двічі
+    console.log(e);
     this.setState({date: e});
+    this.props.api.time = e;
     setTimeout(this.enableButton, 250);
   };
 
@@ -194,7 +199,6 @@ class MenuComponent extends React.Component {
 
     return (<div className="main_map container-fluid p-0">
       <Map setPolyRequest={this.setPolyRequest} setWeather={this.props.setWeather}
-
            clearMarkers={this.props.clearMarkers} api={this.props.api}
            activeMarker={this.props.activeMarker}
            onStationsData={this.props.onStationsData} markers={this.state.selectedPage}

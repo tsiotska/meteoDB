@@ -79,7 +79,6 @@ class Main extends Component {
     this.setState({MapMarkers: e})
   };
 
-
   checkTime = () => {
     let time = this.state.api.time;
     let isYear = time.includes('year');
