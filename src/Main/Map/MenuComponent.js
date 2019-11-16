@@ -196,7 +196,8 @@ class MenuComponent extends React.Component {
         clearMarkers={this.props.clearMarkers} api={this.props.api}
            activeMarker={this.props.activeMarker}
         onStationsData={this.props.onStationsData} markers={this.state.selectedPage}
-        currentSelected={this.props.markers} setCardItem={this.props.setCardItem} />
+        currentSelected={this.props.markers} clearWeather={this.props.clearWeather} setCardItem={this.props.setCardItem}
+      />
 
       <div className="cur_count_wrapper">
         <div className={"cur_count " + (
@@ -319,8 +320,6 @@ class MenuComponent extends React.Component {
         </div>
       </div>
 
-      <div className="m-2">
-        <Pagination items={markers} onChangePage={this.onChangePage} /></div>
     </div>);
   }
 }

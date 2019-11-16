@@ -21,7 +21,12 @@ class Pagination extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    // reset page if items array has changed
+    console.log("componentDidUpdate");
+
+    if(!this.props.items || this.props.items===[]){
+      console.log("DESTROY!");
+      this.props.onChangePage([]);
+    }
     if (this.props.items !== prevProps.items) {
       this.setPage(this.props.initialPage);
     } else if (this.props.onSelected !== prevProps.onSelected)

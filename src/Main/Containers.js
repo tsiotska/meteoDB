@@ -22,9 +22,10 @@ export default class Containers extends React.Component {
             </a>
           </div>
         </nav>
+
         <div className="tab-content" id="nav-tabContent">
           <CountryList ctr_list={this.props.ctr_list}/>
-          <SelectedStationsList index={this.props.mapSelectedIndex} selectedStations={this.props.selectedStations}/>
+          <SelectedStationsList onStationsChange={this.props.onStationsChange} index={this.props.mapSelectedIndex} selectedStations={this.props.selectedStations}/>
           <DaysItemsList selectedPage={this.state.selectedPage} daysItems={this.props.daysItems}/>
         </div>
       </div>

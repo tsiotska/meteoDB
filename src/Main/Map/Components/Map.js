@@ -87,8 +87,25 @@ class MapX extends Component {
   clearCardAndMarkers = () => {
     this.props.setCardItem([]);
     this.props.clearMarkers();
+    this.props.clearWeather();
+    this.clearPoly();
   };
 
+  clearPoly = () => {
+    console.log(mymap);
+    //L.layerGroup().removeFrom(mymap);
+    /* for (let i in mymap._layers) {
+       if (mymap._layers[i]) {
+         try {
+          // mymap.removeLayer(mymap._layers[i]);
+           mymap._layers[i].unbindTooltip();
+         } catch (e) {
+           console.log("problem with " + e + mymap._layers[i]);
+         }
+       }
+     }*/
+
+  };
   whenReady() {
     mymap = this;
     mymap.on('click', () => {
