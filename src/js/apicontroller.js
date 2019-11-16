@@ -172,6 +172,7 @@ export class ApiController {
     context.date && (this.time = context.date) || context.year && (this.year = context.year);
    console.log(this._time);
 
+   let markerRequest;
 
     let isWeatherRequest = this.YieldsToWeatherRequest();
     if (context.isMarkerSelected && isWeatherRequest) {
