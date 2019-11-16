@@ -4,7 +4,8 @@ import FetchController from "../js/Helpers/FetchController";
 export class ApiController {
   constructor(loaderVisibility) {
     this.api = new FetchController(loaderVisibility)
-    this.database = "gsod"
+    this.database = "gsod";
+    this.markerRequest = "";
     this.resetController()
   }
 
@@ -165,18 +166,24 @@ export class ApiController {
   }
 
   ChooseFromContext(context) {
+    console.log(context);
+
+
+    context.date && (this.time = context.date) || context.year && (this.year = context.year);
+   console.log(this._time);
+
+
     let isWeatherRequest = this.YieldsToWeatherRequest();
+    if (context.isMarkerSelected && isWeatherRequest) {
 
-    if (this.props.isMarkerSelected && isWeatherRequest) {
-
-      this.fetchData(this.state.markerRequest + isWeatherRequest)
+      this.fetchData( markerRequest)
         .then((weather) => {
           context.setWeather(weather.response);
         }).catch((error) => console.log(error));
 
     } else if (this.props.isPolySelected && isWeatherRequest) {
 
-      this.fetchData(this.state.polyRequest + isWeatherRequest)
+      this.fetchData(this.state.polyRequest)
         .then((weather) => {
           context.setWeather(weather.response);
         }).catch((error) => console.log(error));
