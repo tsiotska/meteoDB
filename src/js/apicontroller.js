@@ -181,8 +181,14 @@ export class ApiController {
   ChooseFromContext(context) {
     console.log(context);
     context.date && (this.time = context.date) || context.year && (this.year = context.year);
+
     this.polyRequest = context.polyRequest;
     this.markerRequest = context.markerRequest;
+
+   console.log(this._time);
+
+   let markerRequest;
+
 
     let isWeatherRequest = this.YieldsToWeatherRequest();
 
