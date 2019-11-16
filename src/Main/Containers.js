@@ -13,7 +13,7 @@ export default class Containers extends React.Component {
 
   render() {
 
-    return (<div className="container-fluid p-3 mt-5 d-flex">
+    return (<div className="bottom-container container-fluid p-3 mt-5 d-flex">
       <div className="navi card p-2 container-fluid my-2">
         <nav>
           <div className="nav nav-tabs" id="nav-tab" role="tablist">
