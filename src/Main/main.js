@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
-import {mymap} from './Map/Components/Map';
-import {connect} from 'react-redux';
+import React, { Component } from 'react';
+import { mymap } from './Map/Components/Map';
+import { connect } from 'react-redux';
 import L from 'leaflet';
 import WeatherControl from "./Elements/WeatherControl";
 import Station from './Elements/StationTemplate';
@@ -11,21 +11,20 @@ import Nav from './NavbarTop';
 import Loader from './Elements/AtomLoader';
 import Containers from "./Containers";
 import CountCircle from './Elements/CountCircle';
-import 'leaflet.pm';
-import {baseUrl} from "../js/const"
+import 'leaflet.pm'; 
 import Footer from './Elements/Footer'
-import {ApiController} from '../js/apicontroller'
+import { ApiController } from '../js/apicontroller'
 import 'js/map_extensions'
 
 
 var markerGroup = null;
 
-function genMaker(e, click, content, cnt, i) {
-  return {position: e, click, content, id_cnt: cnt, data: i}
+function createMaker(e, click, content, cnt, i) {
+  return { position: e, click, content, id_cnt: cnt, data: i }
 }
 
 export function createStation(e, cnt, click) {
-  return <Station click={click} key={cnt} id={cnt} props={e}/>;
+  return <Station click={click} key={cnt} id={cnt} props={e} />;
 }
 
 function flatten(arr) {
@@ -55,7 +54,7 @@ class Main extends Component {
       //loadingProgress: 0,
       api: new ApiController(this.loaderVisibility),
       daysItems: [],
-      currentSelected: [], 
+      currentSelected: [],
       stationsCounter: null,
       lockM: true,
       readyToDownload: false
@@ -64,41 +63,42 @@ class Main extends Component {
     this.onMarkerClick = throttle(this.onMarkerClickBase, 500)
   }
 
-//Цю функцію в рєдакс не прокинеш
+  //Цю функцію в рєдакс не прокинеш
   loaderVisibility = (flag) => {
-    this.setState({isVisible: flag});
+    this.setState({ isVisible: flag });
   };
 
 
   clearMarkers = () => {
     const markers = [];
-    markers.push(genMaker([]));
-    this.setState({MapMarkers: []})
+    markers.push(createMaker([]));
+    this.setState({ MapMarkers: [] })
   };
 
   setMarkers = (e) => {
-    this.setState({MapMarkers: e})
+    this.setState({ MapMarkers: e })
   };
 
 
-  checkTime = () => { 
-    let time = this.state.api.time; 
+  checkTime = () => {
+    let time = this.state.api.time;
     let isYear = time.includes('year');
-    isYear ? this.state.api.ofTimeExp(time) : this.state.api.ofRangeExp(time);
+    isYear ? this.state.api.withYear(time) : this.state.api.withTimeRange(time);
     return time;
   };
 
-  getStationsData = (location, polygonType, radius) => {
+  getOneStationData = (location, radius) => {
     this.props.MarkerSelected(true);
 
+    radius = radius || 1;
     let lat = location.lat;
     let lon = location.lon || location.lng;
 
-    this.state.api.getStationByLatLon(polygonType, lat, lon, radius).then((station) => {
-    
+    this.state.api.getStationByLatLon(lat, lon, radius).then((station) => {
       let time = this.checkTime();
       if (time) {
-        this.state.api.getWeathByLatLon(polygonType, lat, lon, radius).then((weather) => {
+        // on click??
+        this.state.api.getWeatherByLatLon(lat, lon, radius).then((weather) => {
           this.setCardItem(station.response[0]);
           console.log(weather);
           this.setWeather(weather.response);
@@ -107,22 +107,24 @@ class Main extends Component {
         this.setCardItem(station.response[0]);
       }
     });
- 
-    this.createPackLink(this.state.api.createLatLonWithRadiusLink(polygonType, lat,lon, radius));
+
+    // create link for user download
+    this.fetchFileDownloadLink(
+      this.state.api.createLatLonWithRadiusLink(lat, lon, radius));
   };
 
 
-  createPackLink = (link) => {
+  fetchFileDownloadLink = (link) => {
     this.state.api.getPack(link).then((data) => {
-      this.setState({packLink: data.response[0]});
+      this.setState({ packLink: data.response[0] });
     }).catch((error) => console.log(error));
-    this.setState({readyToDownload: true})
+    this.setState({ readyToDownload: true })
   };
 
   setCardItem = (station) => {
     console.log(station);
     //  let cnt = 0;
-    this.setState({currentStation: createStation(station, 0)});
+    this.setState({ currentStation: createStation(station, 0) });
   };
 
   setWeather = (weather) => {
@@ -136,7 +138,7 @@ class Main extends Component {
   };
 
   creativeDay = (e, cnt) => {
-    return <WeatherControl key={cnt} data={e}/>;
+    return <WeatherControl key={cnt} data={e} />;
   };
 
   onMarkerClick() {
@@ -144,18 +146,12 @@ class Main extends Component {
   }
 
   onMarkerClickBase = (e) => {
-    console.log(e);
-    let coords = [e.latlng.lat, e.latlng.lng, "1km"];
-    let request = baseUrl + '/api/gsod/poly?type=circle&value=[' + coords + ']';
-
-    this.props.MarkerSelected(true, request);
-    const t = e.target.getLatLng();
-    this.getStationsData(t, "circle", 1);
+    this.getOneStationData(e.target.getLatLng(), 1);
   };
 
   onStationsData = (station) => {
-    this.setState({lockM: true});
-    this.setState({stationsCounter: <CountCircle response={station}/>});
+    this.setState({ lockM: true });
+    this.setState({ stationsCounter: <CountCircle response={station} /> });
     if (station.code === 33)
       return; // not found
     // const data = !resp.Item2 ? resp : resp.Item2; // hardcoded. maybe review API models
@@ -176,11 +172,11 @@ class Main extends Component {
         stationsAll: fx.map((i) => createStation(i, cnt++))
       });
     const markers = [], area_latlon = [];
-    for (let o = 0; o < fx.length; o++) {
-      let i = fx[o];
-      let lt = L.latLng(i.lat, i.lon);
-      area_latlon.push(lt);
-      markers.push(genMaker(lt, this.onMarkerClick, createStation(i), o, i));
+    for (let i = 0; i < fx.length; i++) {
+      let location = fx[i];
+      let coords = L.latLng(location.lat, location.lon);
+      area_latlon.push(coords);
+      markers.push(createMaker(coords, this.onMarkerClick, createStation(location), i, location));
     }
     this.setMarkers(markers);
 
@@ -189,7 +185,7 @@ class Main extends Component {
 
   onMapPageChanged = (e) => {
     if (this.state.lockM) {
-      this.setState({lockM: false});
+      this.setState({ lockM: false });
       return;
     }
     let t = e.map((r) => r.position);
@@ -207,11 +203,11 @@ class Main extends Component {
   };
 
   setCtrList = (list) => {
-    this.setState({ctr_list: list})
+    this.setState({ ctr_list: list })
   };
 
   selectedIndexChange = (e) => {
-    this.setState({mapSelectedIndex: e})
+    this.setState({ mapSelectedIndex: e })
   };
 
   onRefreshClick = () => {
@@ -219,9 +215,9 @@ class Main extends Component {
       48.289559, 31.3205566 // Ukraine centered
     ], 6);
     this.setMarkers([]);
-    this.setState({lastPoly: []})
+    this.setState({ lastPoly: [] })
   };
- 
+
 
   render() {
     let comp = {
@@ -237,8 +233,8 @@ class Main extends Component {
       activeMarker: this.activeMarker,
       PageChanged: this.onMapPageChanged,
       onMarkerClick: this.onMarkerClick,
-      onRefreshClick: this.onRefreshClick, 
-      createPackLink: this.createPackLink,
+      onRefreshClick: this.onRefreshClick,
+      createPackLink: this.fetchFileDownloadLink,
       packLink: this.state.packLink,
       readyToDownload: this.state.readyToDownload,
       clearMarkers: this.clearMarkers,
@@ -255,11 +251,11 @@ class Main extends Component {
     };
 
     return (<div className="container-fluid p-0">
-      <Nav/>
-      <MenuComponent {...comp}/>
-       {this.state.isVisible && <Loader isVisible={this.state.isVisible}/>}
-      <Containers {...conts}/>
-      <Footer/>
+      <Nav />
+      <MenuComponent {...comp} />
+      {this.state.isVisible && <Loader isVisible={this.state.isVisible} />}
+      <Containers {...conts} />
+      <Footer />
     </div>)
   }
 }
@@ -270,7 +266,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   MarkerSelected: (flag, req) => {
-    dispatch({type: "IF_MARKER_SELECTED", flag: flag, req: req})
+    dispatch({ type: "IF_MARKER_SELECTED", flag: flag, req: req })
   }
 });
 

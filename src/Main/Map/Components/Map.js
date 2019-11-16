@@ -4,7 +4,6 @@ import L from 'leaflet';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import $ from 'jquery';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
-import {baseUrl} from '../../../js/const';
 import connect from "react-redux/es/connect/connect";
 
 import 'leaflet.pm';

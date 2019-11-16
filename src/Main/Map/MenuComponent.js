@@ -21,7 +21,9 @@ class MenuComponent extends React.Component {
   constructor(props) {
     super(props);
     this.axios = null;
-    this.s_type = React.createRef();
+    this.selectorByField = React.createRef();
+    this.neighborsSelector = React.createRef();
+    this.nearestSelector = React.createRef();
     this.state = {
       markerRequest: "",
       polyRequest: "",
@@ -71,80 +73,17 @@ class MenuComponent extends React.Component {
   onSearchClick = () => {
     console.log("onSearchCLICK!");
 
-    this.props.api.WithOptions(
+    this.props.api.ChooseFromContext(
       {
         ...this.state,
-        neighbors: $('#nbs_chk').prop('checked')
-      })
+        isMarkerSelected: this.props.isMarkerSelected,
+        isPolySelected: this.props.isPolySelected,
+        selectedField: this.selectorByField.current.value,
+        neighbors: this.neighborsSelector.current.value,
+        nearest: this.nearestSelector.current.value
+      }).then((data)=>{
 
-
-    // TODO:  MOVE THIS LOGIC TO CONTROLLER
-    let time = this.props.api.getTimeAmplifiers(this.state);
-    //Єслі виділили маркер/полігон і хочєм погоду
-    console.log('isMarkerSelected?');
-    console.log(this.props.isMarkerSelected);
-    console.log('isPolySelected?');
-    console.log(this.props.isPolySelected);
-
-    if (this.props.isMarkerSelected && time) {
-      this.props.api.fetchData(this.state.markerRequest + time).then((weather) => {
-        this.props.setWeather(weather.response);
-      }).catch((error) => console.log(error));
-    } else if (this.props.isPolySelected && time) {
-      console.log("We are in POLY processing section!");
-      this.props.api.fetchData(this.state.polyRequest + time).then((weather) => {
-        this.props.setWeather(weather.response);
-      }).catch((error) => console.log(error));
-    } else if (this.props.isPolySelected || this.props.isMarkerSelected) {
-      alert("Nothing to search...")
-    }
-    //Звичайний запит за типом і query.
-    else {
-      let neighbors, queryType, polyreq, limit, offset,
-        searchType = this.s_type.current.value;
-      //Запит або Poly або вручну вбивали
-      limit = this.state.limit || undefined;
-      offset = this.state.offset || undefined;
-      neighbors = (
-        $('#nbs_chk').prop('checked')
-          ? '&nbs' : '');
-      let names = this.state.queryParam;
-      queryType = (names ? '&query=' + names : '');
-
-
-      let queryValue = (polyreq ? polyreq : 'stations?field=' + searchType + queryType + neighbors);
-
-      if (limit !== undefined) {
-        queryValue += '&limit=' + limit
-      } //offset може бути і без ліміта.
-      if (offset !== undefined) {
-        queryValue += '&offset=' + offset
-      }
-
-      let stationRequest = baseUrl + '/api/gsod/' + queryValue;
-      if (/* yearTime || */ this.state.date.dateSet) { //Якщо є час, то потрібна і погода!
-
-        this.props.api.fetchData(stationRequest).then((station) => {
-          this.props.onStationsData(station);
-
-          this.props.api.fetchData(stationRequest + time)
-            .then((weather) => {
-              this.props.setWeather(weather);
-            })
-            .catch((error) => {
-              console.log(error)
-            });
-        }).catch((error) => {
-          console.log(error)
-        });
-
-
-      } else {
-        this.props.api.fetchData(stationRequest).then((station) => {
-          this.props.onStationsData(station);
-        })
-      }
-    }
+      });
   };
 
   onChangePage = (selectedPage, index) => {
@@ -159,7 +98,7 @@ class MenuComponent extends React.Component {
   };
 
   setQuery = (e) => {
-    this.s_type.current.value = 'ctry_full';
+    this.selectorByField.current.value = 'ctry_full';
     $('#querystr').val(e);
     this.onSearchClick(e);
   };
@@ -172,7 +111,7 @@ class MenuComponent extends React.Component {
   enableButton = () => {
     let time =  this.props.api.getTimeAmplifiers(this.state)
 
-    if (this.state.queryParam.length > 0 || (time && this.props.isPolySelected || time && this.props.isMarkerSelected)) {
+    if (this.state.queryParam.length > 0 || (time && (this.props.isPolySelected ||  this.props.isMarkerSelected))) {
       this.setState({ enableSearchButton: true });
     } else {
       this.setState({ enableSearchButton: false })
@@ -197,26 +136,26 @@ class MenuComponent extends React.Component {
 
   onTypeChanged = () => {
     this.clearSource();
-    let type = this.s_type.current.value;
+    let type = this.selectorByField.current.value;
     //disable limit and offset 
 
     this.props.disableLimitAndOffset(type === "stname" || type === "id" || type === "wban");
 
     if (this.state.year) {
-      this.props.api.getByTypeAndYear(this.state.year, this.s_type.current.value)
+      this.props.api.getByTypeAndYear(this.state.year, this.selectorByField.current.value)
         .then((data) => {
           console.log(data.response[0]);
           //  this.setState({source: data.response})
         }).catch((error) => console.log(error))
     } else {
-      this.props.api.getByType(this.s_type.current.value, this.state.offset, this.state.limit)
+      this.props.api.getByType(this.selectorByField.current.value, this.state.offset, this.state.limit)
         .then((data) => {
 
           //Валідаційна дічь
           let array = data.response.filter((value) => {
-            return value[this.s_type.current.value] !== ""
+            return value[this.selectorByField.current.value] !== ""
           }).map((i) => {
-            return i[this.s_type.current.value];
+            return i[this.selectorByField.current.value];
           });
 
           array = array.filter(function (item, pos) {
@@ -273,7 +212,7 @@ class MenuComponent extends React.Component {
 
               <div className="col-5  mb-1">
                 <label htmlFor="type">Тип поля</label>
-                <select defaultValue="ctry_full" ref={this.s_type} disabled={this.props.isPolySelected}
+                <select defaultValue="ctry_full" ref={this.selectorByField} disabled={this.props.isPolySelected}
                   className="custom-select"
                   onChange={this.onTypeChanged} id="type">
                   <option>id</option>
@@ -320,9 +259,13 @@ class MenuComponent extends React.Component {
 
             </div>
             <div className="form-group w-50 ml-4 mb-1 form-check">
-              <input type="checkbox" className="form-check-input" id="nbs_chk" />
+              <input type="checkbox" className="form-check-input" id="nbs_chk" ref={this.neighborsSelector} />
               <label className="form-check-label" htmlFor="exampleCheck1">Сусідні країни</label>
 
+            </div>
+            <div className="form-group w-50 ml-4 mb-1 form-check">
+              <input type="text" className="form-check-input" id="nearest_chk" ref={this.nearestSelector} />
+              <label className="form-check-label" htmlFor="exampleCheck1">Найближчі N станцій</label>
             </div>
             <div className="col-auto d-flex w-100">
               <button id="reeval" onClick={this.onSearchClick}
@@ -359,14 +302,14 @@ class MenuComponent extends React.Component {
           </nav>
 
           {readyToDownload &&
-            <button download className="" target="_blank" role="button"
+            <Button download className="" target="_blank" 
               href={baseUrl + packLink + "?saveas=stations.json"}>
               Download
-          </button>}
+          </Button>}
 
           {this.currentStation()}
 
-          <Button id="flyn_toggle" className="fx btn asside btn-md" role="button"
+          <Button id="flyn_toggle" className="fx btn asside btn-md" 
             onClick={() => $('.flyn').toggleClass('active')}>
             <span className="fx1" />
             <span className="fx2" />
