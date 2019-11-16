@@ -81,7 +81,7 @@ class MenuComponent extends React.Component {
         selectedField: this.selectorByField.current.value,
         neighbors: this.neighborsSelector.current.value,
         nearest: this.nearestSelector.current.value
-      }).then((data)=>{
+      }).then((data) => {
 
       });
   };
@@ -109,9 +109,9 @@ class MenuComponent extends React.Component {
 
 
   enableButton = () => {
-    let time =  this.props.api.getTimeAmplifiers(this.state)
+    let time = this.props.api.getTimeAmplifiers(this.state)
 
-    if (this.state.queryParam.length > 0 || (time && (this.props.isPolySelected ||  this.props.isMarkerSelected))) {
+    if (this.state.queryParam.length > 0 || (time && (this.props.isPolySelected || this.props.isMarkerSelected))) {
       this.setState({ enableSearchButton: true });
     } else {
       this.setState({ enableSearchButton: false })
@@ -263,10 +263,12 @@ class MenuComponent extends React.Component {
               <label className="form-check-label" htmlFor="exampleCheck1">Сусідні країни</label>
 
             </div>
-            <div className="form-group w-50 ml-4 mb-1 form-check">
-              <input type="text" className="form-check-input" id="nearest_chk" ref={this.nearestSelector} />
-              <label className="form-check-label" htmlFor="exampleCheck1">Найближчі N станцій</label>
-            </div>
+            <div class="input-group input-group-sm mb-3 ">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-sm">Найближчі N станцій</span>
+              </div>
+              <input type="text" class="form-control" ref={this.nearestSelector} aria-label="Найближчі N станцій" aria-describedby="inputGroup-sizing-sm" />
+            </div> 
             <div className="col-auto d-flex w-100">
               <button id="reeval" onClick={this.onSearchClick}
                 className={this.state.enableSearchButton ? "btn btn-primary m-2 mb-1 mt-auto" :
@@ -302,14 +304,14 @@ class MenuComponent extends React.Component {
           </nav>
 
           {readyToDownload &&
-            <Button download className="" target="_blank" 
+            <Button download className="" target="_blank"
               href={baseUrl + packLink + "?saveas=stations.json"}>
               Download
           </Button>}
 
           {this.currentStation()}
 
-          <Button id="flyn_toggle" className="fx btn asside btn-md" 
+          <Button id="flyn_toggle" className="fx btn asside btn-md"
             onClick={() => $('.flyn').toggleClass('active')}>
             <span className="fx1" />
             <span className="fx2" />
