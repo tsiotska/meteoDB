@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { mymap } from './Map/Components/Map';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {mymap} from './Map/Components/Map';
+import {connect} from 'react-redux';
 import L from 'leaflet';
 import WeatherControl from "./Elements/WeatherControl";
 import Station from './Elements/StationTemplate';
@@ -11,20 +11,20 @@ import Nav from './NavbarTop';
 import Loader from './Elements/AtomLoader';
 import Containers from "./Containers";
 import CountCircle from './Elements/CountCircle';
-import 'leaflet.pm'; 
+import 'leaflet.pm';
 import Footer from './Elements/Footer'
-import { ApiController } from '../js/apicontroller'
+import {ApiController} from '../js/apicontroller'
 import 'js/map_extensions'
 
 
 var markerGroup = null;
 
 function createMaker(e, click, content, cnt, i) {
-  return { position: e, click, content, id_cnt: cnt, data: i }
+  return {position: e, click, content, id_cnt: cnt, data: i}
 }
 
 export function createStation(e, cnt, click) {
-  return <Station click={click} key={cnt} id={cnt} props={e} />;
+  return <Station click={click} key={cnt} id={cnt} props={e}/>;
 }
 
 function flatten(arr) {
@@ -64,18 +64,19 @@ class Main extends Component {
 
   //Цю функцію в рєдакс не прокинеш
   loaderVisibility = (flag) => {
-    this.setState({ isVisible: flag });
+    this.setState({isVisible: flag});
   };
 
 
   clearMarkers = () => {
-    const markers = [];
-    markers.push(createMaker([]));
-    this.setState({ MapMarkers: [] })
+    this.setState({
+      MapMarkers: [],
+      stationsAll: null
+    })
   };
 
   setMarkers = (e) => {
-    this.setState({ MapMarkers: e })
+    this.setState({MapMarkers: e})
   };
 
 
@@ -112,18 +113,16 @@ class Main extends Component {
       this.state.api.createLatLonWithRadiusLink(lat, lon, radius));
   };
 
-
   fetchFileDownloadLink = (link) => {
     this.state.api.getPack(link).then((data) => {
-      this.setState({ packLink: data.response[0] });
+      this.setState({packLink: data.response[0]});
     }).catch((error) => console.log(error));
-    this.setState({ readyToDownload: true })
+    this.setState({readyToDownload: true})
   };
 
   setCardItem = (station) => {
     console.log(station);
-    //  let cnt = 0;
-    this.setState({ currentStation: createStation(station, 0) });
+    this.setState({currentStation: createStation(station, 0)});
   };
 
   setWeather = (weather) => {
@@ -137,7 +136,7 @@ class Main extends Component {
   };
 
   creativeDay = (e, cnt) => {
-    return <WeatherControl key={cnt} data={e} />;
+    return <WeatherControl key={cnt} data={e}/>;
   };
 
   onMarkerClick() {
@@ -149,8 +148,8 @@ class Main extends Component {
   };
 
   onStationsData = (station) => {
-    this.setState({ lockM: true });
-    this.setState({ stationsCounter: <CountCircle response={station} /> });
+    this.setState({lockM: true});
+    this.setState({stationsCounter: <CountCircle response={station}/>});
     if (station.code === 33)
       return; // not found
     // const data = !resp.Item2 ? resp : resp.Item2; // hardcoded. maybe review API models
@@ -182,9 +181,15 @@ class Main extends Component {
     mymap.fitBounds(L.latLngBounds(area_latlon));
   };
 
+  clearWeather = () => {
+    this.setState({
+      daysItems: []
+    })
+  };
+
   onMapPageChanged = (e) => {
     if (this.state.lockM) {
-      this.setState({ lockM: false });
+      this.setState({lockM: false});
       return;
     }
     let t = e.map((r) => r.position);
@@ -202,11 +207,11 @@ class Main extends Component {
   };
 
   setCtrList = (list) => {
-    this.setState({ ctr_list: list })
+    this.setState({ctr_list: list})
   };
 
   selectedIndexChange = (e) => {
-    this.setState({ mapSelectedIndex: e })
+    this.setState({mapSelectedIndex: e})
   };
 
   onRefreshClick = () => {
@@ -214,9 +219,8 @@ class Main extends Component {
       48.289559, 31.3205566 // Ukraine centered
     ], 6);
     this.setMarkers([]);
-    this.setState({ lastPoly: [] })
+    this.setState({lastPoly: []})
   };
-
 
   render() {
     let comp = {
@@ -237,7 +241,8 @@ class Main extends Component {
       packLink: this.state.packLink,
       readyToDownload: this.state.readyToDownload,
       clearMarkers: this.clearMarkers,
-      setCardItem: this.setCardItem
+      setCardItem: this.setCardItem,
+      clearWeather: this.clearWeather
     };
 
     let conts = {
@@ -246,15 +251,15 @@ class Main extends Component {
       DownloadList: this.state.DownloadList,
       selectedStations: this.state.stationsAll,
       stations: this.state.stationsAll,
-      daysItems: this.state.daysItems
+      daysItems: this.state.daysItems,
     };
 
     return (<div className="container-fluid p-0">
-      <Nav />
+      <Nav/>
       <MenuComponent {...comp} />
-      {this.state.isVisible && <Loader isVisible={this.state.isVisible} />}
-      <Containers {...conts} />
-      <Footer />
+      {this.state.isVisible && <Loader isVisible={this.state.isVisible}/>}
+      <Containers {...conts}/>
+      <Footer/>
     </div>)
   }
 }
@@ -265,7 +270,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   MarkerSelected: (flag, req) => {
-    dispatch({ type: "IF_MARKER_SELECTED", flag: flag, req: req })
+    dispatch({type: "IF_MARKER_SELECTED", flag: flag, req: req})
   }
 });
 
