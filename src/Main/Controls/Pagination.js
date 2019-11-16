@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 const defaultProps = {
   initialPage: 1
-}
+};
 
 class Pagination extends React.Component {
   constructor(props) {
@@ -13,7 +13,7 @@ class Pagination extends React.Component {
     };
   }
 
-  UNSAFE_componentWillMount() {
+  componentWillMount() {
     // set page if items array isn't empty
     if (this.props.items && this.props.items.length) {
       this.setPage(this.props.initialPage);
@@ -22,10 +22,10 @@ class Pagination extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     // reset page if items array has changed
-   /* if (this.props.items !== prevProps.items) {
-      this.setPage([]);
-    }*/
-
+    if (this.props.items !== prevProps.items) {
+      this.setPage(this.props.initialPage);
+    } else if (this.props.onSelected !== prevProps.onSelected)
+      this.setPage(this.props.onSelected);
   }
 
   setPage(page) {
@@ -37,7 +37,7 @@ class Pagination extends React.Component {
     pager = this.getPager(items.length, page);
     var pageOfItems = items.slice(pager.startIndex, pager.endIndex + 1);
 
-    this.setState({pager});
+    this.setState({ pager });
     this.props.onChangePage(pageOfItems, page);
   }
 
@@ -85,33 +85,33 @@ class Pagination extends React.Component {
         pager.currentPage === 1
           ? 'disabled'
           : '')}>
-        <a className="page-link" href="#!" onClick={() => this.setPage(1)}>First</a>
+        <a className="page-link" onClick={() => this.setPage(1)}>First</a>
       </li>
       <li className={"page-item " + (
         pager.currentPage === 1
           ? 'disabled'
           : '')}>
-        <a className="page-link" href="#!" onClick={() => this.setPage(pager.currentPage - 1)}>Previous</a>
+        <a className="page-link" onClick={() => this.setPage(pager.currentPage - 1)}>Previous</a>
       </li>
       {
         pager.pages.map((page, index) => <li key={index} className={"page-item " + (
           pager.currentPage === page
             ? 'active'
             : '')}>
-          <a className="page-link" href="#!"  onClick={() => this.setPage(page)}>{page}</a>
+          <a className="page-link" onClick={() => this.setPage(page)}>{page}</a>
         </li>)
       }
       <li className={"page-item " + (
         pager.currentPage === pager.totalPages
           ? 'disabled'
           : '')}>
-        <a className="page-link" href="#!" onClick={() => this.setPage(pager.currentPage + 1)}>Next</a>
+        <a className="page-link" onClick={() => this.setPage(pager.currentPage + 1)}>Next</a>
       </li>
       <li className={"page-item " + (
         pager.currentPage === pager.totalPages
           ? 'disabled'
           : '')}>
-        <a className="page-link" href="#!" onClick={() => this.setPage(pager.totalPages)}>Last</a>
+        <a className="page-link" onClick={() => this.setPage(pager.totalPages)}>Last</a>
       </li>
     </ul>);
   }

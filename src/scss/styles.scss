@@ -1,9 +1,5 @@
-// MUST BE REWRITEN TO BEM
-// CURRENTLY ALL STYLES ARE HERE
-
-
 .scrollable {
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 
 .btn {
@@ -25,8 +21,8 @@
 
 .empt{
   margin: 2em;
-    font-family: cursive;
-    font-size: 1.5em;
+  font-family: cursive;
+  font-size: 1.5em;
 }
 
 .st_card{
@@ -282,7 +278,7 @@
 }
 
 .w_id {
-    border-radius: 3em 3em 0 0;
+  border-radius: 3em 3em 0 0;
   -webkit-box-shadow: 2px -2px 4px 0 #d1d1d1;
   box-shadow: 2px -2px 4px 0 #d1d1d1;
 }
@@ -481,10 +477,10 @@ nav .nav-tabs {
 }
 .container.overex{
   box-shadow: 2px 1px 15px 1px;
-border-radius: 1em;
+  border-radius: 1em;
   overflow-y:scroll;
   max-height: 40vh;
 }
 
 @import "keyframes.scss";
-@import "daterangepicker.scss"
+@import "daterangepicker.scss";

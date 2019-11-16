@@ -192,9 +192,9 @@ class MenuComponent extends React.Component {
 
     return (<div className="main_map container-fluid p-0">
       <Map setPolyRequest={this.setPolyRequest} setWeather={this.props.setWeather}
-        /*    getSelectedTime={this.getSelectedTime.bind(this)} */
+
         clearMarkers={this.props.clearMarkers} api={this.props.api}
-           /* createPackLink={this.props.createPackLink}  */ activeMarker={this.props.activeMarker}
+           activeMarker={this.props.activeMarker}
         onStationsData={this.props.onStationsData} markers={this.state.selectedPage}
         currentSelected={this.props.markers} setCardItem={this.props.setCardItem} />
 

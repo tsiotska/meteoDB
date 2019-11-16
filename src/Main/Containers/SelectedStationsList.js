@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import Pagination from '../../Main/Controls/Pagination'
 import {emptyContainer} from '../../js/const'
+
 export default class SelectedStationsList extends Component {
   constructor(props) {
     super(props);
@@ -18,7 +19,7 @@ export default class SelectedStationsList extends Component {
       {
         this.props.selectedStations
           ? <Pagination items={this.props.selectedStations} onSelected={this.props.index} onChangePage={this.onStationsChange}/>
-          : ""
+          : "Empty"
       }
       {
         this.state.selectedPage

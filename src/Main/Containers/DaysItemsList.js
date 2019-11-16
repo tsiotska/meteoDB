@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import Pagination from '../../Main/Controls/Pagination'
+import Pagination from '../../Main/Controls/Pagination';
 import {emptyContainer} from '../../js/const'
 export default class DaysItemsList extends Component {
   constructor(props) {

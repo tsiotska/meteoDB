@@ -10,7 +10,7 @@ export default class CountryList extends Component {
             <ul className="text-center list-group" id="ctr-list">{this.props.ctr_list}</ul>
           </div>
           : emptyContainer
-      }*
+      }
     </div>)
   }
 }

@@ -44,8 +44,7 @@ class Main extends Component {
         lat: null,
         lng: null
       },
-
-      stationsAll: [],
+      stationsAll: null,
       DownloadList: [],
       ctr_list: [],
       togglerSelect: false,

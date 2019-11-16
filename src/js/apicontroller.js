@@ -1,4 +1,4 @@
-import { baseUrl } from "../js/const"
+import {baseUrl} from "../js/const"
 import FetchController from "../js/Helpers/FetchController";
 
 export class ApiController {
@@ -7,14 +7,15 @@ export class ApiController {
     this.database = "gsod"
     this.resetController()
   }
+
   resetController = () => {
     this._time =
       this._offset =
-      this._limit =
-      this._year =
-      this._pack =
-      this._nearest=
-      this._hasNeighbours = null;
+        this._limit =
+          this._year =
+            this._pack =
+              this._nearest =
+                this._hasNeighbours = null;
   }
 
   YieldsToWeatherRequest = () => this.year || this.time;
@@ -72,31 +73,36 @@ export class ApiController {
   addNeighbours = () => {
     return this._hasNeighbours ? '&nbs' : ''
   }
+
   addTime = () => {
     return this._time
       ? ('&since=' + this._time.startDate.format('DD.MM.YYYY') +
         '&until=' + this._time.endDate.format('DD.MM.YYYY'))
       : (this._year ? "&year=" + this._year : '');
   }
+
   addPack = () => {
     return this._pack ? '&pack' : '';
   }
+
   addLimiters = () => {
     return (this._offset ? '&offset=' + this._offset : '') +
       (this._limit ? '&limit=' + this._limit : '')
   }
+
   addStatistics = () => {
     return '' // statistics parameters in future versions
   }
+
   addNearestStations = () => {
     // returns nearest N stations for query
     return this._nearest ? '&nearest=' + this._nearest : ''
   }
 
   // Link builders
-  createLatLonWithRadiusLink = (lat, lon, rad) => { 
+  createLatLonWithRadiusLink = (lat, lon, rad) => {
     return baseUrl + '/api/' + this.database +
-     '/poly?type=circle&value=[' + lat + ',' + lon + ',' + rad + 'km]';
+      '/poly?type=circle&value=[' + lat + ',' + lon + ',' + rad + 'km]';
   }
 
 
@@ -128,31 +134,32 @@ export class ApiController {
   };
 
   getStationByLatLon = (lat, lon, rad) => {
-    this.resetController()
+    this.resetController();
     return this.fetchData(this.createLatLonWithRadiusLink(lat, lon, rad))
   };
 
   getWeatherByLatLon = (lat, lon, rad) => {
     //TODO: append date
     return this.fetchData(this.createLatLonWithRadiusLink(lat, lon, rad))
-  }
- 
+  };
+
   fromMapEvent(e) {
+    console.log(e);
+
     let req = "", lngs = null;
 
     // TODO : build request from map
     // create circle or poly request
     if (e.options.radius !== undefined) {
-      let res = [e._latlng.lat, e._latlng.lng, e.getRadius()];
+      let res = [e._latlng.lat, e._latlng.lng, e.getRadius()/1000 + 'km'];
       req = baseUrl + '/api/' + this.database + '/poly?type=circle&value=[' + res + ']';
     } else {
       lngs = e._latlngs;
       req = baseUrl + '/api/' + this.database + '/poly?type=poly&value=[' + lngs.join('],[') + ']';
     }
-
-
-
+    return this.fetchData(req);
   }
+
   getStationsCount() {
     return this.fetchData(baseUrl + "/api/gsod/countries/stationsCount")
   }
@@ -223,7 +230,7 @@ export class ApiController {
       }
     }
   }
-  
+
 
   // IT'S WRONG - we can't do it in this way
   // THIS REQUESTS WILL FETCH DATA FOR ALL STATIONS
@@ -244,6 +251,6 @@ export class ApiController {
      let link = baseUrl + "/api/" + this.database + "/stations?extract=" + type + offset + count;
      return this.fetchData(link)
    };
-  */ 
+  */
 
 }

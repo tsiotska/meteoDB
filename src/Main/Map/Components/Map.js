@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
 import {TileLayer, Map, Marker, Tooltip} from 'react-leaflet';
-import L from 'leaflet';
+import L, {LatLng} from 'leaflet';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import $ from 'jquery';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import connect from "react-redux/es/connect/connect";
-
 import 'leaflet.pm';
 
 export var mymap = null,
@@ -43,21 +42,6 @@ class MapX extends Component {
     }
   }
 
-  /* getMarkersInPoly = (e) => {
-     if (this.state.MapMarkers) {
-       let markers = this.state.MapMarkers;
-       let res = [];
-       markers.forEach(function (marker) {
-         if (e.layer.contains(marker.position)) {
-           res.push(marker.position)
-         }
-       });
-       var mks_sel = this.state.MapMarkers.filter(function (m) {
-         return res.includes(m.position)
-       });
-       this.setState({innerMarker: mks_sel})
-     }
-   };*/
 
   initDraw = (mymap) => {
     let options = {
@@ -138,15 +122,13 @@ class MapX extends Component {
     </Marker>);
   };
 
-
   //Спрацьовує коли виділяєш полігон, працює з часом.
   fetchMarkers = (e) => { 
     this.props.PolySelected(true);
 
     e = e.layer;
 
-    this.props.api.FromMapEvent(e)
-    .then((data) => {
+    this.props.api.fromMapEvent(e).then((data) => {
       this.props.onStationsData(data, e._latlngs);
     }).catch((error) => console.log(error));
     
