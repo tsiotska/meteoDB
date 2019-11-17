@@ -19,7 +19,7 @@ export class ApiController {
                 this._hasNeighbours = null;
   }
 
-  YieldsToWeatherRequest = () => this.year || this.time;
+  YieldsToWeatherRequest = () => this.year || (this.time && this.time.dateSet);
 
   // Getters & setters
   get time() {

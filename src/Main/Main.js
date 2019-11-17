@@ -5,7 +5,6 @@ import L from 'leaflet';
 import WeatherControl from "./Elements/WeatherControl";
 import Station from './Elements/StationTemplate';
 import MenuComponent from './Map/MenuComponent'
-import 'leaflet-selectareafeature';
 import throttle from 'lodash/throttle';
 import Nav from './NavbarTop';
 import Loader from './Elements/AtomLoader';
