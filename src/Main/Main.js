@@ -81,9 +81,11 @@ class Main extends Component {
 
   checkTime = () => {
     let time = this.state.api.time;
+    console.log(time);
     let isYear = time.includes('year');
     isYear ? this.state.api.withYear(time) : this.state.api.withTimeRange(time);
     return time;
+    //this.state.api.YieldsToWeatherRequest
   };
 
   getOneStationData = (location, radius) => {
@@ -96,7 +98,6 @@ class Main extends Component {
     this.state.api.getStationByLatLon(lat, lon, radius).then((station) => {
       let time = this.checkTime();
       if (time) {
-        // on click??
         this.state.api.getWeatherByLatLon(lat, lon, radius).then((weather) => {
           this.setCardItem(station.response[0]);
           console.log(weather);

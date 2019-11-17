@@ -2,15 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="127fecab-2f4c-410c-8def-b16e70054d12" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/rc-1.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main/Main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main/Main.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main/Main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main/Map/MenuComponent.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main/Map/MenuComponent.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/js/apicontroller.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/js/apicontroller.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -24,11 +18,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Main/Main.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-100">
-              <caret line="121" column="23" selection-start-line="121" selection-start-column="23" selection-end-line="121" selection-end-column="23" />
+            <state relative-caret-position="160">
+              <caret line="149" column="12" selection-start-line="149" selection-start-column="2" selection-end-line="149" selection-end-column="12" />
             </state>
           </provider>
         </entry>
@@ -36,8 +30,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Main/Map/MenuComponent.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="70">
-              <caret line="41" column="6" selection-start-line="41" selection-start-column="6" selection-end-line="41" selection-end-column="6" />
+            <state relative-caret-position="341">
+              <caret line="102" column="33" selection-start-line="102" selection-start-column="33" selection-end-line="102" selection-end-column="33" />
               <folding>
                 <element signature="e#0#26#0" expanded="true" />
               </folding>
@@ -45,11 +39,24 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Main/Map/Components/Map.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="200">
+              <caret line="145" lean-forward="true" selection-start-line="145" selection-end-line="145" />
+              <folding>
+                <element signature="e#0#39#0" expanded="true" />
+                <element signature="e#9#15#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/js/apicontroller.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="474">
-              <caret line="259" lean-forward="true" selection-end-line="259" />
+            <state relative-caret-position="31">
+              <caret line="244" column="31" selection-start-line="244" selection-start-column="31" selection-end-line="244" selection-end-column="31" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
               </folding>
@@ -61,36 +68,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>getTimeAmplifiers</find>
-      <find>yield</find>
-      <find>getTime</find>
-      <find>contex</find>
-      <find>ChooseFromContext</find>
-      <find>fetchData</find>
+      <find>this.state.api.time</find>
+      <find>isMarkerSele</find>
+      <find>withOffset</find>
+      <find>nearest</find>
       <find>markerRequest</find>
-      <find>baseUrl</find>
+      <find>getTIme</find>
+      <find>setWeather</find>
+      <find>onSearc</find>
+      <find>fetchData</find>
       <find>polyRequest</find>
-      <find>request</find>
+      <find>getStationsFromMapEvent</find>
+      <find>getOneStationData</find>
       <find>setPolyRequest</find>
-      <find>onSearch</find>
-      <find>selectedField</find>
-      <find>selectorByField</find>
-      <find>fromCon</find>
-      <find>fromMapEvent</find>
-      <find>context</find>
+      <find>createLatLonWithRadiusLink</find>
+      <find>getStationByLatLon</find>
+      <find>type</find>
+      <find>queryParam</find>
+      <find>setCo</find>
+      <find>withQuery</find>
+      <find>createStations</find>
+      <find>createStationsLink</find>
+      <find>createWeatherLink</find>
+      <find>withLimit</find>
+      <find>withLi</find>
+      <find>addLimit</find>
+      <find>createStat</find>
+      <find>yieldsTO</find>
       <find>YieldsToWeatherRequest</find>
-      <find>getWeather</find>
-      <find>&amp;</find>
-      <find>g</find>
-      <find>getWea</find>
-      <find>this.time</find>
-      <find>time</find>
-      <find>year</find>
-      <find>fetch</find>
-      <find>from</find>
-      <find>addTime</find>
-      <find>weather</find>
-      <find>date</find>
+      <find>searchByQuery</find>
+      <find>onSear</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -115,13 +122,14 @@
         <option value="$PROJECT_DIR$/.env.production" />
         <option value="$PROJECT_DIR$/src/Main/main.js" />
         <option value="$PROJECT_DIR$/src/Main/Elements/WeatherControl.js" />
-        <option value="$PROJECT_DIR$/src/Main/Map/MenuComponent.js" />
         <option value="$PROJECT_DIR$/src/Main/Map/Components/Map.js" />
+        <option value="$PROJECT_DIR$/src/Main/Main.js" />
         <option value="$PROJECT_DIR$/src/js/apicontroller.js" />
+        <option value="$PROJECT_DIR$/src/Main/Map/MenuComponent.js" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="-39" />
     <option name="y" value="316" />
     <option name="width" value="1296" />
@@ -134,7 +142,56 @@
     </navigator>
     <panes>
       <pane id="Scope" />
-      <pane id="ProjectPane" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="rc-1" type="b2602c69:ProjectViewProjectNode" />
+              <item name="rc-1" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="rc-1" type="b2602c69:ProjectViewProjectNode" />
+              <item name="rc-1" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="rc-1" type="b2602c69:ProjectViewProjectNode" />
+              <item name="rc-1" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="js" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="rc-1" type="b2602c69:ProjectViewProjectNode" />
+              <item name="rc-1" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="Main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="rc-1" type="b2602c69:ProjectViewProjectNode" />
+              <item name="rc-1" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="Main" type="462c0819:PsiDirectoryNode" />
+              <item name="Map" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="rc-1" type="b2602c69:ProjectViewProjectNode" />
+              <item name="rc-1" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="Main" type="462c0819:PsiDirectoryNode" />
+              <item name="Map" type="462c0819:PsiDirectoryNode" />
+              <item name="Components" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="rc-1" type="b2602c69:ProjectViewProjectNode" />
+              <item name="rc-1" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="Main" type="462c0819:PsiDirectoryNode" />
+              <item name="redux" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -171,14 +228,17 @@
       <updated>1573903269686</updated>
       <workItem from="1573903272543" duration="12713000" />
       <workItem from="1573934736539" duration="12471000" />
+      <workItem from="1573947610776" duration="731000" />
+      <workItem from="1573989921918" duration="12611000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="25184000" />
+    <option name="totallyTimeSpent" value="38526000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -194,7 +254,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="10" visible="true" weight="0.029459901" />
+      <window_info anchor="bottom" id="Terminal" order="10" visible="true" weight="0.03927987" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -338,20 +398,29 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Main/Map/MenuComponent.js">
+    <entry file="file://$PROJECT_DIR$/src/Main/redux/conditionReducer.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="70">
-          <caret line="41" column="6" selection-start-line="41" selection-start-column="6" selection-end-line="41" selection-end-column="6" />
+        <state>
           <folding>
-            <element signature="e#0#26#0" expanded="true" />
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/js/apicontroller.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="31">
+          <caret line="244" column="31" selection-start-line="244" selection-start-column="31" selection-end-line="244" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#35#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Main/Map/Components/Map.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="349">
-          <caret line="154" column="45" selection-start-line="154" selection-start-column="45" selection-end-line="154" selection-end-column="45" />
+        <state relative-caret-position="200">
+          <caret line="145" lean-forward="true" selection-start-line="145" selection-end-line="145" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
             <element signature="e#9#15#0" expanded="true" />
@@ -359,20 +428,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Main/Main.js">
+    <entry file="file://$PROJECT_DIR$/src/Main/Map/MenuComponent.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-100">
-          <caret line="121" column="23" selection-start-line="121" selection-start-column="23" selection-end-line="121" selection-end-column="23" />
+        <state relative-caret-position="341">
+          <caret line="102" column="33" selection-start-line="102" selection-start-column="33" selection-end-line="102" selection-end-column="33" />
+          <folding>
+            <element signature="e#0#26#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/js/apicontroller.js">
+    <entry file="file://$PROJECT_DIR$/src/Main/Main.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="474">
-          <caret line="259" lean-forward="true" selection-end-line="259" />
-          <folding>
-            <element signature="e#0#35#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="160">
+          <caret line="149" column="12" selection-start-line="149" selection-start-column="2" selection-end-line="149" selection-end-column="12" />
         </state>
       </provider>
     </entry>

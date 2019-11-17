@@ -69,24 +69,45 @@ class MenuComponent extends React.Component {
     this.setState({polyRequest: req})
   };
 
-  //isPolySelected має пріорітет
+  /*Ти не можешь з одної функції заретурнити станції/погоду/пак.
+  Ти зберігаєш дані з реакт стора в чистому js класі, а не просто працюєш з ними, краще би метод класу просто
+  ретурнив лінку, а зберігати її або реакт або в редакс стейт.
+  Нехай перевірки робляться в реакт компоненті, а не в контроллері
+  */
+
   onSearchClick = () => {
-    console.log("onSearchCLICK!");
-
-    this.props.api.ChooseFromContext(
+    const {date, year, offset, limit, queryParam} = this.state;
+    const {isPolySelected, isMarkerSelected} = this.props;
+    this.props.api.setController(
       {
-        date: this.state.date,
-        year: this.state.year,
-        offset: this.state.offset,
-        limit: this.state.limit,
-        isMarkerSelected: this.props.isMarkerSelected,
-        isPolySelected: this.props.isPolySelected,
-        selectedField: this.selectorByField.current.value,
+        date: date,
+        year: year,
+        offset: offset,
+        limit: limit,
         neighbors: this.neighborsSelector.current.value,
-        nearest: this.nearestSelector.current.value
-      }).then((data) => {
+        nearest: this.nearestSelector.current.value,
+      });
 
-    });
+    if (isMarkerSelected || isPolySelected) {
+      this.props.api.uploadWeather({
+        isMarkerSelected: this.props.isMarkerSelected,
+        isPolySelected: this.props.isPolySelected
+      }).then((weather) => {
+        console.log(weather);
+      }).catch((error) => console.log(error))
+    } else if (queryParam) {
+      let data = this.props.api.searchByQuery({
+        query: queryParam,
+        selectedField: this.selectorByField.current.value,
+      });
+      console.log(data.stations);
+      this.props.onStationsData(data.stations);
+      if (data.weather !== null) {
+        this.props.setWeather(data.weather);
+      }
+    } else {
+      alert("Please choose a query...")
+    }
   };
 
   onChangePage = (selectedPage, index) => {
