@@ -32,8 +32,7 @@ export class ApiController {
   };
 
   YieldsToWeatherRequest = () => {
-    console.log(this.year)
-    return  (this.year || this.time.dateSet)
+    return (this.year || this.time.dateSet)
   };
 
   get time() {
@@ -72,8 +71,21 @@ export class ApiController {
     return this._polyRequest === null ? '' : this._polyRequest;
   }
 
+  set queryRequest(value) {
+    this._queryRequest = value;
+  }
+
+  get queryRequest() {
+    return this._queryRequest === null ? '' : this._queryRequest;
+  }
+
   withSelectedType = (type) => {
     this._type = type;
+    return this;
+  };
+
+  withQueryRequest = (req) => {
+    this._queryRequest = req;
     return this;
   };
 
@@ -119,6 +131,10 @@ export class ApiController {
     return this._type ? '&field=' + this._type : '';
   };
 
+  addQueryRequest = () => {
+    return this._queryRequest ? this._queryRequest : '';
+  };
+
   addNeighbours = () => {
     return this._hasNeighbours ? '&nbs' : ''
   };
@@ -160,7 +176,7 @@ export class ApiController {
     return link + '&pack';
   };
 
-  createStationsLink = (query) => {
+  createQueryLink = (query) => {
     return baseUrl + '/api/gsod/' + query
       + this.addNeighbours() + this.addNearestStations() + this.addLimiters();
   };
@@ -216,6 +232,7 @@ export class ApiController {
     } else return [];
   };
 
+  //upload Weather if we already have stations
   uploadWeather = (context) => {
     let isWeatherRequest = this.YieldsToWeatherRequest();
     if (context.isMarkerSelected && isWeatherRequest) {
@@ -231,37 +248,44 @@ export class ApiController {
     }
   };
 
-  searchByQuery(context) {
+  //simple query searching for stations
+  searchStationsByQuery = (context, time) => {
     let searchType = context.selectedField;
     let names = context.query;
     let queryType = '&query=' + names;
-
     let queryValue = 'stations?field=' + searchType + queryType;
-    let stationRequest = this.createStationsLink(queryValue);
 
-    let data = {stations: [], weather: null}; //Для перевірки null це фолс
-    this.fetchData(stationRequest).then((stations) => {
-      console.log("Stations getting...")
-      data.stations = stations;
-    }).catch((error) => {
-      console.log(error)
-    });
+    let stationRequest = this.createQueryLink(queryValue);
+    //Save req locally, thats bad
+    this.queryRequest = stationRequest;
+    return this.fetchData(stationRequest);
+  };
 
-    if (this.YieldsToWeatherRequest()) {
-      console.log("Weather getting...")
-      let weatherRequest = this.createWeatherLink(stationRequest)
-      this.fetchData(weatherRequest)
-        .then((weather) => {
-          data.weather = weather;
-        })
-        .catch((error) => {
-          console.log(error)
-        });
-    }
-    return data;
-  }
+  getWeatherByQuery = () => {
+    return this.fetchData(this.queryRequest + this.addTime());
+  };
 
   getStationsCount() {
     return this.fetchData(baseUrl + "/api/gsod/countries/stationsCount")
   }
+
+  //extractors
+
+  //Цей екстрактор мав би повертати обмежений лист query, якщо за той рік немає даних по якомусь параметру
+ /* getByTypeAndYear = (year, type) => {
+    let link = baseUrl + "/api/" + this.database + "/stations?extract=" + type + "&year=" + year;
+    return this.fetchData(link)
+  };*/
+
+  getByType = (type, offsetValue, countValue) => {
+    let offset = "", count = "";
+    if (offsetValue) {
+      offset = "&offset=" + offsetValue;
+    }
+    if (countValue) {
+      count = "&limit=" + countValue;
+    }
+    let link = baseUrl + "/api/" + this.database + "/stations?extract=" + type + offset + count;
+    return this.fetchData(link)
+  };
 }

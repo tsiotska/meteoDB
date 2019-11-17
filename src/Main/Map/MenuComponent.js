@@ -96,14 +96,19 @@ class MenuComponent extends React.Component {
         console.log(weather);
       }).catch((error) => console.log(error))
     } else if (queryParam) {
-      let data = this.props.api.searchByQuery({
+
+      this.props.api.searchStationsByQuery({
         query: queryParam,
         selectedField: this.selectorByField.current.value,
-      });
-      console.log(data.stations);
-      this.props.onStationsData(data.stations);
-      if (data.weather !== null) {
-        this.props.setWeather(data.weather);
+      }).then((stations) => {
+        console.log(stations);
+        this.props.onStationsData(stations);
+      }).catch((error) => console.log(error));
+
+      if (this.props.api.YieldsToWeatherRequest()) {
+        this.props.api.getWeatherByQuery().then((weather) => {
+          this.props.setWeather(weather);
+        }).catch((error) => console.log(error));
       }
     } else {
       alert("Please choose a query...")
@@ -161,8 +166,7 @@ class MenuComponent extends React.Component {
   onTypeChanged = () => {
     this.clearSource();
     let type = this.selectorByField.current.value;
-    //disable limit and offset 
-
+    //disable limit and offset
     this.props.disableLimitAndOffset(type === "stname" || type === "id" || type === "wban");
 
     if (this.state.year) {
