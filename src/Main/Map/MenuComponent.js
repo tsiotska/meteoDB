@@ -47,8 +47,6 @@ class MenuComponent extends React.Component {
     this.props.api.getStationsCount()
       .then((data) => {
         if (data && data.response) {
-
-
           this.setState({
             source: data.response.map((i) => i.name), //.item1
             isLoading: false
@@ -61,43 +59,35 @@ class MenuComponent extends React.Component {
       });
   }
 
-  setMarkerRequest = (req) => {
-    this.setState({markerRequest: req})
-  };
-
   setPolyRequest = (req) => {
     this.setState({polyRequest: req})
   };
 
-  /*Ти не можешь з одної функції заретурнити станції/погоду/пак.
-  Ти зберігаєш дані з реакт стора в чистому js класі, а не просто працюєш з ними, краще би метод класу просто
-  ретурнив лінку, а зберігати її або реакт або в редакс стейт.
-  Нехай перевірки робляться в реакт компоненті, а не в контроллері
-  */
-
   onSearchClick = () => {
-    const {date, year, offset, limit, queryParam} = this.state;
-    const {isPolySelected, isMarkerSelected} = this.props;
-    this.props.api.setController(
-      {
-        date: date,
-        year: year,
-        offset: offset,
-        limit: limit,
-        neighbors: this.neighborsSelector.current.value,
-        nearest: this.nearestSelector.current.value,
-      });
+    const {date, year, offset, limit, queryParam, polyRequest} = this.state;
+    const {isPolySelected, isMarkerSelected, markerRequest} = this.props;
+    /* this.props.api.setController(
+       {date: date, year: year, offset: offset,
+         limit: limit, neighbors: this.neighborsSelector.current.value,
+         nearest: this.nearestSelector.current.value,
+       });*/
 
     if (isMarkerSelected || isPolySelected) {
       this.props.api.uploadWeather({
-        isMarkerSelected: this.props.isMarkerSelected,
-        isPolySelected: this.props.isPolySelected
+        date: date, year: year, offset: offset,
+        limit: limit, neighbors: this.neighborsSelector.current.value,
+        nearest: this.nearestSelector.current.value,
+        isMarkerSelected: isMarkerSelected,
+        isPolySelected: isPolySelected,
+        polyRequest: polyRequest, markerRequest: markerRequest
       }).then((weather) => {
-        console.log(weather);
+        this.props.setWeather(weather.response);
       }).catch((error) => console.log(error))
     } else if (queryParam) {
-
       this.props.api.searchStationsByQuery({
+        date: date, year: year, offset: offset,
+        limit: limit, neighbors: this.neighborsSelector.current.value,
+        nearest: this.nearestSelector.current.value,
         query: queryParam,
         selectedField: this.selectorByField.current.value,
       }).then((stations) => {
@@ -136,10 +126,11 @@ class MenuComponent extends React.Component {
     this.props.onRefreshClick(e);
   };
 
-
   enableButton = () => {
-    let time = this.props.api.YieldsToWeatherRequest();
-    if (this.state.queryParam.length > 0 || (time && (this.props.isPolySelected || this.props.isMarkerSelected))) {
+    const {queryParam, date, year} = this.state;
+    const {isPolySelected, isMarkerSelected} = this.props;
+
+    if (queryParam.length > 0 || ((date.dateSet || year) && (isPolySelected || isMarkerSelected))) {
       this.setState({enableSearchButton: true});
     } else {
       this.setState({enableSearchButton: false})
@@ -148,7 +139,6 @@ class MenuComponent extends React.Component {
 
   onYearsChange = (event) => {
     let year = event.target.value;
-    this.props.api.year = year;
 
     if (year.length === 4) {
       this.setState({year: year});
@@ -169,31 +159,31 @@ class MenuComponent extends React.Component {
     //disable limit and offset
     this.props.disableLimitAndOffset(type === "stname" || type === "id" || type === "wban");
 
-    if (this.state.year) {
-      this.props.api.getByTypeAndYear(this.state.year, this.selectorByField.current.value)
-        .then((data) => {
-          console.log(data.response[0]);
-          //  this.setState({source: data.response})
-        }).catch((error) => console.log(error))
-    } else {
-      this.props.api.getByType(this.selectorByField.current.value, this.state.offset, this.state.limit)
-        .then((data) => {
+    /* if (this.state.year) {
+       this.props.api.getByTypeAndYear(this.state.year, this.selectorByField.current.value)
+         .then((data) => {
+           console.log(data.response[0]);
+           //  this.setState({source: data.response})
+         }).catch((error) => console.log(error))
+     } else {*/
+    this.props.api.getByType(this.selectorByField.current.value, this.state.offset, this.state.limit)
+      .then((data) => {
 
-          //Валідаційна дічь
-          let array = data.response.filter((value) => {
-            return value[this.selectorByField.current.value] !== ""
-          }).map((i) => {
-            return i[this.selectorByField.current.value];
-          });
+        //Валідаційна дічь
+        let array = data.response.filter((value) => {
+          return value[this.selectorByField.current.value] !== ""
+        }).map((i) => {
+          return i[this.selectorByField.current.value];
+        });
 
-          array = array.filter(function (item, pos) {
-            return array.indexOf(item) === pos;
-          });
+        array = array.filter(function (item, pos) {
+          return array.indexOf(item) === pos;
+        });
 
-          console.log(array);
-          this.setState({source: array});
-        }).catch((error) => console.log(error))
-    }
+        console.log(array);
+        this.setState({source: array});
+      }).catch((error) => console.log(error))
+    //}
   };
 
   onOffsetChange = (event) => {
@@ -204,13 +194,10 @@ class MenuComponent extends React.Component {
     this.setState({limit: event.target.value})
   };
 
-  //Поки що нехай дублюється менеджер реакта і api.controller.
   ApplyCalendarDate = (e) => {
-    //тобто записуєм двічі
     console.log(e);
     this.setState({date: e});
-    this.props.api.time = e;
-    setTimeout(this.enableButton, 250);
+    setTimeout(this.enableButton, 500);
   };
 
   unControlledInput = (searchParam) => {
@@ -220,7 +207,7 @@ class MenuComponent extends React.Component {
 
   render() {
     //Це деструктуризація, можеш писати її ще зі стейтом
-    const {areLimitAndOffsetDisabled, counter, readyToDownload, packLink, markers} = this.props;
+    const {areLimitAndOffsetDisabled, counter, readyToDownload, packLink} = this.props;
 
     return (<div className="main_map container-fluid p-0">
       <Map setPolyRequest={this.setPolyRequest} setWeather={this.props.setWeather}
@@ -228,7 +215,7 @@ class MenuComponent extends React.Component {
            activeMarker={this.props.activeMarker}
            onStationsData={this.props.onStationsData} markers={this.state.selectedPage}
            currentSelected={this.props.markers} clearWeather={this.props.clearWeather}
-           setCardItem={this.props.setCardItem}
+           setCardItem={this.props.setCardItem} year={this.state.year} date={this.state.date}
       />
 
       <div className="cur_count_wrapper">

@@ -95,6 +95,7 @@ class Main extends Component {
     let lat = location.lat;
     let lon = location.lon || location.lng;
 
+    this.this.setMarkerRequest(this.state.api.createLatLonWithRadiusLink(lat, lon, radius));
     this.state.api.getStationByLatLon(lat, lon, radius).then((station) => {
       let time = this.checkTime();
       if (time) {
@@ -145,6 +146,10 @@ class Main extends Component {
 
   onMarkerClickBase = (e) => {
     this.getOneStationData(e.target.getLatLng(), 1);
+  };
+
+  setMarkerRequest = (req) => {
+    this.setState({markerRequest: req})
   };
 
   onStationsData = (station) => {
@@ -242,7 +247,8 @@ class Main extends Component {
       readyToDownload: this.state.readyToDownload,
       clearMarkers: this.clearMarkers,
       setCardItem: this.setCardItem,
-      clearWeather: this.clearWeather
+      clearWeather: this.clearWeather,
+      markerRequest: this.state.markerRequest
     };
 
     let conts = {

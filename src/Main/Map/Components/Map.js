@@ -141,18 +141,26 @@ class MapX extends Component {
   };
 
   fetchMarkers = (e) => {
-    this.props.PolySelected(true);
+    const {PolySelected, setPolyRequest,onStationsData, setWeather, api, date, year} = this.props;
+
+    PolySelected(true);
     e = e.layer;
 
-    this.props.api.getStationsFromMapEvent(e) .then((stations) => {
-      this.props.onStationsData(stations, e._latlngs);
+    setPolyRequest(api.createPolyRequest(e));
+
+    api.getStationsFromMapEvent(e) .then((stations) => {
+      onStationsData(stations, e._latlngs);
     }).catch((error) => console.log(error));
 
-
-    this.props.api.getWeatherFromMapEvent()
+    if(date.dateSet || year)
+    api.getWeatherFromMapEvent({e: e, date: date, year: year})
       .then((weather) => {
-      this.props.setWeather(weather.response);
+      setWeather(weather.response);
     }) .catch((error) => console.log(error));
+
+    api.getPackFromMapEvent(e).then((pack) => {
+      //this.props.onStationsData(stations, e._latlngs);
+    }).catch((error) => console.log(error));
   };
 
 
