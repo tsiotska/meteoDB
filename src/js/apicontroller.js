@@ -9,23 +9,23 @@ export class ApiController {
   }
 
   setController = (context) => {
-    context.date && (this.time = context.date) || context.year && (this.year = context.year);
-    this.withQuery = context.query;
-    this.withOffset = context.offset;
-    this.withLimit = context.limit;
-    this.withNeighbors = context.neighbors;
-    this.withNearest = context.nearest;
+    context.date && (this.time = context.date);
+    context.year && (this.year = context.year);
+    this.withOffset(context.offset);
+    this.withLimit(context.limit);
+    this.withNeighbors(context.neighbors);
+    this.withNearest(context.nearest);
+    this.withPack(context.pack);
   };
 
   resetController = () => {
-    this._markerRequest =
-      this._time =
+    this._time =
+      this._year =
         this._offset =
           this._limit =
-            this._year =
-              this._pack =
-                this._nearest =
-                  this._hasNeighbours = null;
+            this._pack =
+              this._nearest =
+                this._hasNeighbours = null;
   };
 
   YieldsToWeatherRequest = () => {
@@ -52,45 +52,6 @@ export class ApiController {
     this._year = value;
   }
 
-  set markerRequest(value) {
-    this._markerRequest = value;
-  }
-
-  get markerRequest() {
-    return this._markerRequest === null ? '' : this._markerRequest;
-  }
-
-  set polyRequest(value) {
-    this._polyRequest = value;
-  }
-
-  get polyRequest() {
-    return this._polyRequest === null ? '' : this._polyRequest;
-  }
-
-  set queryRequest(value) {
-    this._queryRequest = value;
-  }
-
-  get queryRequest() {
-    return this._queryRequest === null ? '' : this._queryRequest;
-  }
-
-  withSelectedType = (type) => {
-    this._type = type;
-    return this;
-  };
-
-  withQueryRequest = (req) => {
-    this._queryRequest = req;
-    return this;
-  };
-
-  withQuery = (value) => {
-    this._query = value;
-    return this;
-  };
-
   withYear = (value) => {
     this._time = null;
     this._year = value;
@@ -104,6 +65,11 @@ export class ApiController {
 
   withNeighbors = (value) => {
     this._hasNeighbours = value;
+    return this;
+  };
+
+  withPack = (flag) => {
+    this._pack = flag;
     return this;
   };
 
@@ -130,15 +96,16 @@ export class ApiController {
   };
 
   addTime = () => {
-    return this.time
+    return this.time.dateSet
       ? ('&since=' + this.time.startDate.format('DD.MM.YYYY') +
         '&until=' + this.time.endDate.format('DD.MM.YYYY'))
       : (this.year ? "&year=" + this.year : '');
   };
 
   addPack = () => {
+    console.log(this._pack);
     return this._pack ? '&pack' : '';
-  }
+  };
 
   addLimiters = () => {
     return (this._offset ? '&offset=' + this._offset : '') +
@@ -187,25 +154,22 @@ export class ApiController {
 
   // Final builder
   fetchData = (link) => {
-    return this.api.Get(
-      link +
+    let req = link +
       this.addLimiters() +
       this.addNearestStations() +
       this.addNeighbours() +
       this.addTime() +
       this.addStatistics() +
-      this.addPack());
+      this.addPack();
+
+    this.resetController();
+    return this.api.Get(req)
+
   };
 
   // Fetch region. Each method will reset controller
-  getPack = (link) => {
-    this.resetController();
-    this._pack = true;
-    return this.fetchData(link);
-  };
 
   getStationByLatLon = (lat, lon, rad) => {
-    this.resetController();
     return this.fetchData(this.createLatLonWithRadiusLink(lat, lon, rad))
   };
 
@@ -219,18 +183,17 @@ export class ApiController {
     return this.fetchData(link);
   }
 
-  //Це все шо внутрі нада якось замутити під параметри латлони і івент.
-  getWeatherFromMapEvent = (e) => {
-    this.setController(e);
+  getWeatherFromMapEvent = (context) => {
+    this.setController(context);
     if (this.YieldsToWeatherRequest()) {
-      let link = this.createPolyRequest(e) + this.addTime();
+      let link = this.createPolyRequest(context.e);
       return this.fetchData(link);
     }
   };
 
-  getPackFromMapEvent = (e) => {
-    let req = this.createPolyRequest(e);
-    let link = this.createPackLink(req);
+  getPackFromMapEvent = (context) => {
+    this.setController(context);
+    let link = this.createPolyRequest(context.e);
     return this.fetchData(link);
   };
 
@@ -238,6 +201,7 @@ export class ApiController {
   uploadWeather = (context) => {
     this.setController(context);
     let isWeatherRequest = this.YieldsToWeatherRequest();
+    console.log(this.year);
     if (context.isMarkerSelected && isWeatherRequest) {
       console.log("Marker request!");
       return this.fetchData(context.markerRequest)
@@ -245,7 +209,7 @@ export class ApiController {
     } else if (context.isPolySelected && isWeatherRequest) {
       console.log("Poly request!");
       return this.fetchData(context.polyRequest)
-      
+
     } else if (context.isPolySelected || context.isMarkerSelected) {
       alert("Nothing to search...") //Тут помилка, треба ретурн проміс
     }

@@ -95,7 +95,7 @@ class Main extends Component {
     let lat = location.lat;
     let lon = location.lon || location.lng;
 
-    this.this.setMarkerRequest(this.state.api.createLatLonWithRadiusLink(lat, lon, radius));
+    this.setMarkerRequest(this.state.api.createLatLonWithRadiusLink(lat, lon, radius));
     this.state.api.getStationByLatLon(lat, lon, radius).then((station) => {
       let time = this.checkTime();
       if (time) {

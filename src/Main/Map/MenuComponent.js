@@ -72,6 +72,7 @@ class MenuComponent extends React.Component {
          nearest: this.nearestSelector.current.value,
        });*/
 
+    console.log(year);
     if (isMarkerSelected || isPolySelected) {
       this.props.api.uploadWeather({
         date: date, year: year, offset: offset,
@@ -145,7 +146,7 @@ class MenuComponent extends React.Component {
     } else {
       this.setState({year: ""});
     }
-    setTimeout(this.enableButton, 250)
+    setTimeout(this.enableButton, 500)
   };
 
   clearSource = () => {
@@ -195,7 +196,6 @@ class MenuComponent extends React.Component {
   };
 
   ApplyCalendarDate = (e) => {
-    console.log(e);
     this.setState({date: e});
     setTimeout(this.enableButton, 500);
   };
@@ -264,7 +264,7 @@ class MenuComponent extends React.Component {
               </div>
 
               <div id="datex" className="col-auto  mb-1 ">
-                <DatePicker OnClear={(e) => this.setState({date: e})} OnApply={this.ApplyCalendarDate}/>
+                <DatePicker OnClear={this.ApplyCalendarDate} OnApply={this.ApplyCalendarDate}/>
               </div>
             </div>
             <div className="col-auto mb-1">
