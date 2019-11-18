@@ -5,23 +5,33 @@ export class ApiController {
   constructor(loaderVisibility) {
     this.api = new FetchController(loaderVisibility)
     this.database = "gsod";
-    this.markerRequest = "";
-    this.resetController()
+    this.resetController();
   }
+
+  setController = (context) => {
+    context.date && (this.time = context.date);
+    context.year && (this.year = context.year);
+    this.withOffset(context.offset);
+    this.withLimit(context.limit);
+    this.withNeighbors(context.neighbors);
+    this.withNearest(context.nearest);
+    this.withPack(context.pack);
+  };
 
   resetController = () => {
     this._time =
-      this._offset =
-        this._limit =
-          this._year =
+      this._year =
+        this._offset =
+          this._limit =
             this._pack =
               this._nearest =
                 this._hasNeighbours = null;
-  }
+  };
 
-  YieldsToWeatherRequest = () => this.year || (this.time && this.time.dateSet);
+  YieldsToWeatherRequest = () => {
+    return (this.year || this.time.dateSet)
+  };
 
-  // Getters & setters
   get time() {
     return this._time === null
       ? ''
@@ -39,26 +49,36 @@ export class ApiController {
   }
 
   set year(value) {
-    this._time = value;
+    this._year = value;
   }
 
-  // Fluent api region
   withYear = (value) => {
     this._time = null;
     this._year = value;
     return this;
-  }
+  };
+
+  withNearest = (value) => {
+    this._nearest = value;
+    return this;
+  };
 
   withNeighbors = (value) => {
     this._hasNeighbours = value;
     return this;
-  }
+  };
+
+  withPack = (flag) => {
+    this._pack = flag;
+    return this;
+  };
 
   withTimeRange = (value) => {
     this._year = null;
     this._time = value;
     return this;
   }
+
   withOffset = (value) => {
     this._offset = value;
     return this;
@@ -67,24 +87,25 @@ export class ApiController {
   withLimit = (value) => {
     this._limit = value;
     return this;
-  }
-
+  };
 
   // Link builders
+
   addNeighbours = () => {
     return this._hasNeighbours ? '&nbs' : ''
-  }
+  };
 
   addTime = () => {
-    return this._time
-      ? ('&since=' + this._time.startDate.format('DD.MM.YYYY') +
-        '&until=' + this._time.endDate.format('DD.MM.YYYY'))
-      : (this._year ? "&year=" + this._year : '');
-  }
+    return this.time.dateSet
+      ? ('&since=' + this.time.startDate.format('DD.MM.YYYY') +
+        '&until=' + this.time.endDate.format('DD.MM.YYYY'))
+      : (this.year ? "&year=" + this.year : '');
+  };
 
   addPack = () => {
+    console.log(this._pack);
     return this._pack ? '&pack' : '';
-  }
+  };
 
   addLimiters = () => {
     return (this._offset ? '&offset=' + this._offset : '') +
@@ -104,39 +125,53 @@ export class ApiController {
   createLatLonWithRadiusLink = (lat, lon, rad) => {
     return baseUrl + '/api/' + this.database +
       '/poly?type=circle&value=[' + lat + ',' + lon + ',' + rad + 'km]';
-  }
+  };
 
+  createPolyRequest = (e, bufferForOneSt) => {
+    console.log(e);
+    let req = "", lngs = null;
+
+    if (bufferForOneSt || e.options.radius) {
+
+      //Ось тут ця дивна дічь, але вона працює з різними свойствами, але працює.
+      let lat = e.hasOwnProperty("_latlng") ? e._latlng.lat : e.latlng.lat;
+      let lon = e.hasOwnProperty("_latlng") ? e._latlng.lng : e.latlng.lng;
+
+      let res = [lat, lon, (bufferForOneSt || e.getRadius() / 1000) + 'km'];
+      req = baseUrl + '/api/' + this.database + '/poly?type=circle&value=[' + res + ']';
+    } else {
+      lngs = e._latlngs;
+      req = baseUrl + '/api/' + this.database + '/poly?type=poly&value=[' + lngs.join('],[') + ']';
+    }
+    return req;
+  };
+
+  createQueryLink = (selectedField, query) => {
+    let searchType = selectedField;
+    let queryType = '&query=' + query;
+    let queryValue = 'stations?field=' + searchType + queryType;
+    return baseUrl + '/api/gsod/' + queryValue;
+  };
 
   // Final builder
   fetchData = (link) => {
-    return this.api.Get(
-      link +
+    let req = link +
       this.addLimiters() +
       this.addNearestStations() +
       this.addNeighbours() +
       this.addTime() +
       this.addStatistics() +
-      this.addPack());
-  };
+      this.addPack();
 
+    this.resetController();
+    return this.api.Get(req)
+
+  };
 
   // Fetch region. Each method will reset controller
 
-  getPack = (link) => {
-    this.resetController()
-    this._pack = true
-    return this.fetchData(link);
-  };
-
-  getYears = () => { //Беремо просто роки
-    this.resetController()
-    let link = baseUrl + "/api/" + this.database + "/years?";
-    return this.fetchData(link);
-  };
-
-  getStationByLatLon = (lat, lon, rad) => {
-    this.resetController();
-    return this.fetchData(this.createLatLonWithRadiusLink(lat, lon, rad))
+  getStationByLatLon = (e, buffer) => {
+    return this.fetchData(this.createPolyRequest(e, buffer))
   };
 
   getWeatherByLatLon = (lat, lon, rad) => {
@@ -144,121 +179,83 @@ export class ApiController {
     return this.fetchData(this.createLatLonWithRadiusLink(lat, lon, rad))
   };
 
-  fromMapEvent(e) {
-    console.log(e);
-
-    let req = "", lngs = null;
-
-    // TODO : build request from map
-    // create circle or poly request
-    if (e.options.radius !== undefined) {
-      let res = [e._latlng.lat, e._latlng.lng, e.getRadius()/1000 + 'km'];
-      req = baseUrl + '/api/' + this.database + '/poly?type=circle&value=[' + res + ']';
-    } else {
-      lngs = e._latlngs;
-      req = baseUrl + '/api/' + this.database + '/poly?type=poly&value=[' + lngs.join('],[') + ']';
-    }
-    return this.fetchData(req);
+  getStationsFromMapEvent(e) {
+    let link = this.createPolyRequest(e);
+    return this.fetchData(link);
   }
+
+  getWeatherFromMapEvent = (context) => {
+    this.setController(context);
+    if (this.YieldsToWeatherRequest()) {
+      let link = this.createPolyRequest(context.e);
+      return this.fetchData(link);
+    }
+  };
+
+  getPackFromMapEvent = (context) => {
+    this.setController(context);
+    let link = this.createPolyRequest(context.e);
+    return this.fetchData(link);
+  };
+
+  //upload Weather if we already have stations
+  uploadWeather = (context) => {
+    this.setController(context);
+    let isWeatherRequest = this.YieldsToWeatherRequest();
+    console.log(this.year);
+    if (context.isMarkerSelected && isWeatherRequest) {
+      console.log("Marker request!");
+      return this.fetchData(context.markerRequest)
+
+    } else if (context.isPolySelected && isWeatherRequest) {
+      console.log("Poly request!");
+      return this.fetchData(context.polyRequest)
+
+    } else if (context.isPolySelected || context.isMarkerSelected) {
+      alert("Nothing to search...") //Тут помилка, треба ретурн проміс
+    }
+  };
+
+  //simple query searching for stations
+  searchStationsByQuery = (context) => {
+    this.withLimit = context.limit;
+    this.withOffset = context.offset;
+    this.withNearest = context.nearest;
+    this.withNeighbors = context.neighbors;
+
+    return this.fetchData(this.createQueryLink(context.selectedField, context.query));
+  };
+
+  getWeatherByQuery = (context) => {
+    this.withLimit = context.limit;
+    this.withOffset = context.offset;
+    this.withNearest = context.nearest;
+    this.withNeighbors = context.neighbors;
+    context.date && (this.time = context.date) || context.year && (this.year = context.year);
+
+    return this.fetchData(this.createQueryLink(context.selectedField, context.query));
+  };
 
   getStationsCount() {
     return this.fetchData(baseUrl + "/api/gsod/countries/stationsCount")
   }
 
-  ChooseFromContext(context) {
-    console.log(context);
-
-
-    context.date && (this.time = context.date) || context.year && (this.year = context.year);
-   console.log(this._time);
-
-   let markerRequest;
-
-    let isWeatherRequest = this.YieldsToWeatherRequest();
-    if (context.isMarkerSelected && isWeatherRequest) {
-
-      this.fetchData( markerRequest)
-        .then((weather) => {
-          context.setWeather(weather.response);
-        }).catch((error) => console.log(error));
-
-    } else if (this.props.isPolySelected && isWeatherRequest) {
-
-      this.fetchData(this.state.polyRequest)
-        .then((weather) => {
-          context.setWeather(weather.response);
-        }).catch((error) => console.log(error));
-
-    } else if (this.props.isPolySelected || this.props.isMarkerSelected) {
-      alert("Nothing to search...")
-    }
-    //Звичайний запит за типом і query.
-    else {
-      let neighbors, queryType, polyreq, limit, offset,
-        searchType = this.selectorByField.current.value;
-      //Запит або Poly або вручну вбивали
-      limit = this.state.limit || undefined;
-      offset = this.state.offset || undefined;
-      neighbors = context.neighbors;
-      let names = this.state.queryParam;
-      queryType = (names ? '&query=' + names : '');
-
-
-      let queryValue = (polyreq ? polyreq : 'stations?field=' + searchType + queryType + neighbors);
-
-      if (limit !== undefined) {
-        queryValue += '&limit=' + limit
-      } //offset може бути і без ліміта.
-      if (offset !== undefined) {
-        queryValue += '&offset=' + offset
-      }
-
-      let stationRequest = baseUrl + '/api/gsod/' + queryValue;
-      if (/* yearTime || */ this.state.date.dateSet) { //Якщо є час, то потрібна і погода!
-
-        this.fetchData(stationRequest).then((station) => {
-          this.props.onStationsData(station);
-
-          this.props.api.fetchData(stationRequest + isWeatherRequest)
-            .then((weather) => {
-              this.props.setWeather(weather);
-            })
-            .catch((error) => {
-              console.log(error)
-            });
-        }).catch((error) => {
-          console.log(error)
-        });
-
-
-      } else {
-        this.props.api.fetchData(stationRequest).then((station) => {
-          this.props.onStationsData(station);
-        })
-      }
-    }
-  }
-
-
-  // IT'S WRONG - we can't do it in this way
-  // THIS REQUESTS WILL FETCH DATA FOR ALL STATIONS
-
-  /*  getByTypeAndYear = (year, type) => {
+  //extractors
+  //Цей екстрактор мав би повертати обмежений лист query, якщо за той рік немає даних по якомусь параметру
+  /* getByTypeAndYear = (year, type) => {
      let link = baseUrl + "/api/" + this.database + "/stations?extract=" + type + "&year=" + year;
      return this.fetchData(link)
-   };
- 
-   getByType = (type, offsetValue, countValue) => {
-     let offset = "", count = "";
-     if (offsetValue) {
-       offset = "&offset=" + offsetValue;
-     }
-     if (countValue) {
-       count = "&limit=" + countValue;
-     }
-     let link = baseUrl + "/api/" + this.database + "/stations?extract=" + type + offset + count;
-     return this.fetchData(link)
-   };
-  */
+   };*/
 
+  getByType = (type, offsetValue, countValue) => {
+    let offset = "", count = "";
+    if (offsetValue) {
+      offset = "&offset=" + offsetValue;
+    }
+    if (countValue) {
+      count = "&limit=" + countValue;
+    }
+    let link = baseUrl + "/api/" + this.database + "/stations?extract=" + type + offset + count;
+    return this.fetchData(link)
+  };
 }

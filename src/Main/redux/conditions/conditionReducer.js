@@ -1,7 +1,7 @@
-import {initialState} from './state';
-import {types} from './actions'
+import {conditionState} from '../state';
+import {types} from './conditionActions'
 
-const conditionReducer = (state = initialState, action) => {
+const conditionReducer = (state = conditionState, action) => {
   switch (action.type) {
     case types.IF_POLY_SELECTED:
       console.log(action.flag);

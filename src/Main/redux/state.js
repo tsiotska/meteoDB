@@ -1,13 +1,16 @@
-
-export const initialState = {
+export const conditionState = {
   isPolySelected: false,
   isMarkerSelected: false,
-
   areLimitAndOffsetDisabled: false,
-  //Ось так можна переписать
+};
+
+export const dataState = {
+  currentPackLink: null,
+
+  /* на очєрєді
   currentWeather: [],
   currentStation: [],
-
-  markerRequest: "",
-  polyRequest: ""
+    markerRequest: "",
+    polyRequest: ""
+    */
 };

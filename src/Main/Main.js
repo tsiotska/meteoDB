@@ -55,7 +55,6 @@ class Main extends Component {
       currentSelected: [],
       stationsCounter: null,
       lockM: true,
-      readyToDownload: false
     };
 
     this.onMarkerClick = throttle(this.onMarkerClickBase, 500)
@@ -78,25 +77,28 @@ class Main extends Component {
     this.setState({MapMarkers: e})
   };
 
-
   checkTime = () => {
     let time = this.state.api.time;
+    console.log(time);
     let isYear = time.includes('year');
     isYear ? this.state.api.withYear(time) : this.state.api.withTimeRange(time);
     return time;
+    //this.state.api.YieldsToWeatherRequest
   };
 
-  getOneStationData = (location, radius) => {
+  getOneStationData = (e, radius) => {
     this.props.MarkerSelected(true);
 
     radius = radius || 1;
+
+    let location = e.target.getLatLng();
     let lat = location.lat;
     let lon = location.lon || location.lng;
 
-    this.state.api.getStationByLatLon(lat, lon, radius).then((station) => {
+    this.setMarkerRequest(this.state.api.createPolyRequest(e, radius));
+    this.state.api.getStationByLatLon(e, radius).then((station) => {
       let time = this.checkTime();
       if (time) {
-        // on click??
         this.state.api.getWeatherByLatLon(lat, lon, radius).then((weather) => {
           this.setCardItem(station.response[0]);
           console.log(weather);
@@ -110,13 +112,6 @@ class Main extends Component {
     // create link for user download
     this.fetchFileDownloadLink(
       this.state.api.createLatLonWithRadiusLink(lat, lon, radius));
-  };
-
-  fetchFileDownloadLink = (link) => {
-    this.state.api.getPack(link).then((data) => {
-      this.setState({packLink: data.response[0]});
-    }).catch((error) => console.log(error));
-    this.setState({readyToDownload: true})
   };
 
   setCardItem = (station) => {
@@ -143,7 +138,11 @@ class Main extends Component {
   }
 
   onMarkerClickBase = (e) => {
-    this.getOneStationData(e.target.getLatLng(), 1);
+    this.getOneStationData(e, 1);
+  };
+
+  setMarkerRequest = (req) => {
+    this.setState({markerRequest: req})
   };
 
   onStationsData = (station) => {
@@ -236,12 +235,11 @@ class Main extends Component {
       PageChanged: this.onMapPageChanged,
       onMarkerClick: this.onMarkerClick,
       onRefreshClick: this.onRefreshClick,
-      createPackLink: this.fetchFileDownloadLink,
-      packLink: this.state.packLink,
-      readyToDownload: this.state.readyToDownload,
+
       clearMarkers: this.clearMarkers,
       setCardItem: this.setCardItem,
-      clearWeather: this.clearWeather
+      clearWeather: this.clearWeather,
+      markerRequest: this.state.markerRequest
     };
 
     let conts = {

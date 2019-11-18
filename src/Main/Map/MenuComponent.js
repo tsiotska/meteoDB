@@ -28,7 +28,6 @@ class MenuComponent extends React.Component {
       markerRequest: "",
       polyRequest: "",
       year: null,
-      packLink: null,
       offset: null,
       limit: null,
       isLoading: true,
@@ -47,8 +46,6 @@ class MenuComponent extends React.Component {
     this.props.api.getStationsCount()
       .then((data) => {
         if (data && data.response) {
-
-
           this.setState({
             source: data.response.map((i) => i.name), //.item1
             isLoading: false
@@ -61,33 +58,51 @@ class MenuComponent extends React.Component {
       });
   }
 
-  setMarkerRequest = (req) => {
-    this.setState({ markerRequest: req })
-  };
-
   setPolyRequest = (req) => {
     this.setState({ polyRequest: req })
   };
 
-  //isPolySelected має пріорітет
   onSearchClick = () => {
-    console.log("onSearchCLICK!");
+    const {date, year, offset, limit, queryParam, polyRequest} = this.state;
+    const {isPolySelected, isMarkerSelected, markerRequest} = this.props;
+    /* this.props.api.setController(
+       {date: date, year: year, offset: offset,
+         limit: limit, neighbors: this.neighborsSelector.current.value,
+         nearest: this.nearestSelector.current.value,
+       });*/
 
-    this.props.api.ChooseFromContext(
-      {
-        date: this.state.date,
-        year: this.state.year,
-        offset: this.state.offset,
-        limit: this.state.limit,
-        isMarkerSelected: this.props.isMarkerSelected,
-        isPolySelected: this.props.isPolySelected,
+    console.log(year);
+    if (isMarkerSelected || isPolySelected) {
+      this.props.api.uploadWeather({
+        date: date, year: year, offset: offset,
+        limit: limit, neighbors: this.neighborsSelector.current.value,
+        nearest: this.nearestSelector.current.value,
+        isMarkerSelected: isMarkerSelected,
+        isPolySelected: isPolySelected,
+        polyRequest: polyRequest, markerRequest: markerRequest
+      }).then((weather) => {
+        this.props.setWeather(weather.response);
+      }).catch((error) => console.log(error))
+    } else if (queryParam) {
+      this.props.api.searchStationsByQuery({
+        date: date, year: year, offset: offset,
+        limit: limit, neighbors: this.neighborsSelector.current.value,
+        nearest: this.nearestSelector.current.value,
+        query: queryParam,
         selectedField: this.selectorByField.current.value,
-        neighbors: this.neighborsSelector.current.value,
-        nearest: this.nearestSelector.current.value
-      }).then((data) => {
-        // TODO: process response
+      }).then((stations) => {
+        console.log(stations);
+        this.props.onStationsData(stations);
+      }).catch((error) => console.log(error));
 
-      });
+      if (this.props.api.YieldsToWeatherRequest()) {
+        this.props.api.getWeatherByQuery().then((weather) => {
+          this.props.setWeather(weather);
+        }).catch((error) => console.log(error));
+      }
+    } else {
+      alert("Please choose a query...")
+    }
   };
 
   onChangePage = (selectedPage, index) => {
@@ -111,11 +126,12 @@ class MenuComponent extends React.Component {
     this.props.onRefreshClick(e);
   };
 
-
   enableButton = () => {
-    let time = this.props.api.YieldsToWeatherRequest();
-    if (this.state.queryParam.length > 0 || (time && (this.props.isPolySelected || this.props.isMarkerSelected))) {
-      this.setState({ enableSearchButton: true });
+    const {queryParam, date, year} = this.state;
+    const {isPolySelected, isMarkerSelected} = this.props;
+
+    if (queryParam.length > 0 || ((date.dateSet || year) && (isPolySelected || isMarkerSelected))) {
+      this.setState({enableSearchButton: true});
     } else {
       this.setState({ enableSearchButton: false })
     }
@@ -123,13 +139,13 @@ class MenuComponent extends React.Component {
 
   onYearsChange = (event) => {
     let year = event.target.value;
+
     if (year.length === 4) {
       this.setState({ year: year });
     } else {
       this.setState({ year: "" });
     }
-    //Треба юзати сагу/транк
-    setTimeout(this.enableButton, 250)
+    setTimeout(this.enableButton, 500)
   };
 
   clearSource = () => {
@@ -140,35 +156,34 @@ class MenuComponent extends React.Component {
   onTypeChanged = () => {
     this.clearSource();
     let type = this.selectorByField.current.value;
-    //disable limit and offset 
-
+    //disable limit and offset
     this.props.disableLimitAndOffset(type === "stname" || type === "id" || type === "wban");
 
-    if (this.state.year) {
-      this.props.api.getByTypeAndYear(this.state.year, this.selectorByField.current.value)
-        .then((data) => {
-          console.log(data.response[0]);
-          //  this.setState({source: data.response})
-        }).catch((error) => console.log(error))
-    } else {
-      this.props.api.getByType(this.selectorByField.current.value, this.state.offset, this.state.limit)
-        .then((data) => {
+    /* if (this.state.year) {
+       this.props.api.getByTypeAndYear(this.state.year, this.selectorByField.current.value)
+         .then((data) => {
+           console.log(data.response[0]);
+           //  this.setState({source: data.response})
+         }).catch((error) => console.log(error))
+     } else {*/
+    this.props.api.getByType(this.selectorByField.current.value, this.state.offset, this.state.limit)
+      .then((data) => {
 
-          //Валідаційна дічь
-          let array = data.response.filter((value) => {
-            return value[this.selectorByField.current.value] !== ""
-          }).map((i) => {
-            return i[this.selectorByField.current.value];
-          });
+        //Валідаційна дічь
+        let array = data.response.filter((value) => {
+          return value[this.selectorByField.current.value] !== ""
+        }).map((i) => {
+          return i[this.selectorByField.current.value];
+        });
 
-          array = array.filter(function (item, pos) {
-            return array.indexOf(item) === pos;
-          });
+        array = array.filter(function (item, pos) {
+          return array.indexOf(item) === pos;
+        });
 
-          console.log(array);
-          this.setState({ source: array });
-        }).catch((error) => console.log(error))
-    }
+        console.log(array);
+        this.setState({source: array});
+      }).catch((error) => console.log(error))
+    //}
   };
 
   onOffsetChange = (event) => {
@@ -180,8 +195,8 @@ class MenuComponent extends React.Component {
   };
 
   ApplyCalendarDate = (e) => {
-    this.setState({ date: e });
-    setTimeout(this.enableButton, 250);
+    this.setState({date: e});
+    setTimeout(this.enableButton, 500);
   };
 
   unControlledInput = (searchParam) => {
@@ -191,16 +206,15 @@ class MenuComponent extends React.Component {
 
   render() {
     //Це деструктуризація, можеш писати її ще зі стейтом
-    const { areLimitAndOffsetDisabled, counter, readyToDownload, packLink, markers } = this.props;
+    const {areLimitAndOffsetDisabled, counter, readyToDownload, packLink} = this.props;
 
     return (<div className="main_map container-fluid p-0">
       <Map setPolyRequest={this.setPolyRequest} setWeather={this.props.setWeather}
-
-        clearMarkers={this.props.clearMarkers} api={this.props.api}
-        activeMarker={this.props.activeMarker}
-        onStationsData={this.props.onStationsData} markers={this.state.selectedPage}
-        currentSelected={this.props.markers} clearWeather={this.props.clearWeather}
-        setCardItem={this.props.setCardItem}
+           clearMarkers={this.props.clearMarkers} api={this.props.api}
+           activeMarker={this.props.activeMarker}
+           onStationsData={this.props.onStationsData} markers={this.state.selectedPage}
+           currentSelected={this.props.markers} clearWeather={this.props.clearWeather}
+           setCardItem={this.props.setCardItem} year={this.state.year} date={this.state.date}
       />
 
       <div className="cur_count_wrapper">
@@ -261,7 +275,7 @@ class MenuComponent extends React.Component {
               </div>
 
               <div id="datex" className="col-auto  mb-1 ">
-                <DatePicker OnClear={(e) => this.setState({ date: e })} OnApply={this.ApplyCalendarDate} />
+                <DatePicker OnClear={this.ApplyCalendarDate} OnApply={this.ApplyCalendarDate}/>
               </div>
             </div>
             <div className="col-auto mb-1">
@@ -317,10 +331,10 @@ class MenuComponent extends React.Component {
             <ul id="stNav" className="pagination justify-content-center" />
           </nav>
 
-          {readyToDownload &&
-            <Button download className="" target="_blank"
-              href={baseUrl + packLink + "?saveas=stations.json"}>
-              Download
+          {packLink &&
+          <Button download className="" target="_blank"
+                  href={baseUrl + packLink + "?saveas=stations.json"}>
+            Download
           </Button>}
 
           {this.currentStation()}
@@ -341,11 +355,15 @@ const mapStateToProps = state => ({
   isPolySelected: state.conditionReducer.isPolySelected,
   isMarkerSelected: state.conditionReducer.isMarkerSelected,
   areLimitAndOffsetDisabled: state.conditionReducer.areLimitAndOffsetDisabled,
+  packLink: state.dataReducer.currentPackLink
 });
 
 const mapDispatchToProps = dispatch => ({
   disableLimitAndOffset: (flag) => {
-    dispatch({ type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag })
+    dispatch({type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag})
+  },
+  setPackLink: (link) => {
+    dispatch({type: "SET_PACK_LINK", link: link})
   }
 });
 

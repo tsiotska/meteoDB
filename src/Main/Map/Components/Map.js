@@ -106,6 +106,7 @@ class MapX extends Component {
      }*/
 
   };
+
   whenReady() {
     mymap = this;
     mymap.on('click', () => {
@@ -139,33 +140,27 @@ class MapX extends Component {
     </Marker>);
   };
 
-  //Спрацьовує коли виділяєш полігон, працює з часом.
-  fetchMarkers = (e) => { 
-    this.props.PolySelected(true);
+  fetchMarkers = (e) => {
+    const {PolySelected, setPolyRequest, onStationsData, setWeather, setPackLink, api, date, year} = this.props;
 
+    PolySelected(true);
     e = e.layer;
 
-    this.props.api.fromMapEvent(e).then((data) => {
-      this.props.onStationsData(data, e._latlngs);
+    setPolyRequest(api.createPolyRequest(e));
+
+    api.getStationsFromMapEvent(e).then((stations) => {
+      onStationsData(stations, e._latlngs);
     }).catch((error) => console.log(error));
-    
-    
-   // this.props.setPolyRequest(req);
 
-    //Запити станцій і погода (якщо час), нехай асинхронно
+    if (date.dateSet || year)
+      api.getWeatherFromMapEvent({e: e, date: date, year: year})
+        .then((weather) => {
+          setWeather(weather.response);
+        }).catch((error) => console.log(error));
 
-/*     this.props.api.fetchData(req).then((data) => {
-      this.props.onStationsData(data, lngs);
+    api.getPackFromMapEvent({e: e, pack: true}).then((pack) => {
+      setPackLink(pack.response[0])
     }).catch((error) => console.log(error));
- */
-
-/*     let time = this.props.getSelectedTime();
-    if (time) {
-      this.props.api.fetchData(req + time).then((weather) => {
-        this.props.setWeather(weather.response);
-      }).catch((error) => console.log(error));
-    }
-    this.props.createPackLink(req); */
   };
 
 
@@ -180,7 +175,7 @@ class MapX extends Component {
     }
   };
 
-  shouldComponentUpdate(nextProps, nextState) { 
+  shouldComponentUpdate(nextProps, nextState) {
     return !(
       nextProps.markers && nextProps.markers[0] &&
       this.props.markers[0] === nextProps.markers[0]
@@ -212,6 +207,9 @@ const mapStateToProps = state => ({});
 const mapDispatchToProps = dispatch => ({
   PolySelected: (flag) => {
     dispatch({type: "IF_POLY_SELECTED", flag: flag})
+  },
+  setPackLink: (link) => {
+    dispatch({type: "SET_PACK_LINK", link: link})
   }
 });
 
