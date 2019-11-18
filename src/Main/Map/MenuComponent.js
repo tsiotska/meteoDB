@@ -28,7 +28,6 @@ class MenuComponent extends React.Component {
       markerRequest: "",
       polyRequest: "",
       year: null,
-      packLink: null,
       offset: null,
       limit: null,
       isLoading: true,
@@ -322,7 +321,7 @@ class MenuComponent extends React.Component {
             <ul id="stNav" className="pagination justify-content-center"/>
           </nav>
 
-          {readyToDownload &&
+          {packLink &&
           <Button download className="" target="_blank"
                   href={baseUrl + packLink + "?saveas=stations.json"}>
             Download
@@ -346,11 +345,15 @@ const mapStateToProps = state => ({
   isPolySelected: state.conditionReducer.isPolySelected,
   isMarkerSelected: state.conditionReducer.isMarkerSelected,
   areLimitAndOffsetDisabled: state.conditionReducer.areLimitAndOffsetDisabled,
+  packLink: state.dataReducer.currentPackLink
 });
 
 const mapDispatchToProps = dispatch => ({
   disableLimitAndOffset: (flag) => {
     dispatch({type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag})
+  },
+  setPackLink: (link) => {
+    dispatch({type: "SET_PACK_LINK", link: link})
   }
 });
 

@@ -141,7 +141,7 @@ class MapX extends Component {
   };
 
   fetchMarkers = (e) => {
-    const {PolySelected, setPolyRequest, onStationsData, setWeather, api, date, year} = this.props;
+    const {PolySelected, setPolyRequest, onStationsData, setWeather, setPackLink, api, date, year} = this.props;
 
     PolySelected(true);
     e = e.layer;
@@ -159,7 +159,7 @@ class MapX extends Component {
         }).catch((error) => console.log(error));
 
     api.getPackFromMapEvent({e: e, pack: true}).then((pack) => {
-      //this.props.onStationsData(stations, e._latlngs);
+      setPackLink(pack.response[0])
     }).catch((error) => console.log(error));
   };
 
@@ -207,6 +207,9 @@ const mapStateToProps = state => ({});
 const mapDispatchToProps = dispatch => ({
   PolySelected: (flag) => {
     dispatch({type: "IF_POLY_SELECTED", flag: flag})
+  },
+  setPackLink: (link) => {
+    dispatch({type: "SET_PACK_LINK", link: link})
   }
 });
 

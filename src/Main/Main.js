@@ -56,7 +56,6 @@ class Main extends Component {
       currentSelected: [],
       stationsCounter: null,
       lockM: true,
-      readyToDownload: false
     };
 
     this.onMarkerClick = throttle(this.onMarkerClickBase, 500)
@@ -114,13 +113,6 @@ class Main extends Component {
     // create link for user download
     this.fetchFileDownloadLink(
       this.state.api.createLatLonWithRadiusLink(lat, lon, radius));
-  };
-
-  fetchFileDownloadLink = (link) => {
-    this.state.api.getPack(link).then((data) => {
-      this.setState({packLink: data.response[0]});
-    }).catch((error) => console.log(error));
-    this.setState({readyToDownload: true})
   };
 
   setCardItem = (station) => {
@@ -244,9 +236,7 @@ class Main extends Component {
       PageChanged: this.onMapPageChanged,
       onMarkerClick: this.onMarkerClick,
       onRefreshClick: this.onRefreshClick,
-      createPackLink: this.fetchFileDownloadLink,
-      packLink: this.state.packLink,
-      readyToDownload: this.state.readyToDownload,
+
       clearMarkers: this.clearMarkers,
       setCardItem: this.setCardItem,
       clearWeather: this.clearWeather,
