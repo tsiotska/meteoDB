@@ -52,14 +52,16 @@ class MenuComponent extends React.Component {
   };
 
   onSearchClick = () => {
-    const {isPolySelected, isMarkerSelected, markerRequest, queryParam,
-      date, year, offset, limit, neigh, nearest, polyRequest} = this.props;
+    const {
+      isPolySelected, isMarkerSelected, markerRequest, polyRequest, queryParam,
+      date, year, offset, limit, neigh, nearest,
+    } = this.props;
     //Якщо дозагрузка погоди
     if (isMarkerSelected || isPolySelected) {
       this.props.api.uploadWeather({
         date: date, year: year, offset: offset,
-        limit: limit, neighbors: this.neighborsSelector.current.value,
-        nearest: this.nearestSelector.current.value,
+        limit: limit, neighbors: this.neigh,
+        nearest: nearest,
         isMarkerSelected: isMarkerSelected,
         isPolySelected: isPolySelected,
         polyRequest: polyRequest, markerRequest: markerRequest
@@ -121,9 +123,18 @@ class MenuComponent extends React.Component {
   };
 
   onYearsChange = (event) => {
+
     console.log("ON YEAR");
     console.log(event);
     this.props.setYear(event.target.value);
+
+    let year = event.target.value;
+
+    if (year.length === 4) {
+      this.setState({year: year});
+    } else {
+      this.setState({year: ""});
+    }
     setTimeout(this.enableButton, 500)
   };
 
@@ -169,16 +180,16 @@ class MenuComponent extends React.Component {
     this.props.setOffset(event.target.value)
   };
 
-  onLimitChange = (event) => {
-    this.props.setLimit(event.target.value)
-  };
-
   onNeighChange = (event) => {
     this.props.setNeigh(event.target.value)
   };
 
   onNearestChange = (event) => {
-    this.props.setNearest(event.target.value)
+    this.props.setNearest(event.target.value);
+  };
+
+  onLimitChange = (event) => {
+    this.props.setLimit(event.target.value)
   };
 
   ApplyCalendarDate = (e) => {
@@ -187,7 +198,11 @@ class MenuComponent extends React.Component {
   };
 
   unControlledInput = (searchParam) => {
+
     this.props.setQuery(searchParam);
+
+    this.setState({queryParam: searchParam});
+
     setTimeout(this.enableButton, 500);
   };
 
@@ -210,11 +225,23 @@ class MenuComponent extends React.Component {
             : "fade")} id="result-info">{counter}</div>
       </div>
       <div className="panel flyn active  card card-body">
-        <div className="scrollable">
+        <div className="flyn-inputs-container scrollable">
+
+
+          {/*       <div class="flyn-grid container d-flex">
+        <div class="col-sm-12 col-md-12">
+          <div class="flyn-region"></div>
+        </div>
+        <div class="col-sm-12 col-md-12">
+          <div class="flyn-region"></div>
+        </div>
+        <div class="col-sm-12 col-md-12">
+          <div class="flyn-region"></div>
+        </div>
+      </div> */}
+
           <div className="form-inline ">
-
             <div className="form-inline row m-1">
-
               <div className="col-5  mb-1">
                 <label htmlFor="type">Тип поля</label>
                 <select defaultValue="ctry_full" ref={this.selectorByField} disabled={this.props.isPolySelected}
@@ -238,10 +265,10 @@ class MenuComponent extends React.Component {
               <div id="yearsx" className="col-5 mb-1">
                 <label htmlFor="years">Рік</label>
                 <div className="input-group">
-
-                  <input type="text" id="years" onChange={this.onYearsChange} className="form-control typeahead"
+                  <input type="text" id="years"
+                         onChange={this.onYearsChange}
+                         className="form-control typeahead"
                          placeholder="Рік" data-provide="typeahead"/>
-
                   <div className="cssload-container fade">
                     <div className="cssload-whirlpool"/>
                   </div>
@@ -255,16 +282,14 @@ class MenuComponent extends React.Component {
             <div className="col-auto mb-1">
               <label htmlFor="querystr">Пошуковий параметр</label>
               <div className={"input-group"}>
-
                 <Typeahead disabled={false} multiple={true} isLoading={this.state.isLoading}
                            placeholder="Пошуковий параметр"
                            onChange={this.unControlledInput} ref={(typeahead) => this.typeahead = typeahead}
                            options={this.state.source}/>
               </div>
-
-
             </div>
             <div className="form-group w-50 ml-4 mb-1 form-check">
+
               <input type="checkbox" className="form-check-input" id="nbs_chk" onChange={this.onNeighChange}/>
               <label className="form-check-label" htmlFor="exampleCheck1">Сусідні країни</label>
 
@@ -272,11 +297,22 @@ class MenuComponent extends React.Component {
             <div className="form-group w-50 ml-4 mb-1 form-check">
               <input type="text" className="form-check-input" id="nearest_chk" onChange={this.onNearestChange}/>
               <label className="form-check-label" htmlFor="exampleCheck1">Найближчі N станцій</label>
+
+              <input type="checkbox" className="form-check-input" id="nbs_chk" ref={this.neighborsSelector}/>
+              <label className="form-check-label" htmlFor="exampleCheck1">Сусідні країни</label>
+
+            </div>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="">Найближчі N станцій</span>
+              </div>
+              <input type="text" class="form-control" ref={this.nearestSelector} aria-label="Sizing example input"
+                     aria-describedby="nearestNinp"/>
+
             </div>
             <div className="col-auto d-flex w-100">
               <button id="reeval" onClick={this.onSearchClick}
-                      className={this.state.enableSearchButton ? "btn btn-primary m-2 mb-1 mt-auto" :
-                        "disabled btn btn-primary m-2 mb-1 mt-auto"}>Пошук
+                      className={(this.state.enableSearchButton ? "" : "disabled ") + "btn btn-primary m-2 mb-1 mt-auto"}>Пошук
               </button>
               <button id="refresh" onClick={this.onRefreshClick}
                       className="btn btn-secondary m-2 mb-1 mt-auto">Очистити
@@ -328,6 +364,8 @@ class MenuComponent extends React.Component {
 }
 
 const mapStateToProps = state => ({
+  polyRequest: state.conditionReducer.polyRequest,
+  markerRequest: state.conditionReducer.markerRequest,
   isPolySelected: state.conditionReducer.isPolySelected,
   isMarkerSelected: state.conditionReducer.isMarkerSelected,
   areLimitAndOffsetDisabled: state.conditionReducer.areLimitAndOffsetDisabled,
@@ -353,16 +391,17 @@ const mapDispatchToProps = dispatch => ({
   setTime: (date) => {
     dispatch({type: "SET_TIME", date: date})
   },
+  //Відрізняються лише параметри, спрощу в одну якшо можливо
   setLimit: (limit) => {
     dispatch({type: "SET_ANY_INPUT_DATA", limit: limit})
   },
   setOffset: (offset) => {
     dispatch({type: "SET_ANY_INPUT_DATA", offset: offset})
   },
-  setNearest: (nearest)=> {
+  setNearest: (nearest) => {
     dispatch({type: "SET_ANY_INPUT_DATA", nearest: nearest})
   },
-  setNeigh: (neigh)=> {
+  setNeigh: (neigh) => {
     dispatch({type: "SET_ANY_INPUT_DATA", neigh: neigh})
   },
 });

@@ -4,11 +4,11 @@ import {types} from './conditionActions'
 const conditionReducer = (state = conditionState, action) => {
   switch (action.type) {
     case types.IF_POLY_SELECTED:
-      console.log(action.flag);
       return {
         ...state,
         isPolySelected: action.flag,
         areLimitAndOffsetDisabled: action.flag,
+        polyRequest: action.req
       };
     case types.IF_MARKER_SELECTED:
       return {

@@ -9,6 +9,8 @@ export class ApiController {
   }
 
   setController = (context) => {
+    console.log(context.date);
+    console.log(context.year);
     context.date && (this.time = context.date);
     context.year && (this.year = context.year);
     this.withOffset(context.offset);
@@ -168,13 +170,13 @@ export class ApiController {
   }
   //Можеш просто викликати getDataForMapAndMarker і передавати контекст, а це видалити.
   getStationsFromMapEvent(context) {
-   this.getDataForMapOrMarker(context);
+  return this.getDataForMapOrMarker(context);
   }
   getWeatherFromMapEvent = (context) => {
-    this.getDataForMapOrMarker(context);
+   return this.getDataForMapOrMarker(context);
   };
   getPackFromMapEvent = (context) => {
-    this.getDataForMapOrMarker(context);
+   return this.getDataForMapOrMarker(context);
   };
 
   //upload Weather if we already have stations

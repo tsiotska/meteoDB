@@ -5,7 +5,6 @@ import L from 'leaflet';
 import WeatherControl from "./Elements/WeatherControl";
 import Station from './Elements/StationTemplate';
 import MenuComponent from './Map/MenuComponent'
-import 'leaflet-selectareafeature';
 import throttle from 'lodash/throttle';
 import Nav from './NavbarTop';
 import Loader from './Elements/AtomLoader';
@@ -83,14 +82,14 @@ class Main extends Component {
 
   getOneStationData = (e) => {
     const {MarkerSelected, date, year} = this.props;
-    MarkerSelected(true);
-
     //Отут дічь якась. Там по дефолту немає свойства, тому створюю шоб в перевірці співпадало як з circle req
     let data = e;
     data.options = {};
     data.options.radius = 1;
 
-    this.setMarkerRequest(this.state.api.createPolyRequest(data));
+    let req = this.state.api.createPolyRequest(data);
+    MarkerSelected(true, req);
+
     this.state.api.getStationsFromMapEvent({e: data}).then((station) => {
       this.setCardItem(station.response[0]);
     }).catch((error) => console.log(error));
@@ -102,7 +101,10 @@ class Main extends Component {
         }).catch((error) => console.log(error));
 
     // create link for user download
-    this.state.api.getPackFromMapEvent({e: e, pack: true});
+    this.state.api.getPackFromMapEvent({e: data, time: date, year: year, pack: true})
+      .then((pack) => {
+        this.props.setPackLink(pack);
+      }).catch((error) => console.log(error));
   };
 
   setCardItem = (station) => {
@@ -130,10 +132,6 @@ class Main extends Component {
 
   onMarkerClickBase = (e) => {
     this.getOneStationData(e);
-  };
-
-  setMarkerRequest = (req) => {
-    this.setState({markerRequest: req})
   };
 
   onStationsData = (station) => {
@@ -252,23 +250,19 @@ class Main extends Component {
   }
 }
 
-const
-  mapStateToProps = state => ({
-    isMarkerSelected: state.conditionReducer.isMarkerSelected,
-    year: state.dataReducer.year,
-    date: state.dataReducer.date,
-  });
+const mapStateToProps = state => ({
+  isMarkerSelected: state.conditionReducer.isMarkerSelected,
+  year: state.dataReducer.year,
+  date: state.dataReducer.date,
+});
 
-const
-  mapDispatchToProps = dispatch => ({
-    MarkerSelected: (flag, req) => {
-      dispatch({type: "IF_MARKER_SELECTED", flag: flag, req: req})
-    }
-  });
+const mapDispatchToProps = dispatch => ({
+  MarkerSelected: (flag, req) => {
+    dispatch({type: "IF_MARKER_SELECTED", flag: flag, req: req})
+  },
+  setPackLink: (link) => {
+    dispatch({type: "SET_PACK_LINK", link: link})
+  }
+});
 
-export default connect(mapStateToProps, mapDispatchToProps)
-
-(
-  Main
-)
-;
+export default connect(mapStateToProps, mapDispatchToProps)(Main);
