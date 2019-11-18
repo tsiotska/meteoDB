@@ -11,32 +11,21 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-daterangepicker/daterangepicker.css';
 import {connect} from 'react-redux';
 
-let initdate = {
-  dateSet: false,
-  startDate: null,
-  endDate: null
-};
-
 class MenuComponent extends React.Component {
   constructor(props) {
     super(props);
     this.axios = null;
     this.selectorByField = React.createRef();
-    this.neighborsSelector = React.createRef();
-    this.nearestSelector = React.createRef();
     this.state = {
       markerRequest: "",
       polyRequest: "",
-      year: null,
       offset: null,
       limit: null,
       isLoading: true,
       selectedPage: [],
       source: [],
-      queryParam: [],
       ctr_list: [],
       lastPoly: null,
-      date: initdate,
       enableSearchButton: false
     };
   }
@@ -63,15 +52,9 @@ class MenuComponent extends React.Component {
   };
 
   onSearchClick = () => {
-    const {date, year, offset, limit, queryParam, polyRequest} = this.state;
-    const {isPolySelected, isMarkerSelected, markerRequest} = this.props;
-    /* this.props.api.setController(
-       {date: date, year: year, offset: offset,
-         limit: limit, neighbors: this.neighborsSelector.current.value,
-         nearest: this.nearestSelector.current.value,
-       });*/
-
-    console.log(year);
+    const {isPolySelected, isMarkerSelected, markerRequest, queryParam,
+      date, year, offset, limit, neigh, nearest, polyRequest} = this.props;
+    //Якщо дозагрузка погоди
     if (isMarkerSelected || isPolySelected) {
       this.props.api.uploadWeather({
         date: date, year: year, offset: offset,
@@ -83,11 +66,12 @@ class MenuComponent extends React.Component {
       }).then((weather) => {
         this.props.setWeather(weather.response);
       }).catch((error) => console.log(error))
-    } else if (queryParam) {
+    } //Якщо повністю новий запит
+    else if (queryParam) {
       this.props.api.searchStationsByQuery({
-        date: date, year: year, offset: offset,
-        limit: limit, neighbors: this.neighborsSelector.current.value,
-        nearest: this.nearestSelector.current.value,
+        date: date, year: year,
+        offset: offset, limit: limit,
+        neighbors: neigh, nearest: nearest,
         query: queryParam,
         selectedField: this.selectorByField.current.value,
       }).then((stations) => {
@@ -127,8 +111,7 @@ class MenuComponent extends React.Component {
   };
 
   enableButton = () => {
-    const {queryParam, date, year} = this.state;
-    const {isPolySelected, isMarkerSelected} = this.props;
+    const {isPolySelected, isMarkerSelected, queryParam, date, year} = this.props;
 
     if (queryParam.length > 0 || ((date.dateSet || year) && (isPolySelected || isMarkerSelected))) {
       this.setState({enableSearchButton: true});
@@ -138,18 +121,14 @@ class MenuComponent extends React.Component {
   };
 
   onYearsChange = (event) => {
-    let year = event.target.value;
-
-    if (year.length === 4) {
-      this.setState({year: year});
-    } else {
-      this.setState({year: ""});
-    }
+    console.log("ON YEAR");
+    console.log(event);
+    this.props.setYear(event.target.value);
     setTimeout(this.enableButton, 500)
   };
 
   clearSource = () => {
-    //this.setState({source: [], queryParam: []});
+    this.props.setQuery([]);
     this.typeahead.getInstance().clear();
   };
 
@@ -159,8 +138,8 @@ class MenuComponent extends React.Component {
     //disable limit and offset
     this.props.disableLimitAndOffset(type === "stname" || type === "id" || type === "wban");
 
-    /* if (this.state.year) {
-       this.props.api.getByTypeAndYear(this.state.year, this.selectorByField.current.value)
+    /* if (this.props.year) {
+       this.props.api.getByTypeAndYear(this.props.year, this.selectorByField.current.value)
          .then((data) => {
            console.log(data.response[0]);
            //  this.setState({source: data.response})
@@ -187,25 +166,33 @@ class MenuComponent extends React.Component {
   };
 
   onOffsetChange = (event) => {
-    this.setState({offset: event.target.value})
+    this.props.setOffset(event.target.value)
   };
 
   onLimitChange = (event) => {
-    this.setState({limit: event.target.value})
+    this.props.setLimit(event.target.value)
+  };
+
+  onNeighChange = (event) => {
+    this.props.setNeigh(event.target.value)
+  };
+
+  onNearestChange = (event) => {
+    this.props.setNearest(event.target.value)
   };
 
   ApplyCalendarDate = (e) => {
-    this.setState({date: e});
+    this.props.setTime(e);
     setTimeout(this.enableButton, 500);
   };
 
   unControlledInput = (searchParam) => {
-    this.setState({queryParam: searchParam});
+    this.props.setQuery(searchParam);
     setTimeout(this.enableButton, 500);
   };
 
   render() {
-    //Це деструктуризація, можеш писати її ще зі стейтом
+    //Це деструктуризація, пиши якщо багато даних
     const {areLimitAndOffsetDisabled, counter, readyToDownload, packLink} = this.props;
 
     return (<div className="main_map container-fluid p-0">
@@ -214,8 +201,7 @@ class MenuComponent extends React.Component {
            activeMarker={this.props.activeMarker}
            onStationsData={this.props.onStationsData} markers={this.state.selectedPage}
            currentSelected={this.props.markers} clearWeather={this.props.clearWeather}
-           setCardItem={this.props.setCardItem} year={this.state.year} date={this.state.date}
-      />
+           setCardItem={this.props.setCardItem}/>
 
       <div className="cur_count_wrapper">
         <div className={"cur_count " + (
@@ -279,12 +265,12 @@ class MenuComponent extends React.Component {
 
             </div>
             <div className="form-group w-50 ml-4 mb-1 form-check">
-              <input type="checkbox" className="form-check-input" id="nbs_chk" ref={this.neighborsSelector}/>
+              <input type="checkbox" className="form-check-input" id="nbs_chk" onChange={this.onNeighChange}/>
               <label className="form-check-label" htmlFor="exampleCheck1">Сусідні країни</label>
 
             </div>
             <div className="form-group w-50 ml-4 mb-1 form-check">
-              <input type="text" className="form-check-input" id="nearest_chk" ref={this.nearestSelector}/>
+              <input type="text" className="form-check-input" id="nearest_chk" onChange={this.onNearestChange}/>
               <label className="form-check-label" htmlFor="exampleCheck1">Найближчі N станцій</label>
             </div>
             <div className="col-auto d-flex w-100">
@@ -345,16 +331,40 @@ const mapStateToProps = state => ({
   isPolySelected: state.conditionReducer.isPolySelected,
   isMarkerSelected: state.conditionReducer.isMarkerSelected,
   areLimitAndOffsetDisabled: state.conditionReducer.areLimitAndOffsetDisabled,
-  packLink: state.dataReducer.currentPackLink
+  packLink: state.dataReducer.currentPackLink,
+  queryParam: state.dataReducer.query,
+  year: state.dataReducer.year,
+  date: state.dataReducer.date,
 });
 
 const mapDispatchToProps = dispatch => ({
+  setQuery: (param) => {
+    dispatch({type: "SET_ANY_INPUT_DATA", param: param})
+  },
   disableLimitAndOffset: (flag) => {
     dispatch({type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag})
   },
   setPackLink: (link) => {
     dispatch({type: "SET_PACK_LINK", link: link})
-  }
+  },
+  setYear: (year) => {
+    dispatch({type: "SET_YEAR", year: year})
+  },
+  setTime: (date) => {
+    dispatch({type: "SET_TIME", date: date})
+  },
+  setLimit: (limit) => {
+    dispatch({type: "SET_ANY_INPUT_DATA", limit: limit})
+  },
+  setOffset: (offset) => {
+    dispatch({type: "SET_ANY_INPUT_DATA", offset: offset})
+  },
+  setNearest: (nearest)=> {
+    dispatch({type: "SET_ANY_INPUT_DATA", nearest: nearest})
+  },
+  setNeigh: (neigh)=> {
+    dispatch({type: "SET_ANY_INPUT_DATA", neigh: neigh})
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(MenuComponent);

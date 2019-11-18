@@ -122,22 +122,15 @@ export class ApiController {
   }
 
   // Link builders
-  createLatLonWithRadiusLink = (lat, lon, rad) => {
-    return baseUrl + '/api/' + this.database +
-      '/poly?type=circle&value=[' + lat + ',' + lon + ',' + rad + 'km]';
-  };
-
-  createPolyRequest = (e, bufferForOneSt) => {
+  createPolyRequest = (e) => {
     console.log(e);
     let req = "", lngs = null;
 
-    if (bufferForOneSt || e.options.radius) {
-
-      //Ось тут ця дивна дічь, але вона працює з різними свойствами, але працює.
+    if (e.options.radius) {
+      //Ось тут можна правити
       let lat = e.hasOwnProperty("_latlng") ? e._latlng.lat : e.latlng.lat;
       let lon = e.hasOwnProperty("_latlng") ? e._latlng.lng : e.latlng.lng;
-
-      let res = [lat, lon, (bufferForOneSt || e.getRadius() / 1000) + 'km'];
+      let res = [lat, lon, (e.options.radius / 1000) + 'km'];
       req = baseUrl + '/api/' + this.database + '/poly?type=circle&value=[' + res + ']';
     } else {
       lngs = e._latlngs;
@@ -168,39 +161,26 @@ export class ApiController {
 
   };
 
-  // Fetch region. Each method will reset controller
-
-  getStationByLatLon = (e, buffer) => {
-    return this.fetchData(this.createPolyRequest(e, buffer))
-  };
-
-  getWeatherByLatLon = (lat, lon, rad) => {
-    //TODO: append date
-    return this.fetchData(this.createLatLonWithRadiusLink(lat, lon, rad))
-  };
-
-  getStationsFromMapEvent(e) {
-    let link = this.createPolyRequest(e);
-    return this.fetchData(link);
-  }
-
-  getWeatherFromMapEvent = (context) => {
-    this.setController(context);
-    if (this.YieldsToWeatherRequest()) {
-      let link = this.createPolyRequest(context.e);
-      return this.fetchData(link);
-    }
-  };
-
-  getPackFromMapEvent = (context) => {
+  getDataForMapOrMarker(context){
     this.setController(context);
     let link = this.createPolyRequest(context.e);
     return this.fetchData(link);
+  }
+  //Можеш просто викликати getDataForMapAndMarker і передавати контекст, а це видалити.
+  getStationsFromMapEvent(context) {
+   this.getDataForMapOrMarker(context);
+  }
+  getWeatherFromMapEvent = (context) => {
+    this.getDataForMapOrMarker(context);
+  };
+  getPackFromMapEvent = (context) => {
+    this.getDataForMapOrMarker(context);
   };
 
   //upload Weather if we already have stations
   uploadWeather = (context) => {
     this.setController(context);
+    //Все-таки краще перевіряти чином як в Main.js 98;
     let isWeatherRequest = this.YieldsToWeatherRequest();
     console.log(this.year);
     if (context.isMarkerSelected && isWeatherRequest) {
@@ -212,7 +192,7 @@ export class ApiController {
       return this.fetchData(context.polyRequest)
 
     } else if (context.isPolySelected || context.isMarkerSelected) {
-      alert("Nothing to search...") //Тут помилка, треба ретурн проміс
+      alert("Nothing to search...") //Бо тут буде помилка. Необхідно повернути пустий проміс.
     }
   };
 

@@ -141,14 +141,23 @@ class MapX extends Component {
   };
 
   fetchMarkers = (e) => {
-    const {PolySelected, setPolyRequest, onStationsData, setWeather, setPackLink, api, date, year} = this.props;
+    const {
+      PolySelected, setPolyRequest, onStationsData, setWeather, setPackLink,
+      api, date, year, neigh, nearest, offset, limit
+    } = this.props;
 
-    PolySelected(true);
     e = e.layer;
-
+    //Save our req
     setPolyRequest(api.createPolyRequest(e));
-
-    api.getStationsFromMapEvent(e).then((stations) => {
+    PolySelected(true);
+    //Не помятаю з якими параметрами працює полігон. Розкоментуєш.
+    api.getStationsFromMapEvent({
+      e: e,
+      /*offset: offset,
+      limit: limit,
+      nearest: nearest,
+      neigh: neigh*/
+    }).then((stations) => {
       onStationsData(stations, e._latlngs);
     }).catch((error) => console.log(error));
 
@@ -202,7 +211,14 @@ class MapX extends Component {
   }
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  year: state.dataReducer.year,
+  date: state.dataReducer.date,
+  neigh: state.dataReducer.neigh,
+  nearest: state.dataReducer.nearest,
+  offset: state.dataReducer.offset,
+  limit: state.dataReducer.limit
+});
 
 const mapDispatchToProps = dispatch => ({
   PolySelected: (flag) => {
