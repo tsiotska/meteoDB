@@ -213,7 +213,7 @@ export class ApiController {
     this.withOffset = context.offset;
     this.withNearest = context.nearest;
     this.withNeighbors = context.neighbors;
-    context.date && (this.time = context.date) || context.year && (this.year = context.year);
+    (context.date && (this.time = context.date)) || (context.year && (this.year = context.year));
 
     return this.fetchData(this.createQueryLink(context.selectedField, context.query));
   };

@@ -14,7 +14,7 @@ export default class Containers extends React.Component {
   render() {
 
     return (<div className="bottom-container container-fluid p-3 d-flex" >
-      <div class="button" class="container-flag"  onClick={() => $('.bottom-container').toggleClass('active')}>
+      <div class="button container-flag"  onClick={() => $('.bottom-container').toggleClass('active')}>
         
       </div>
       <div className="navi card p-2 container-fluid my-2">

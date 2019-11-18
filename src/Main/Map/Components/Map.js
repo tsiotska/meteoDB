@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
-import {TileLayer, Map, Marker, Tooltip} from 'react-leaflet';
-import L, {LatLng} from 'leaflet';
+import React, { Component } from 'react';
+import { TileLayer, Map, Marker, Tooltip } from 'react-leaflet';
+import L from 'leaflet';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import $ from 'jquery';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
@@ -61,7 +61,7 @@ class MapX extends Component {
       console.log(e);
       let lastPoly = this.state.lastPoly;
       let tg = lastPoly.filter((pl) => pl.layer !== e.layer);
-      this.setState({lastPoly: tg});
+      this.setState({ lastPoly: tg });
       this.props.PolySelected(false, "");
       this.props.MarkerSelected(false, "");
       this.clearCardAndMarkers();
@@ -70,7 +70,7 @@ class MapX extends Component {
     mymap.on('pm:create', (e) => {
       let lastPoly = this.state.lastPoly
       lastPoly.push(e);
-      this.setState({lastPoly})
+      this.setState({ lastPoly })
       e.layer.on('pm:dragend', () => {
         this.fetchMarkers(e)
       });
@@ -102,7 +102,7 @@ class MapX extends Component {
         mymap.scrollWheelZoom.enable();
       }
     });
-    L.control.zoom({position: 'topright'}).addTo(mymap);
+    L.control.zoom({ position: 'topright' }).addTo(mymap);
     markerGroup = L.layerGroup().addTo(mymap);
   }
 
@@ -129,7 +129,7 @@ class MapX extends Component {
   fetchMarkers = (e) => {
     const {
       PolySelected, onStationsData, setWeather, setPackLink,
-      api, date, year, neigh, nearest, offset, limit
+      api, date, year, /* neigh, nearest, offset, limit */
     } = this.props;
 
     e = e.layer;
@@ -148,12 +148,12 @@ class MapX extends Component {
     }).catch((error) => console.log(error));
 
     if (date.dateSet || year)
-      api.getWeatherFromMapEvent({e: e, date: date, year: year})
+      api.getWeatherFromMapEvent({ e: e, date: date, year: year })
         .then((weather) => {
           setWeather(weather.response);
         }).catch((error) => console.log(error));
 
-    api.getPackFromMapEvent({e: e, date: date, year: year, pack: true}).then((pack) => {
+    api.getPackFromMapEvent({ e: e, date: date, year: year, pack: true }).then((pack) => {
       console.log(pack);
       setPackLink(pack.response[0])
     }).catch((error) => console.log(error));
@@ -187,12 +187,12 @@ class MapX extends Component {
       width: "100%",
       position: "relative"
     }} zoom={this.state.zoom} preferCanvas="True" scrollWheelZoom={false} zoomControl={false}>
-      <TileLayer attribution={this.state.attribution} url={this.state.tiles}/>
+      <TileLayer attribution={this.state.attribution} url={this.state.tiles} />
       {markers &&
-      <MarkerClusterGroup chunkedLoadind={true} showCoverageOnHover={true}
-                          iconCreateFunction={createClusterCustomIcon}>
-        {markers}
-      </MarkerClusterGroup>
+        <MarkerClusterGroup chunkedLoadind={true} showCoverageOnHover={true}
+          iconCreateFunction={createClusterCustomIcon}>
+          {markers}
+        </MarkerClusterGroup>
       }
     </Map>);
   }
@@ -209,13 +209,13 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   MarkerSelected: (flag, req) => {
-    dispatch({type: "IF_MARKER_SELECTED", flag: flag, req: req})
+    dispatch({ type: "IF_MARKER_SELECTED", flag: flag, req: req })
   },
   PolySelected: (flag, req) => {
-    dispatch({type: "IF_POLY_SELECTED", flag: flag, req: req})
+    dispatch({ type: "IF_POLY_SELECTED", flag: flag, req: req })
   },
   setPackLink: (link) => {
-    dispatch({type: "SET_PACK_LINK", link: link})
+    dispatch({ type: "SET_PACK_LINK", link: link })
   }
 });
 

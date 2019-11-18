@@ -1,6 +1,5 @@
 import React from 'react';
-import Map from './Components/Map';
-import Pagination from '../../Main/Controls/Pagination';
+import Map from './Components/Map'; 
 import {baseUrl} from '../../js/const';
 import DatePicker from '../../Main/Controls/DatePicker'
 import $ from 'jquery';
@@ -207,7 +206,7 @@ class MenuComponent extends React.Component {
 
   render() {
     //Це деструктуризація, пиши якщо багато даних
-    const {areLimitAndOffsetDisabled, counter, readyToDownload, packLink} = this.props;
+    const {areLimitAndOffsetDisabled, counter,  packLink} = this.props;
 
     return (<div className="main_map container-fluid p-0">
       <Map setPolyRequest={this.setPolyRequest} setWeather={this.props.setWeather}
