@@ -92,8 +92,8 @@ class Main extends Component {
     this.props.MarkerSelected(true);
 
     radius = radius || 1;
-    let location = e.target.getLatLng();
 
+    let location = e.target.getLatLng();
     let lat = location.lat;
     let lon = location.lon || location.lng;
 

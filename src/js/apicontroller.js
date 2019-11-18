@@ -130,12 +130,14 @@ export class ApiController {
   createPolyRequest = (e, bufferForOneSt) => {
     console.log(e);
     let req = "", lngs = null;
+
     if (bufferForOneSt || e.options.radius) {
 
-      //hasOwnProperty 
-      let lat =  e.latlng.lat || e._latlng.lat; // З _ це полігон, без - це точка. Хз чо так.
-      let lng =  e.latlng.lng || e._latlng.lng ;
-      let res = [lat, lng, (e.getRadius() / 1000 || bufferForOneSt) + 'km'];
+      //Ось тут ця дивна дічь, але вона працює з різними свойствами, але працює.
+      let lat = e.hasOwnProperty("_latlng") ? e._latlng.lat : e.latlng.lat;
+      let lon = e.hasOwnProperty("_latlng") ? e._latlng.lng : e.latlng.lng;
+
+      let res = [lat, lon, (bufferForOneSt || e.getRadius() / 1000) + 'km'];
       req = baseUrl + '/api/' + this.database + '/poly?type=circle&value=[' + res + ']';
     } else {
       lngs = e._latlngs;

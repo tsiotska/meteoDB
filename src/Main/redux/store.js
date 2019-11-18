@@ -1,8 +1,11 @@
-import { createStore, combineReducers} from "redux";
+import { createStore, combineReducers, applyMiddleware } from "redux";
+import createSagaMiddleware from 'redux-saga';
 import conditionReducer from "./conditionReducer";
-//import menuReducer from ""
+import mySaga from './sagas/sagas';
 
-const  store = createStore(combineReducers({conditionReducer}));
+const sagaMiddleware = createSagaMiddleware();
+const  store = createStore(combineReducers({conditionReducer}), applyMiddleware(sagaMiddleware));
 
+//sagaMiddleware.run(mySaga);
 export default store;
 
