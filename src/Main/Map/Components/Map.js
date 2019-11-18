@@ -62,7 +62,8 @@ class MapX extends Component {
       let lastPoly = this.state.lastPoly;
       let tg = lastPoly.filter((pl) => pl.layer !== e.layer);
       this.setState({lastPoly: tg});
-      this.props.PolySelected(false);
+      this.props.PolySelected(false, "");
+      this.props.MarkerSelected(false, "");
       this.clearCardAndMarkers();
     });
 
@@ -88,23 +89,8 @@ class MapX extends Component {
     this.props.setCardItem([]);
     this.props.clearMarkers();
     this.props.clearWeather();
-    this.clearPoly();
-  };
-
-  clearPoly = () => {
-    console.log(mymap);
-    //L.layerGroup().removeFrom(mymap);
-    /* for (let i in mymap._layers) {
-       if (mymap._layers[i]) {
-         try {
-          // mymap.removeLayer(mymap._layers[i]);
-           mymap._layers[i].unbindTooltip();
-         } catch (e) {
-           console.log("problem with " + e + mymap._layers[i]);
-         }
-       }
-     }*/
-
+    this.props.PolySelected(false, "");
+    this.props.MarkerSelected(false, "");
   };
 
   whenReady() {
@@ -141,14 +127,23 @@ class MapX extends Component {
   };
 
   fetchMarkers = (e) => {
-    const {PolySelected, setPolyRequest, onStationsData, setWeather, setPackLink, api, date, year} = this.props;
+    const {
+      PolySelected, onStationsData, setWeather, setPackLink,
+      api, date, year, neigh, nearest, offset, limit
+    } = this.props;
 
-    PolySelected(true);
     e = e.layer;
-
-    setPolyRequest(api.createPolyRequest(e));
-
-    api.getStationsFromMapEvent(e).then((stations) => {
+    //Save our req
+    let req = api.createPolyRequest(e);
+    PolySelected(true, req);
+    //Не помятаю з якими параметрами працює полігон. Розкоментуєш.
+    api.getStationsFromMapEvent({
+      e: e,
+      /*offset: offset,
+      limit: limit,
+      nearest: nearest,
+      neigh: neigh*/
+    }).then((stations) => {
       onStationsData(stations, e._latlngs);
     }).catch((error) => console.log(error));
 
@@ -158,7 +153,8 @@ class MapX extends Component {
           setWeather(weather.response);
         }).catch((error) => console.log(error));
 
-    api.getPackFromMapEvent({e: e, pack: true}).then((pack) => {
+    api.getPackFromMapEvent({e: e, date: date, year: year, pack: true}).then((pack) => {
+      console.log(pack);
       setPackLink(pack.response[0])
     }).catch((error) => console.log(error));
   };
@@ -202,11 +198,21 @@ class MapX extends Component {
   }
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  year: state.dataReducer.year,
+  date: state.dataReducer.date,
+  neigh: state.dataReducer.neigh,
+  nearest: state.dataReducer.nearest,
+  offset: state.dataReducer.offset,
+  limit: state.dataReducer.limit
+});
 
 const mapDispatchToProps = dispatch => ({
-  PolySelected: (flag) => {
-    dispatch({type: "IF_POLY_SELECTED", flag: flag})
+  MarkerSelected: (flag, req) => {
+    dispatch({type: "IF_MARKER_SELECTED", flag: flag, req: req})
+  },
+  PolySelected: (flag, req) => {
+    dispatch({type: "IF_POLY_SELECTED", flag: flag, req: req})
   },
   setPackLink: (link) => {
     dispatch({type: "SET_PACK_LINK", link: link})

@@ -49,7 +49,6 @@ class Main extends Component {
       togglerSelect: false,
       markerGroup: null,
       isVisible: false,
-      //loadingProgress: 0,
       api: new ApiController(this.loaderVisibility),
       daysItems: [],
       currentSelected: [],
@@ -78,40 +77,34 @@ class Main extends Component {
   };
 
   checkTime = () => {
-    let time = this.state.api.time;
-    console.log(time);
-    let isYear = time.includes('year');
-    isYear ? this.state.api.withYear(time) : this.state.api.withTimeRange(time);
-    return time;
-    //this.state.api.YieldsToWeatherRequest
+    return this.props.date || this.props.year || false;
   };
 
-  getOneStationData = (e, radius) => {
-    this.props.MarkerSelected(true);
+  getOneStationData = (e) => {
+    const {MarkerSelected, date, year} = this.props;
+    //Отут дічь якась. Там по дефолту немає свойства, тому створюю шоб в перевірці співпадало як з circle req
+    let data = e;
+    data.options = {};
+    data.options.radius = 1;
 
-    radius = radius || 1;
+    let req = this.state.api.createPolyRequest(data);
+    MarkerSelected(true, req);
 
-    let location = e.target.getLatLng();
-    let lat = location.lat;
-    let lon = location.lon || location.lng;
+    this.state.api.getStationsFromMapEvent({e: data}).then((station) => {
+      this.setCardItem(station.response[0]);
+    }).catch((error) => console.log(error));
 
-    this.setMarkerRequest(this.state.api.createPolyRequest(e, radius));
-    this.state.api.getStationByLatLon(e, radius).then((station) => {
-      let time = this.checkTime();
-      if (time) {
-        this.state.api.getWeatherByLatLon(lat, lon, radius).then((weather) => {
-          this.setCardItem(station.response[0]);
-          console.log(weather);
+    if (date.dateSet || year)
+      this.state.api.getWeatherFromMapEvent({e: data, time: date, year: year})
+        .then((weather) => {
           this.setWeather(weather.response);
-        }).catch((error) => console.log(error))
-      } else {
-        this.setCardItem(station.response[0]);
-      }
-    });
+        }).catch((error) => console.log(error));
 
     // create link for user download
-    this.fetchFileDownloadLink(
-      this.state.api.createLatLonWithRadiusLink(lat, lon, radius));
+    this.state.api.getPackFromMapEvent({e: data, time: date, year: year, pack: true})
+      .then((pack) => {
+        this.props.setPackLink(pack);
+      }).catch((error) => console.log(error));
   };
 
   setCardItem = (station) => {
@@ -138,11 +131,7 @@ class Main extends Component {
   }
 
   onMarkerClickBase = (e) => {
-    this.getOneStationData(e, 1);
-  };
-
-  setMarkerRequest = (req) => {
-    this.setState({markerRequest: req})
+    this.getOneStationData(e);
   };
 
   onStationsData = (station) => {
@@ -262,12 +251,17 @@ class Main extends Component {
 }
 
 const mapStateToProps = state => ({
-  isMarkerSelected: state.conditionReducer.isMarkerSelected
+  isMarkerSelected: state.conditionReducer.isMarkerSelected,
+  year: state.dataReducer.year,
+  date: state.dataReducer.date,
 });
 
 const mapDispatchToProps = dispatch => ({
   MarkerSelected: (flag, req) => {
     dispatch({type: "IF_MARKER_SELECTED", flag: flag, req: req})
+  },
+  setPackLink: (link) => {
+    dispatch({type: "SET_PACK_LINK", link: link})
   }
 });
 
