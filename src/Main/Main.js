@@ -88,15 +88,17 @@ class Main extends Component {
     //this.state.api.YieldsToWeatherRequest
   };
 
-  getOneStationData = (location, radius) => {
+  getOneStationData = (e, radius) => {
     this.props.MarkerSelected(true);
 
     radius = radius || 1;
+    let location = e.target.getLatLng();
+
     let lat = location.lat;
     let lon = location.lon || location.lng;
 
-    this.setMarkerRequest(this.state.api.createLatLonWithRadiusLink(lat, lon, radius));
-    this.state.api.getStationByLatLon(lat, lon, radius).then((station) => {
+    this.setMarkerRequest(this.state.api.createPolyRequest(e, radius));
+    this.state.api.getStationByLatLon(e, radius).then((station) => {
       let time = this.checkTime();
       if (time) {
         this.state.api.getWeatherByLatLon(lat, lon, radius).then((weather) => {
@@ -145,7 +147,7 @@ class Main extends Component {
   }
 
   onMarkerClickBase = (e) => {
-    this.getOneStationData(e.target.getLatLng(), 1);
+    this.getOneStationData(e, 1);
   };
 
   setMarkerRequest = (req) => {

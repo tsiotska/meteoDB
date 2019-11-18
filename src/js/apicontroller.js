@@ -127,10 +127,15 @@ export class ApiController {
       '/poly?type=circle&value=[' + lat + ',' + lon + ',' + rad + 'km]';
   };
 
-  createPolyRequest = (e) => {
+  createPolyRequest = (e, bufferForOneSt) => {
+    console.log(e);
     let req = "", lngs = null;
-    if (e.options.radius !== undefined) {
-      let res = [e._latlng.lat, e._latlng.lng, e.getRadius() / 1000 + 'km'];
+    if (bufferForOneSt || e.options.radius) {
+
+      //hasOwnProperty 
+      let lat =  e.latlng.lat || e._latlng.lat; // З _ це полігон, без - це точка. Хз чо так.
+      let lng =  e.latlng.lng || e._latlng.lng ;
+      let res = [lat, lng, (e.getRadius() / 1000 || bufferForOneSt) + 'km'];
       req = baseUrl + '/api/' + this.database + '/poly?type=circle&value=[' + res + ']';
     } else {
       lngs = e._latlngs;
@@ -139,18 +144,12 @@ export class ApiController {
     return req;
   };
 
-  createPackLink = (link) => {
-    return link + '&pack';
-  };
-
-
   createQueryLink = (selectedField, query) => {
     let searchType = selectedField;
     let queryType = '&query=' + query;
     let queryValue = 'stations?field=' + searchType + queryType;
     return baseUrl + '/api/gsod/' + queryValue;
   };
-
 
   // Final builder
   fetchData = (link) => {
@@ -169,8 +168,8 @@ export class ApiController {
 
   // Fetch region. Each method will reset controller
 
-  getStationByLatLon = (lat, lon, rad) => {
-    return this.fetchData(this.createLatLonWithRadiusLink(lat, lon, rad))
+  getStationByLatLon = (e, buffer) => {
+    return this.fetchData(this.createPolyRequest(e, buffer))
   };
 
   getWeatherByLatLon = (lat, lon, rad) => {
@@ -240,7 +239,6 @@ export class ApiController {
   }
 
   //extractors
-
   //Цей екстрактор мав би повертати обмежений лист query, якщо за той рік немає даних по якомусь параметру
   /* getByTypeAndYear = (year, type) => {
      let link = baseUrl + "/api/" + this.database + "/stations?extract=" + type + "&year=" + year;
