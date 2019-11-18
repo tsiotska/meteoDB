@@ -38,8 +38,8 @@
     "typeahead": "^0.2.2"
   },
   "scripts": {
-    "build-css": "node-sass-chokidar src/scss -o src/css",
-    "watch-css": "npm run build-css && node-sass-chokidar src/scss -o src/css --watch --recursive",
+    "build-css": "node-sass-chokidar src/scss -o src/css  --importer=node_modules/node-sass-tilde-importer",
+    "watch-css": "npm run build-css && node-sass-chokidar src/scss -o src/css --watch --recursive  --importer=node_modules/node-sass-tilde-importer",
     "start-js": "react-scripts start",
     "start": "npm-run-all -p watch-css start-js",
     "build-js": "react-scripts build",
@@ -48,8 +48,11 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
+    "compass": "^0.1.1",
+    "compass-mixins": "^0.12.10",
     "eslint": "^6.1.0",
-    "eslint-plugin-react": "^7.11.1"
+    "eslint-plugin-react": "^7.11.1",
+    "node-sass-tilde-importer": "^1.0.2"
   },
   "browserslist": {
     "production": [

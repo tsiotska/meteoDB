@@ -1,7 +1,41 @@
-.flyn.active {
-  -webkit-transform: none;
-  -ms-transform: none;
-  transform: none;
+@import "partials/variables";
+@import "partials/mixins";
+@import "~compass-mixins/lib/compass/_css3";
+
+$rotate-right: 45deg;
+$rotate-left: -$rotate-right;
+$flyn-animation-dur: .7s;
+
+.flyn {
+  &.active {
+    -webkit-transform: none;
+    -ms-transform: none;
+    transform: none;
+  }
+
+  height: inherit;
+  -webkit-transition: 0.4s ease;
+  -o-transition: 0.4s ease;
+  transition: 0.4s ease;
+  position: absolute;
+  top: 0;
+  padding-top: calc(#{$navbar-height} + 1em);
+  width: $flyn-width;
+  z-index: 950;
+  padding-bottom: 1.5rem;
+  -webkit-transform: translate(-100%);
+  -ms-transform: translate(-100%);
+  transform: translate(-100%);
+  background-color: $background-theme-main;
+}
+
+
+#flyn_toggle.btn.btn-secondary {
+  border: none;
+
+  &:hover {
+    background-color: $background-theme-main;
+  }
 }
 
 .fx {
@@ -15,81 +49,61 @@
   top: 6em;
   height: 4em;
   width: 2em;
-  background: #fff;
+  background: $background-theme-main;
   padding: 0;
-  -webkit-box-shadow: 3px 0 6px #dedede;
-  box-shadow: 3px 0 6px #dedede;
+  // box-shadow:3px 0px 6px #dedede ;
+  //@include box-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
   border-radius: 0 0.4em 0.4em 0;
 
-  &.btn:focus {
-    outline: 0;
+  &:focus {
+    outline: none !important;
     border: none;
     -webkit-box-shadow: none;
-    box-shadow: none;
+    box-shadow: none !important;
   }
+
 
   span {
 
     &:after,
     &:before {
       content: "";
-      -webkit-transition: 1s all ease;
-      -o-transition: 1s all ease;
-      transition: 1s all ease;
+      @include transition($flyn-animation-dur * 0.5 all ease);
       position: absolute;
       width: 0.1em;
       height: 2em;
       top: 0.25em;
-      border: 1px solid #000;
-      background-color: #000;
+      border: 1px solid $button-accent;
+      background-color: $button-accent;
       border-radius: 5px;
-      -webkit-transform: rotate(-45deg);
-      -ms-transform: rotate(-45deg);
-      transform: rotate(-45deg);
+      @include transform(rotate($rotate-left))
     }
   }
 
   .fx1:after,
   .fx2:after {
     top: 1.6em;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
+    @include transform(rotate($rotate-right))
   }
 }
 
 .flyn.active {
 
   .fx1:after,
-  .fx2:after {
-    top: 1em;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
-  }
-
-  .fx1:before,
-  .fx2:before {
-    top: 1em;
-    -webkit-transform: rotate(-45deg);
-    -ms-transform: rotate(-45deg);
-    transform: rotate(-45deg);
-  }
-
+  .fx2:after,
   .fx1 span:after,
   .fx2 span:after {
     top: 1em;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
+    @include transform(rotate($rotate-right))
   }
 
+
+  .fx1:before,
+  .fx2:before,
   .fx1 span:before,
   .fx2 span:before {
     top: 1em;
-    -webkit-transform: rotate(-45deg);
-    -ms-transform: rotate(-45deg);
-    transform: rotate(-45deg);
+    @include transform(rotate($rotate-left))
   }
 
   .fx:hover {
@@ -97,33 +111,29 @@
     .fx1:after,
     .fx2:after {
       top: 0.25em;
-      -webkit-transform: rotate(45deg);
-      -ms-transform: rotate(45deg);
-      transform: rotate(45deg);
+      @include transform(rotate($rotate-right))
     }
 
     .fx1:after {
-      animation: slides 1s linear infinite reverse;
+      animation: slides $flyn-animation-dur linear infinite reverse;
     }
 
     .fx2:after {
-      animation: slides 1s linear infinite reverse 0.8s;
+      animation: slides $flyn-animation-dur linear infinite reverse 0.8s;
     }
 
     .fx1:before,
     .fx2:before {
       top: 1.6em;
-      -webkit-transform: rotate(-45deg);
-      -ms-transform: rotate(-45deg);
-      transform: rotate(-45deg);
+      @include transform(rotate($rotate-left))
     }
 
     .fx1:before {
-      animation: slides2 1s linear infinite reverse;
+      animation: slides2 $flyn-animation-dur linear infinite reverse;
     }
 
     .fx2:before {
-      animation: slides2 1s linear infinite reverse 0.8s;
+      animation: slides2 $flyn-animation-dur linear infinite reverse 0.8s;
     }
   }
 }
@@ -131,32 +141,49 @@
 .fx:hover {
   .fx1 {
     &:before {
-      -webkit-animation: slides2 1s linear infinite;
-      animation: slides2 1s linear infinite;
+      -webkit-animation: slides2 $flyn-animation-dur linear infinite;
+      animation: slides2 $flyn-animation-dur linear infinite;
     }
 
     &:after {
-      -webkit-animation: slides 1s linear infinite 0.8s;
-      animation: slides 1s linear infinite 0.8s;
+      -webkit-animation: slides $flyn-animation-dur linear infinite 0.8s;
+      animation: slides $flyn-animation-dur linear infinite 0.8s;
     }
   }
 
   .fx2 {
     &:before {
-      -webkit-animation: slides2 1s linear infinite 0.8s;
-      animation: slides2 1s linear infinite 0.8s;
+      -webkit-animation: slides2 $flyn-animation-dur linear infinite 0.8s;
+      animation: slides2 $flyn-animation-dur linear infinite 0.8s;
     }
 
     &:after {
-      -webkit-animation: slides 1s linear infinite;
-      animation: slides 1s linear infinite;
+      -webkit-animation: slides $flyn-animation-dur linear infinite;
+      animation: slides $flyn-animation-dur linear infinite;
     }
   }
 }
 
-#flyn_current_station {
+.flyn_current_station {
   height: 15em;
   position: relative;
   opacity: 0;
   animation: fadeIn 0.8s linear forwards;
+}
+
+
+.cur_count_wrapper {
+  width: 100%;
+  position: relative;
+
+  .cur_count {
+    position: absolute;
+    bottom: 2em;
+    z-index: 1000;
+    right: 1em;
+    background-color: white;
+    padding: 1em;
+    border-radius: 5em;
+    box-shadow: 0 0 0.3em black;
+  }
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import CountryList from './Containers/CountryList';
 import DaysItemsList from './Containers/DaysItemsList';
 import SelectedStationsList from './Containers/SelectedStationsList'
+import $ from 'jquery';
 
 export default class Containers extends React.Component {
   constructor(props) {
@@ -12,7 +13,10 @@ export default class Containers extends React.Component {
   }
   render() {
 
-    return (<div className="bottom-container container-fluid p-3 mt-5 d-flex">
+    return (<div className="bottom-container container-fluid p-3 d-flex" >
+      <div class="button" class="container-flag"  onClick={() => $('.bottom-container').toggleClass('active')}>
+        
+      </div>
       <div className="navi card p-2 container-fluid my-2">
         <nav>
           <div className="nav nav-tabs" id="nav-tab" role="tablist">
@@ -24,9 +28,9 @@ export default class Containers extends React.Component {
         </nav>
 
         <div className="tab-content" id="nav-tabContent">
-          <CountryList ctr_list={this.props.ctr_list}/>
-          <SelectedStationsList onStationsChange={this.props.onStationsChange} index={this.props.mapSelectedIndex} selectedStations={this.props.selectedStations}/>
-          <DaysItemsList selectedPage={this.state.selectedPage} daysItems={this.props.daysItems}/>
+          <CountryList ctr_list={this.props.ctr_list} />
+          <SelectedStationsList onStationsChange={this.props.onStationsChange} index={this.props.mapSelectedIndex} selectedStations={this.props.selectedStations} />
+          <DaysItemsList selectedPage={this.state.selectedPage} daysItems={this.props.daysItems} />
         </div>
       </div>
     </div>);

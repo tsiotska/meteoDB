@@ -112,7 +112,7 @@ class MenuComponent extends React.Component {
   };
 
   currentStation = () => {
-    return (<div id="flyn_current_station" className="w-100 d-flex flex-column">
+    return (<div id="flyn_current_station" className="w-100 d-flex flex-column flyn_current_station">
       {this.props.currentStation}</div>);
   };
 

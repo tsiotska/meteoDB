@@ -1,5 +1,8 @@
+@import "partials/variables";
+
 .main_map {
-  height: 53em;
+  height: 100vh;
+  // height: calc(100vh - #{$footer-height});
 }
 #mapid {
   height: inherit;

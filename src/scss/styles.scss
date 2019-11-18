@@ -1,12 +1,21 @@
 // MUST BE REWRITEN TO BEM
 // CURRENTLY ALL STYLES ARE HERE
+@import "partials/variables";
 
 
-body{
-  overflow-y: hidden; 
+body {
+  margin: 0;
+  padding: 0; 
+  overflow-y: hidden;
+  font-family: $third-font;
 }
+
 .scrollable {
   overflow-y: hidden;
+}
+
+button {
+  outline: none !important;
 }
 
 .btn {
@@ -20,474 +29,46 @@ body{
 }
 
 
-.col-auto label{
+.col-auto label {
   margin: 10px;
   text-align: left;
   justify-content: left;
 }
 
-.empt{
+.empt {
   margin: 2em;
   font-family: cursive;
   font-size: 1.5em;
 }
 
-.st_card{
+.st_card {
   cursor: pointer;
 }
+
+@import "typeahead.scss";
 
 @import "map.scss";
 
-#ctr-list {
-  max-height: 20em;
-  overflow-y: scroll;
+@import "coutry-list.scss";
 
-  li {
-    min-height: 3em;
-  }
-}
-
-
-#flyn_toggle.btn.btn-secondary {
-  border: none;
-
-  &:hover {
-    background-color: white;
-  }
-}
-
-.flyn {
-  height: inherit;
-  -webkit-transition: 0.4s ease;
-  -o-transition: 0.4s ease;
-  transition: 0.4s ease;
-  position: absolute;
-  top: 3.5em;
-  width: 22em;
-  z-index: 950;
-  padding-bottom: 1.5rem;
-  -webkit-transform: translate(-100%);
-  -ms-transform: translate(-100%);
-  transform: translate(-100%);
-}
-
-.cur_count_wrapper {
-  width: 100%;
-  position: relative;
-  .cur_count {
-    position: absolute;
-    bottom: 2em;
-    z-index: 100000;
-    right: 1em;
-    background-color: white;
-    padding: 1em;
-    border-radius: 5em;
-    box-shadow: 0 0 0.3em black;
-  }
-}
-
-.drp {
-  float: right;
-}
-
-.weath {
-  opacity: 0;
-  animation: fadeIn 0.8s linear forwards;
-
-  .w_gaudge {
-    &:after,
-    &:before {
-      background-color: #ff3e3e;
-      position: absolute;
-      right: 0;
-      content: "";
-    }
-
-    &:after,
-    &:before,
-    .col-auto:before {
-      content: "";
-    }
-  }
-
-  .w_dt-header {
-    margin: 0;
-    -webkit-box-shadow: 0 -2px 6px #dedede;
-    box-shadow: 0 -2px 6px #dedede;
-    border-radius: 3em 3em 0 0;
-  }
-}
-
-.w_header {
-  margin-left: -15px;
-  margin-right: -15px;
-  z-index: 2;
-}
-
-.w_cont {
-  border-radius: 10px;
-  -webkit-box-shadow: 3px 1px 10px #d2d2d2;
-  box-shadow: 3px 1px 10px #d2d2d2;
-}
-
-.weath {
-  i.disabled {
-    opacity: 0.3;
-  }
-
-  .wi {
-    font-size: 1.5em;
-
-    &:last-of-type {
-      margin: 0 10px 0 0;
-    }
-  }
-
-  .w_s i.wi {
-    font-size: 1.6em;
-    margin-top: 5px;
-  }
-}
-
-.w_s {
-  margin-top: 0;
-  z-index: 1000;
-  padding: 5px 10px;
-  border-bottom-left-radius: 1em;
-  border-bottom-right-radius: 1em;
-  -webkit-box-shadow: 0 4px 10px #e3e3e3;
-  box-shadow: 0 4px 10px #e3e3e3;
-}
-
-.weath {
-  .col-auto {
-    margin: 10px;
-  }
-
-  .wi-celsius {
-    margin: 0;
-    top: 1px;
-    font-size: 1.5em;
-    position: absolute;
-  }
-
-  .w_gaudge {
-    &:after {
-      border: 0.4rem solid #cecece;
-      border-radius: 10px;
-      width: 0.9em;
-      height: 90%;
-      top: 5%;
-      bottom: 5%;
-      left: 45%;
-    }
-
-    &:before {
-      z-index: 1;
-      border: 5px solid #cecece;
-      border-radius: 1em;
-      width: 2em;
-      height: 2em;
-      bottom: 2%;
-      left: calc(45% - 1.05em / 2);
-    }
-  }
-
-  .w_gaudge_wrap {
-    position: relative;
-    width: 10em;
-    min-width: 200px;
-    margin: 0;
-  }
-
-  .w_gaudge {
-    div {
-      margin: 0;
-
-      &:last-child {
-        margin-bottom: 13%;
-      }
-
-      &.col-auto {
-        font-size: 1.1em;
-        font-weight: 500;
-      }
-    }
-    position: relative;
-    padding: 2em 0 2em 52.5%;
-    margin: 10px 0;
-
-    .col-auto:before {
-      -webkit-transform: rotate(90deg);
-      -ms-transform: rotate(90deg);
-      transform: rotate(90deg);
-      border: 1px solid #000;
-      background: #00f;
-      border-radius: 1em;
-      height: 0.6em;
-      position: absolute;
-      z-index: 10;
-      left: -6px;
-      top: 8px;
-      bottom: 0;
-    }
-  }
-
-  .badge {
-    font-size: 0.7em;
-    margin-left: 5px;
-  }
-
-  .w_gaudge {
-    .badge {
-      position: absolute;
-      top: -2px;
-      left: 8em;
-      font-size: 0.6em;
-      font-weight: 500;
-    }
-
-    .w_aver:after,
-    .w_dewp:after,
-    .w_max:after,
-    .w_min:after {
-      border-radius: 1em;
-      height: 0.6em;
-      font-size: 1em;
-      font-weight: 300;
-      position: absolute;
-      z-index: 10;
-      left: -3.5em;
-      top: 0;
-      bottom: 0;
-    }
-
-    .w_max:after {
-      content: "Max";
-    }
-
-    .w_min:after {
-      content: "Min";
-    }
-
-    .w_aver:after {
-      content: "Aver";
-    }
-
-    .w_dewp:after {
-      content: "Dwp";
-    }
-  }
-}
-
-.w_footer {
-  background: inherit;
-}
-
-.w_id {
-  border-radius: 3em 3em 0 0;
-  -webkit-box-shadow: 2px -2px 4px 0 #d1d1d1;
-  box-shadow: 2px -2px 4px 0 #d1d1d1;
-}
+@import "weather-elements.scss";
 
 @import "station.scss";
 
-nav .nav-tabs {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  justify-content: space-around;
-}
+@import "nav-tabs.scss";
 
-.nav .nav-item {
-  border: 1px solid;
-  margin-bottom: 0.4rem;
-}
-
-.tab-pane {
-  min-height: 10em;
-}
-
-.navi .nav-item {
-  &.active {
-    font-size: 1.04em;
-    background-color: #fff;
-    border: 2px solid #3a3eff;
-  }
-  border: 2px solid #d1d1ff;
-  border-radius: 4px;
-}
 @import "flyn.scss";
-.x_loader {
-  transition: 0.4s all;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  background: radial-gradient(unquote('#ffffff'), unquote('#d8d8d826'));
-
-  .progress-x {
-    position: absolute;
-    left: -5em;
-    right: -5em;
-    z-index: 10000;
-    bottom: -7em;
-
-    .progress-barx {
-      height: 100%;
-      position: relative;
-    }
-  }
-}
-
-.wload {
-  font-size: 1.4em;
-  font-weight: 600;
-  position: absolute;
-  bottom: -1em;
-  margin: auto;
-  left: -35%;
-}
-
-.load_text {
-  position: absolute;
-  left: -50;
-  right: -50;
-  margin: auto;
-}
 
 @import "loader.scss";
 
-.dx {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  width: 100%;
-
-  .el {
-    position: absolute;
-    width: 50.5%;
-    left: 50%;
-    top: 50%;
-    margin: -3px -3px -3px -5px;
-
-    .el-inner {
-      &:after,
-      &:before {
-        content: "";
-        position: absolute;
-        top: 1px;
-        left: 2px;
-        width: 0.17em;
-        height: 0.17em;
-        background-color: #0000bc;
-        border: 1px solid rgb(20, 0, 255);
-        border-radius: 1em;
-        box-shadow: 0 0 2px 2px rgba(255, 255, 255, 0.9);
-      }
-    }
-
-    &:nth-of-type(1) {
-      animation: el_innerSpin 6s linear infinite 1.5s;
-    }
-
-    &:nth-of-type(2) {
-      animation: el_innerSpin 2s linear infinite 0.5s;
-    }
-
-    &:nth-of-type(3) {
-      animation: el_innerSpin 1s linear infinite 1s;
-    }
-  }
-}
-
-.w_out {
-  position: relative;
-  width: 100%;
-}
-
-.w_selector {
-  position: absolute;
-  top: -2em;
-  right: -2em;
-  border-radius: 10em;
-  background-color: black;
-  width: 2em;
-  height: 2em;
-  display: block;
-  cursor: pointer;
-  font-size: 1.3em;
-  user-select: none;
-
-  input[type="checkbox"] i {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-  }
-
-  input {
-    position: absolute;
-    opacity: 0;
-    left: 0;
-    top: 0;
-    cursor: pointer;
-    height: 100%;
-    width: 100%;
-    z-index: 100;
-
-    &:checked ~ .w_mark {
-      background-color: #2196F3;
-    }
-
-    &:checked ~ .w_mark:after {
-      display: block;
-    }
-  }
-
-  &:hover input ~ .w_mark {
-    background-color: #ccc;
-  }
-
-  .w_mark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    border-radius: 0.2em;
-    background-color: #eee;
-
-    &:after {
-      content: "";
-      position: absolute;
-      display: none;
-      left: 40%;
-      top: 10%;
-      width: 0.5em;
-      height: 1.25em;
-      border: solid white;
-      border-width: 0 3px 3px 0;
-      -webkit-transform: rotate(45deg);
-      -ms-transform: rotate(45deg);
-      transform: rotate(45deg);
-    }
-  }
-}
-.container.overex{
-  box-shadow: 2px 1px 15px 1px;
-  border-radius: 1em;
-  overflow-y:scroll;
-  max-height: 40vh;
-}
+@import "download-list.scss";
 
 @import "keyframes.scss";
+
 @import "daterangepicker.scss";
+
+@import "navbar-main-top.scss";
+
+@import "footer.scss";
+
+@import "container.scss";
