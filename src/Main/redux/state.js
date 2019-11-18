@@ -5,7 +5,7 @@ export const conditionState = {
 };
 
 export const dataState = {
-  query: "",
+  queryParam: "",
   currentPackLink: null,
   date: {dateSet: false, startDate: null, endDate: null},
   year: null,

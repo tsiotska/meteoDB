@@ -115,7 +115,9 @@ class MenuComponent extends React.Component {
   enableButton = () => {
     const {isPolySelected, isMarkerSelected, queryParam, date, year} = this.props;
 
-    if (queryParam.length > 0 || ((date.dateSet || year) && (isPolySelected || isMarkerSelected))) {
+    console.log(queryParam);
+    console.log(year)
+    if (queryParam || ((date.dateSet || year) && (isPolySelected || isMarkerSelected))) {
       this.setState({enableSearchButton: true});
     } else {
       this.setState({enableSearchButton: false})
@@ -191,18 +193,15 @@ class MenuComponent extends React.Component {
   onLimitChange = (event) => {
     this.props.setLimit(event.target.value)
   };
-
+//Ось ці функції треба переписати на сагу, бо кнопка буде disabled
   ApplyCalendarDate = (e) => {
     this.props.setTime(e);
     setTimeout(this.enableButton, 500);
   };
 
   unControlledInput = (searchParam) => {
-
     this.props.setQuery(searchParam);
-
     this.setState({queryParam: searchParam});
-
     setTimeout(this.enableButton, 500);
   };
 
@@ -297,19 +296,8 @@ class MenuComponent extends React.Component {
             <div className="form-group w-50 ml-4 mb-1 form-check">
               <input type="text" className="form-check-input" id="nearest_chk" onChange={this.onNearestChange}/>
               <label className="form-check-label" htmlFor="exampleCheck1">Найближчі N станцій</label>
-
-              <input type="checkbox" className="form-check-input" id="nbs_chk" ref={this.neighborsSelector}/>
-              <label className="form-check-label" htmlFor="exampleCheck1">Сусідні країни</label>
-
             </div>
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="">Найближчі N станцій</span>
-              </div>
-              <input type="text" class="form-control" ref={this.nearestSelector} aria-label="Sizing example input"
-                     aria-describedby="nearestNinp"/>
 
-            </div>
             <div className="col-auto d-flex w-100">
               <button id="reeval" onClick={this.onSearchClick}
                       className={(this.state.enableSearchButton ? "" : "disabled ") + "btn btn-primary m-2 mb-1 mt-auto"}>Пошук
@@ -370,7 +358,7 @@ const mapStateToProps = state => ({
   isMarkerSelected: state.conditionReducer.isMarkerSelected,
   areLimitAndOffsetDisabled: state.conditionReducer.areLimitAndOffsetDisabled,
   packLink: state.dataReducer.currentPackLink,
-  queryParam: state.dataReducer.query,
+  queryParam: state.dataReducer.queryParam,
   year: state.dataReducer.year,
   date: state.dataReducer.date,
 });

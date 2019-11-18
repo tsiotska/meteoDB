@@ -6,7 +6,7 @@ const dataReducer = (state = dataState, action) => {
     case types.SET_QUERY:
       return {
         ...state,
-        query: action.param,
+        queryParam: action.param,
       };
     case types.SET_PACK_LINK:
       return {
