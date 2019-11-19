@@ -35,7 +35,7 @@ class MenuComponent extends React.Component {
       .then((data) => {
         if (data && data.response) {
           this.setState({
-            source: data.response.map((i) => i.Name), //.item1
+            source: data.response.map((i) => i.name), //.item1
             isLoading: false
           });
           let cnt = 0;
