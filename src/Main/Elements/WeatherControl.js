@@ -12,7 +12,7 @@ export default class WeatherControl extends Component {
 
   render() {
     const e = this.props.data;
-
+    console.log(this.props.data)
     return (<div className="col-sm col-lg-6 d-flex flex-column  weath my-2">
       <div className="w_header   d-flex mx-auto   justify-content-center">
         <div className="w_dt-header px-4 flex-row col-auto mb-0 w_s text-center">

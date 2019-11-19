@@ -6,7 +6,8 @@ export const conditionState = {
 
 export const dataState = {
   queryParam: [],
-  currentPackLink: null,
+  stationPackLink: null,
+  weatherPackLink: null,
   date: {dateSet: false, startDate: null, endDate: null},
   year: null,
   limit: null,

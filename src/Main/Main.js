@@ -90,17 +90,22 @@ class Main extends Component {
       this.setCardItem(station.response[0]);
     }).catch((error) => console.log(error));
 
-    if (date.dateSet || year)
+    this.state.api.getPackFromMapEvent({e: data, pack: true})
+      .then((pack) => {
+        this.props.setWeatherPackLink(pack.response[0]);
+      }).catch((error) => console.log(error));
+
+    if (date.dateSet || year) {
       this.state.api.getWeatherFromMapEvent({e: data, time: date, year: year})
         .then((weather) => {
           this.setWeather(weather.response);
         }).catch((error) => console.log(error));
 
-    // create link for user download
-    this.state.api.getPackFromMapEvent({e: data, time: date, year: year, pack: true})
-      .then((pack) => {
-        this.props.setPackLink(pack);
-      }).catch((error) => console.log(error));
+      this.state.api.getPackFromMapEvent({e: data, time: date, year: year, pack: true})
+        .then((pack) => {
+          this.props.setWeatherPackLink(pack.response[0]);
+        }).catch((error) => console.log(error));
+    }
   };
 
   setCardItem = (station) => {
@@ -251,9 +256,12 @@ const mapDispatchToProps = dispatch => ({
   MarkerSelected: (flag, req) => {
     dispatch({type: "IF_MARKER_SELECTED", req: req})
   },
-  setPackLink: (link) => {
-    dispatch({type: "SET_PACK_LINK", link: link})
-  }
+  setStationPackLink: (link) => {
+    dispatch({type: "SET_STATION_PACK_LINK", link: link})
+  },
+  setWeatherPackLink: (link) => {
+    dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Main);

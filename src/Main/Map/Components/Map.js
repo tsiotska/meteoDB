@@ -121,35 +121,37 @@ class MapX extends Component {
 
   fetchMarkers = (e) => {
     const {
-      PolySelected, onStationsData, setWeather, setPackLink,
+      PolySelected, onStationsData, setWeather,setStationPackLink, setWeatherPackLink,
       api, date, year, /* neigh, nearest, offset, limit */
     } = this.props;
 
     e = e.layer;
-    //Save our req
+
     let req = api.createPolyRequest(e);
     PolySelected(req, true);
-    //Не помятаю з якими параметрами працює полігон. Розкоментуєш.
+
     api.getStationsFromMapEvent({
       e: e,
-      /*offset: offset,
-      limit: limit,
-      nearest: nearest,
-      neigh: neigh*/
     }).then((stations) => {
       onStationsData(stations, e._latlngs);
     }).catch((error) => console.log(error));
 
-    if (date.dateSet || year)
+    api.getPackFromMapEvent({e: e, pack: true}).then((pack) => {
+      console.log(pack);
+      setStationPackLink(pack.response[0])
+    }).catch((error) => console.log(error));
+
+    if (date.dateSet || year) {
       api.getWeatherFromMapEvent({e: e, date: date, year: year})
         .then((weather) => {
           setWeather(weather.response);
         }).catch((error) => console.log(error));
 
-    api.getPackFromMapEvent({e: e, date: date, year: year, pack: true}).then((pack) => {
-      console.log(pack);
-      setPackLink(pack.response[0])
-    }).catch((error) => console.log(error));
+      api.getPackFromMapEvent({e: e, date: date, year: year, pack: true}).then((pack) => {
+        console.log(pack);
+        setWeatherPackLink(pack.response[0])
+      }).catch((error) => console.log(error));
+    }
   };
 
 
@@ -214,9 +216,12 @@ const mapDispatchToProps = dispatch => ({
   PolySelected: (req, flag) => {
     dispatch({type: "IF_POLY_SELECTED", req: req, flag: flag})
   },
-  setPackLink: (link) => {
-    dispatch({type: "SET_PACK_LINK", link: link})
-  }
+  setStationPackLink: (link) => {
+    dispatch({type: "SET_STATION_PACK_LINK", link: link})
+  },
+  setWeatherPackLink: (link) => {
+    dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(MapX);

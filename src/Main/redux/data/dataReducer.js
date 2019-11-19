@@ -9,10 +9,15 @@ const dataReducer = (state = dataState, action) => {
         ...state,
         queryParam: action.param,
       };
-    case types.SET_PACK_LINK:
+    case types.SET_STATION_PACK_LINK:
       return {
         ...state,
-        currentPackLink: action.link,
+        stationPackLink: action.link,
+      };
+    case types.SET_WEATHER_PACK_LINK:
+      return {
+        ...state,
+        stationPackLink: action.link,
       };
     case types.SET_YEAR:
       //Перевірки можна робити в редюсері

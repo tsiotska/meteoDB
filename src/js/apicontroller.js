@@ -159,20 +159,23 @@ export class ApiController {
 
   };
 
-  getDataForMapOrMarker(context){
+  getDataForMapOrMarker(context) {
     this.setController(context);
     let link = this.createPolyRequest(context.e);
     return this.fetchData(link);
   }
+
   //Можеш просто викликати getDataForMapAndMarker і передавати контекст, а це видалити.
   getStationsFromMapEvent(context) {
-  return this.getDataForMapOrMarker(context);
+    return this.getDataForMapOrMarker(context);
   }
+
   getWeatherFromMapEvent = (context) => {
-   return this.getDataForMapOrMarker(context);
+    return this.getDataForMapOrMarker(context);
   };
+
   getPackFromMapEvent = (context) => {
-   return this.getDataForMapOrMarker(context);
+    return this.getDataForMapOrMarker(context);
   };
 
   //upload Weather if we already have stations
@@ -198,6 +201,11 @@ export class ApiController {
   };
 
   getWeatherByQuery = (context) => {
+    this.setController(context);
+    return this.fetchData(this.createQueryLink(context.selectedField, context.query));
+  };
+
+  getPackByQuery = (context) => {
     this.setController(context);
     return this.fetchData(this.createQueryLink(context.selectedField, context.query));
   };

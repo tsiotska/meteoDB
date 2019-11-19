@@ -64,7 +64,6 @@ class MenuComponent extends React.Component {
     } //Якщо повністю новий запит
     else if (queryParam) {
       this.props.api.searchStationsByQuery({
-        date: date, year: year,
         offset: offset, limit: limit,
         neighbors: neigh, nearest: nearest,
         query: queryParam,
@@ -74,6 +73,18 @@ class MenuComponent extends React.Component {
         this.props.onStationsData(stations);
       }).catch((error) => console.log(error));
 
+      this.props.api.getPackByQuery({
+        offset: offset, limit: limit,
+        neighbors: neigh, nearest: nearest,
+        query: queryParam,
+        selectedField: this.selectorByField.current.value,
+        pack: true
+      })
+        .then((pack) => {
+          this.props.setStationPackLink(pack.response[0]);
+        }).catch((error) => console.log(error));
+
+
       if (year || date.dateSet) {
         this.props.api.getWeatherByQuery({
           date: date, year: year,
@@ -82,8 +93,18 @@ class MenuComponent extends React.Component {
           query: queryParam,
           selectedField: this.selectorByField.current.value
         }).then((weather) => {
-          this.props.setWeather(weather);
+          this.props.setWeather(weather.response);
         }).catch((error) => console.log(error));
+
+        this.props.api.getPackByQuery({ date: date, year: year,
+          offset: offset, limit: limit,
+          neighbors: neigh, nearest: nearest,
+          query: queryParam,
+          selectedField: this.selectorByField.current.value, pack: true})
+          .then((pack) => {
+            console.log(pack)
+            this.props.setWeatherPackLink(pack.response[0]);
+          }).catch((error) => console.log(error));
       }
     } else {
       alert("Please choose a query...")
@@ -201,7 +222,7 @@ class MenuComponent extends React.Component {
 
   render() {
     //Це деструктуризація, пиши якщо багато даних
-    const {areLimitAndOffsetDisabled, counter, packLink, polyRequest} = this.props;
+    const {areLimitAndOffsetDisabled, counter, stationPackLink, weatherPackLink, polyRequest} = this.props;
 
     return (<div className="main_map container-fluid p-0">
       <Map setWeather={this.props.setWeather} api={this.props.api}
@@ -325,9 +346,14 @@ class MenuComponent extends React.Component {
             <ul id="stNav" className="pagination justify-content-center"/>
           </nav>
 
-          {packLink &&
+          {stationPackLink &&
           <Button download className="" target="_blank"
-                  href={baseUrl + packLink + "?saveas=stations.json"}>
+                  href={baseUrl + stationPackLink + "?saveas=stations.json"}>
+            Download
+          </Button>}
+          {weatherPackLink &&
+          <Button download className="" target="_blank"
+                  href={baseUrl + weatherPackLink + "?saveas=stations.json"}>
             Download
           </Button>}
 
@@ -351,7 +377,8 @@ const mapStateToProps = state => ({
   areLimitAndOffsetDisabled: state.conditionReducer.areLimitAndOffsetDisabled,
 
   lastPoly: state.dataReducer.lastPoly,
-  packLink: state.dataReducer.currentPackLink,
+  stationPackLink: state.dataReducer.stationPackLink,
+  weatherPackLink: state.dataReducer.weatherPackLink,
   queryParam: state.dataReducer.queryParam,
   year: state.dataReducer.year,
   date: state.dataReducer.date,
@@ -364,8 +391,11 @@ const mapDispatchToProps = dispatch => ({
   disableLimitAndOffset: (flag) => {
     dispatch({type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag})
   },
-  setPackLink: (link) => {
-    dispatch({type: "SET_PACK_LINK", link: link})
+  setStationPackLink: (link) => {
+    dispatch({type: "SET_STATION_PACK_LINK", link: link})
+  },
+  setWeatherPackLink: (link) => {
+    dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
   },
   setYear: (year) => {
     dispatch({type: "SET_YEAR", year: year})
