@@ -1,6 +1,6 @@
 export const conditionState = {
-  isPolySelected: false,
-  isMarkerSelected: false,
+  markerRequest: "",
+  polyRequest: "",
   areLimitAndOffsetDisabled: false,
 };
 
@@ -10,7 +10,11 @@ export const dataState = {
   date: {dateSet: false, startDate: null, endDate: null},
   year: null,
   limit: null,
-  offset: null
+  offset: null,
+  nearest: false,
+  neigh: null,
+
+  lastPoly: []
 };
 
 

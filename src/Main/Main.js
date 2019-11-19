@@ -59,16 +59,16 @@ class Main extends Component {
     this.onMarkerClick = throttle(this.onMarkerClickBase, 500)
   }
 
-  //Цю функцію в рєдакс не прокинеш
   loaderVisibility = (flag) => {
     this.setState({isVisible: flag});
   };
 
 
-  clearMarkers = () => {
+  clearMap = () => {
     this.setState({
       MapMarkers: [],
-      stationsAll: null
+      stationsAll: null,
+      daysItems: []
     })
   };
 
@@ -76,19 +76,15 @@ class Main extends Component {
     this.setState({MapMarkers: e})
   };
 
-  checkTime = () => {
-    return this.props.date || this.props.year || false;
-  };
-
   getOneStationData = (e) => {
     const {MarkerSelected, date, year} = this.props;
-    //Отут дічь якась. Там по дефолту немає свойства, тому створюю шоб в перевірці співпадало як з circle req
+
     let data = e;
     data.options = {};
     data.options.radius = 1;
 
     let req = this.state.api.createPolyRequest(data);
-    MarkerSelected(true, req);
+    MarkerSelected(req);
 
     this.state.api.getStationsFromMapEvent({e: data}).then((station) => {
       this.setCardItem(station.response[0]);
@@ -168,12 +164,6 @@ class Main extends Component {
     mymap.fitBounds(L.latLngBounds(area_latlon));
   };
 
-  clearWeather = () => {
-    this.setState({
-      daysItems: []
-    })
-  };
-
   onMapPageChanged = (e) => {
     if (this.state.lockM) {
       this.setState({lockM: false});
@@ -201,13 +191,14 @@ class Main extends Component {
     this.setState({mapSelectedIndex: e})
   };
 
-  onRefreshClick = () => {
-    mymap.setView([
-      48.289559, 31.3205566 // Ukraine centered
-    ], 6);
-    this.setMarkers([]);
-    this.setState({lastPoly: []})
+  //Якщо видаляється лише один полігон. Тут треба погратись
+  onToolRemove = (event) => {
+    this.setCardItem([]);
+    this.clearMap();
+    this.props.PolySelected("");
+    this.props.MarkerSelected("");
   };
+
 
   render() {
     let comp = {
@@ -223,12 +214,9 @@ class Main extends Component {
       activeMarker: this.activeMarker,
       PageChanged: this.onMapPageChanged,
       onMarkerClick: this.onMarkerClick,
-      onRefreshClick: this.onRefreshClick,
-
-      clearMarkers: this.clearMarkers,
-      setCardItem: this.setCardItem,
-      clearWeather: this.clearWeather,
-      markerRequest: this.state.markerRequest
+      onToolRemove: this.onToolRemove,
+      clearMap: this.clearMap,
+      setCardItem: this.setCardItem
     };
 
     let conts = {
@@ -251,14 +239,17 @@ class Main extends Component {
 }
 
 const mapStateToProps = state => ({
-  isMarkerSelected: state.conditionReducer.isMarkerSelected,
   year: state.dataReducer.year,
   date: state.dataReducer.date,
+  lastPoly: state.dataReducer.lastPoly
 });
 
 const mapDispatchToProps = dispatch => ({
+  PolySelected: (req) => {
+    dispatch({type: "IF_POLY_SELECTED", req: req})
+  },
   MarkerSelected: (flag, req) => {
-    dispatch({type: "IF_MARKER_SELECTED", flag: flag, req: req})
+    dispatch({type: "IF_MARKER_SELECTED", req: req})
   },
   setPackLink: (link) => {
     dispatch({type: "SET_PACK_LINK", link: link})

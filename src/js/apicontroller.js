@@ -9,8 +9,6 @@ export class ApiController {
   }
 
   setController = (context) => {
-    console.log(context.date);
-    console.log(context.year);
     context.date && (this.time = context.date);
     context.year && (this.year = context.year);
     this.withOffset(context.offset);
@@ -105,7 +103,6 @@ export class ApiController {
   };
 
   addPack = () => {
-    console.log(this._pack);
     return this._pack ? '&pack' : '';
   };
 
@@ -125,7 +122,6 @@ export class ApiController {
 
   // Link builders
   createPolyRequest = (e) => {
-    console.log(e);
     let req = "", lngs = null;
 
     if (e.options.radius) {
@@ -184,37 +180,25 @@ export class ApiController {
     this.setController(context);
     //Все-таки краще перевіряти чином як в Main.js 98;
     let isWeatherRequest = this.YieldsToWeatherRequest();
-    console.log(this.year);
-    if (context.isMarkerSelected && isWeatherRequest) {
-      console.log("Marker request!");
+    if (context.markerRequest && isWeatherRequest) {
       return this.fetchData(context.markerRequest)
 
-    } else if (context.isPolySelected && isWeatherRequest) {
-      console.log("Poly request!");
+    } else if (context.polyRequest && isWeatherRequest) {
       return this.fetchData(context.polyRequest)
 
-    } else if (context.isPolySelected || context.isMarkerSelected) {
+    } else if (context.polyRequest || context.markerRequest) {
       alert("Nothing to search...") //Бо тут буде помилка. Необхідно повернути пустий проміс.
     }
   };
 
   //simple query searching for stations
   searchStationsByQuery = (context) => {
-    this.withLimit = context.limit;
-    this.withOffset = context.offset;
-    this.withNearest = context.nearest;
-    this.withNeighbors = context.neighbors;
-
+    this.setController(context);
     return this.fetchData(this.createQueryLink(context.selectedField, context.query));
   };
 
   getWeatherByQuery = (context) => {
-    this.withLimit = context.limit;
-    this.withOffset = context.offset;
-    this.withNearest = context.nearest;
-    this.withNeighbors = context.neighbors;
-    (context.date && (this.time = context.date)) || (context.year && (this.year = context.year));
-
+    this.setController(context);
     return this.fetchData(this.createQueryLink(context.selectedField, context.query));
   };
 

@@ -1,5 +1,6 @@
 import React from 'react';
-import Map from './Components/Map'; 
+import Map from './Components/Map';
+import {mymap} from './Components/Map';
 import {baseUrl} from '../../js/const';
 import DatePicker from '../../Main/Controls/DatePicker'
 import $ from 'jquery';
@@ -30,12 +31,11 @@ class MenuComponent extends React.Component {
   }
 
   componentDidMount() {
-    /* this.props.SelTime(this.getSelectedTime.bind(this)); */
     this.props.api.getStationsCount()
       .then((data) => {
         if (data && data.response) {
           this.setState({
-            source: data.response.map((i) => i.name), //.item1
+            source: data.response.map((i) => i.Name), //.item1
             isLoading: false
           });
           let cnt = 0;
@@ -46,23 +46,17 @@ class MenuComponent extends React.Component {
       });
   }
 
-  setPolyRequest = (req) => {
-    this.setState({polyRequest: req})
-  };
-
   onSearchClick = () => {
     const {
-      isPolySelected, isMarkerSelected, markerRequest, polyRequest, queryParam,
+      markerRequest, polyRequest, queryParam,
       date, year, offset, limit, neigh, nearest,
     } = this.props;
     //Якщо дозагрузка погоди
-    if (isMarkerSelected || isPolySelected) {
+    if (markerRequest || polyRequest) {
       this.props.api.uploadWeather({
         date: date, year: year, offset: offset,
         limit: limit, neighbors: this.neigh,
         nearest: nearest,
-        isMarkerSelected: isMarkerSelected,
-        isPolySelected: isPolySelected,
         polyRequest: polyRequest, markerRequest: markerRequest
       }).then((weather) => {
         this.props.setWeather(weather.response);
@@ -74,14 +68,20 @@ class MenuComponent extends React.Component {
         offset: offset, limit: limit,
         neighbors: neigh, nearest: nearest,
         query: queryParam,
-        selectedField: this.selectorByField.current.value,
+        selectedField: this.selectorByField.current.value
       }).then((stations) => {
         console.log(stations);
         this.props.onStationsData(stations);
       }).catch((error) => console.log(error));
 
-      if (this.props.api.YieldsToWeatherRequest()) {
-        this.props.api.getWeatherByQuery().then((weather) => {
+      if (year || date.dateSet) {
+        this.props.api.getWeatherByQuery({
+          date: date, year: year,
+          offset: offset, limit: limit,
+          neighbors: neigh, nearest: nearest,
+          query: queryParam,
+          selectedField: this.selectorByField.current.value
+        }).then((weather) => {
           this.props.setWeather(weather);
         }).catch((error) => console.log(error));
       }
@@ -101,22 +101,13 @@ class MenuComponent extends React.Component {
       {this.props.currentStation}</div>);
   };
 
-  setQuery = (e) => {
-    this.selectorByField.current.value = 'ctry_full';
-    $('#querystr').val(e);
-    this.onSearchClick(e);
-  };
-
-  onRefreshClick = (e) => {
-    this.props.onRefreshClick(e);
-  };
-
   enableButton = () => {
-    const {isPolySelected, isMarkerSelected, queryParam, date, year} = this.props;
+    const {markerRequest, polyRequest, queryParam, date, year} = this.props;
 
     console.log(queryParam);
-    console.log(year)
-    if (queryParam || ((date.dateSet || year) && (isPolySelected || isMarkerSelected))) {
+    console.log(year);
+
+    if (queryParam || ((date.dateSet || year) && (polyRequest || markerRequest))) {
       this.setState({enableSearchButton: true});
     } else {
       this.setState({enableSearchButton: false})
@@ -124,18 +115,7 @@ class MenuComponent extends React.Component {
   };
 
   onYearsChange = (event) => {
-
-    console.log("ON YEAR");
-    console.log(event);
     this.props.setYear(event.target.value);
-
-    let year = event.target.value;
-
-    if (year.length === 4) {
-      this.setState({year: year});
-    } else {
-      this.setState({year: ""});
-    }
     setTimeout(this.enableButton, 500)
   };
 
@@ -144,6 +124,21 @@ class MenuComponent extends React.Component {
     this.typeahead.getInstance().clear();
   };
 
+  onRefreshClick = () => {
+    this.clearSource();
+    this.props.lastPoly.forEach((poly) => {
+      mymap.removeLayer(poly.layer)
+    });
+
+    mymap.setView([
+      48.289559, 31.3205566 // Ukraine centered
+    ], 6);
+    this.props.setCardItem([]);
+    this.props.clearMap();
+
+    this.props.PolySelected("");
+    this.props.MarkerSelected("");
+  };
   onTypeChanged = () => {
     this.clearSource();
     let type = this.selectorByField.current.value;
@@ -178,21 +173,21 @@ class MenuComponent extends React.Component {
   };
 
   onOffsetChange = (event) => {
-    this.props.setOffset(event.target.value)
+    this.props.setLimiters(event.target.value, "offset")
   };
 
   onNeighChange = (event) => {
-    this.props.setNeigh(event.target.value)
+    this.props.setLimiters(event.target.value, "neigh")
   };
 
   onNearestChange = (event) => {
-    this.props.setNearest(event.target.value);
+    this.props.setLimiters(event.target.value, "nearest");
   };
 
   onLimitChange = (event) => {
-    this.props.setLimit(event.target.value)
+    this.props.setLimiters(event.target.value, "limit")
   };
-//Ось ці функції треба переписати на сагу, бо кнопка буде disabled
+
   ApplyCalendarDate = (e) => {
     this.props.setTime(e);
     setTimeout(this.enableButton, 500);
@@ -206,15 +201,14 @@ class MenuComponent extends React.Component {
 
   render() {
     //Це деструктуризація, пиши якщо багато даних
-    const {areLimitAndOffsetDisabled, counter,  packLink} = this.props;
+    const {areLimitAndOffsetDisabled, counter, packLink} = this.props;
 
     return (<div className="main_map container-fluid p-0">
-      <Map setPolyRequest={this.setPolyRequest} setWeather={this.props.setWeather}
-           clearMarkers={this.props.clearMarkers} api={this.props.api}
+      <Map setWeather={this.props.setWeather} api={this.props.api}
            activeMarker={this.props.activeMarker}
            onStationsData={this.props.onStationsData} markers={this.state.selectedPage}
-           currentSelected={this.props.markers} clearWeather={this.props.clearWeather}
-           setCardItem={this.props.setCardItem}/>
+           currentSelected={this.props.markers}
+           setCardItem={this.props.setCardItem} onToolRemove={this.props.onToolRemove}/>
 
       <div className="cur_count_wrapper">
         <div className={"cur_count " + (
@@ -242,7 +236,7 @@ class MenuComponent extends React.Component {
             <div className="form-inline row m-1">
               <div className="col-5  mb-1">
                 <label htmlFor="type">Тип поля</label>
-                <select defaultValue="ctry_full" ref={this.selectorByField} disabled={this.props.isPolySelected}
+                <select defaultValue="ctry_full" ref={this.selectorByField} disabled={this.props.polyRequest}
                         className="custom-select"
                         onChange={this.onTypeChanged} id="type">
                   <option>id</option>
@@ -353,9 +347,9 @@ class MenuComponent extends React.Component {
 const mapStateToProps = state => ({
   polyRequest: state.conditionReducer.polyRequest,
   markerRequest: state.conditionReducer.markerRequest,
-  isPolySelected: state.conditionReducer.isPolySelected,
-  isMarkerSelected: state.conditionReducer.isMarkerSelected,
   areLimitAndOffsetDisabled: state.conditionReducer.areLimitAndOffsetDisabled,
+
+  lastPoly: state.dataReducer.lastPoly,
   packLink: state.dataReducer.currentPackLink,
   queryParam: state.dataReducer.queryParam,
   year: state.dataReducer.year,
@@ -378,18 +372,15 @@ const mapDispatchToProps = dispatch => ({
   setTime: (date) => {
     dispatch({type: "SET_TIME", date: date})
   },
-  //Відрізняються лише параметри, спрощу в одну якшо можливо
-  setLimit: (limit) => {
-    dispatch({type: "SET_ANY_INPUT_DATA", limit: limit})
+  //Працює для  limit offset nearest neigh
+  setLimiters: (data, kind) => {
+    dispatch({type: "SET_ANY_INPUT_DATA", data: data, kind: kind})
   },
-  setOffset: (offset) => {
-    dispatch({type: "SET_ANY_INPUT_DATA", offset: offset})
+  PolySelected: (req) => {
+    dispatch({type: "IF_POLY_SELECTED", req: req})
   },
-  setNearest: (nearest) => {
-    dispatch({type: "SET_ANY_INPUT_DATA", nearest: nearest})
-  },
-  setNeigh: (neigh) => {
-    dispatch({type: "SET_ANY_INPUT_DATA", neigh: neigh})
+  MarkerSelected: (flag, req) => {
+    dispatch({type: "IF_MARKER_SELECTED", req: req})
   },
 });
 

@@ -36,7 +36,21 @@ const dataReducer = (state = dataState, action) => {
     case types.SET_ANY_INPUT_DATA:
       return {
         ...state,
-        [action.data]: action.data,
+        [action.kind]: action.data,
+      };
+    case types.SET_LAST_POLY:
+      let array = state.lastPoly;
+      array.push(action.event);
+      return {
+        ...state,
+        lastPoly: array,
+      };
+    case types.DELETE_LAST_POLY:
+      let lastPoly = state.lastPoly;
+      let tg = lastPoly.filter((pl) => pl.layer !== action.event.layer);
+      return {
+        ...state,
+        lastPoly: tg,
       };
     default:
       return state;
