@@ -6,7 +6,7 @@ errors/
 log/
 css/
 # User-specific files
-.env.local.*
+.env.*.local
 *.suo
 *.user
 *.userosscache
