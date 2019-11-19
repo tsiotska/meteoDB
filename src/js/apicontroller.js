@@ -9,6 +9,8 @@ export class ApiController {
   }
 
   setController = (context) => {
+    console.log(context.date);
+
     context.date && (this.time = context.date);
     context.year && (this.year = context.year);
     this.withOffset(context.offset);
@@ -181,12 +183,13 @@ export class ApiController {
   //upload Weather if we already have stations
   uploadWeather = (context) => {
     this.setController(context);
-    //Все-таки краще перевіряти чином як в Main.js 98;
-    let isWeatherRequest = this.YieldsToWeatherRequest();
-    if (context.markerRequest && isWeatherRequest) {
+
+    if (context.markerRequest) {
+      console.log("Marker section")
       return this.fetchData(context.markerRequest)
 
-    } else if (context.polyRequest && isWeatherRequest) {
+    } else if (context.polyRequest) {
+      console.log("Poly section")
       return this.fetchData(context.polyRequest)
 
     } else if (context.polyRequest || context.markerRequest) {

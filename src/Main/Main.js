@@ -96,12 +96,12 @@ class Main extends Component {
       }).catch((error) => console.log(error));
 
     if (date.dateSet || year) {
-      this.state.api.getWeatherFromMapEvent({e: data, time: date, year: year})
+      this.state.api.getWeatherFromMapEvent({e: data, date: date, year: year})
         .then((weather) => {
           this.setWeather(weather.response);
         }).catch((error) => console.log(error));
 
-      this.state.api.getPackFromMapEvent({e: data, time: date, year: year, pack: true})
+      this.state.api.getPackFromMapEvent({e: data, date: date, year: year, pack: true})
         .then((pack) => {
           this.props.setWeatherPackLink(pack.response[0]);
         }).catch((error) => console.log(error));
@@ -253,7 +253,7 @@ const mapDispatchToProps = dispatch => ({
   PolySelected: (req, flag) => {
     dispatch({type: "IF_POLY_SELECTED", req: req, flag: flag})
   },
-  MarkerSelected: (flag, req) => {
+  MarkerSelected: (req) => {
     dispatch({type: "IF_MARKER_SELECTED", req: req})
   },
   setStationPackLink: (link) => {

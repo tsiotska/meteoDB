@@ -54,9 +54,7 @@ class MenuComponent extends React.Component {
     //Якщо дозагрузка погоди
     if (markerRequest || polyRequest) {
       this.props.api.uploadWeather({
-        date: date, year: year, offset: offset,
-        limit: limit, neighbors: this.neigh,
-        nearest: nearest,
+        date: date, year: year,
         polyRequest: polyRequest, markerRequest: markerRequest
       }).then((weather) => {
         this.props.setWeather(weather.response);
