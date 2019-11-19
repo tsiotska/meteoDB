@@ -22,6 +22,11 @@ button {
   border: none;
 }
 
+//Просто підсвіти її сірим як решту звичайних інпатів.
+.disabledQueryInput{
+  display: none;
+}
+
 .page-link {
   &:focus {
     box-shadow: none;

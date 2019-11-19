@@ -4,6 +4,7 @@ import {types} from './dataActions';
 const dataReducer = (state = dataState, action) => {
   switch (action.type) {
     case types.SET_QUERY:
+      console.log(action.param);
       return {
         ...state,
         queryParam: action.param,

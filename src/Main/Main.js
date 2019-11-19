@@ -195,7 +195,7 @@ class Main extends Component {
   onToolRemove = (event) => {
     this.setCardItem([]);
     this.clearMap();
-    this.props.PolySelected("");
+    this.props.PolySelected("", false);
     this.props.MarkerSelected("");
   };
 
@@ -245,8 +245,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  PolySelected: (req) => {
-    dispatch({type: "IF_POLY_SELECTED", req: req})
+  PolySelected: (req, flag) => {
+    dispatch({type: "IF_POLY_SELECTED", req: req, flag: flag})
   },
   MarkerSelected: (flag, req) => {
     dispatch({type: "IF_MARKER_SELECTED", req: req})

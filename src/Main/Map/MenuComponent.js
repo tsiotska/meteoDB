@@ -101,27 +101,20 @@ class MenuComponent extends React.Component {
       {this.props.currentStation}</div>);
   };
 
+  //Кнопка пошуку активується якщо є пошуковий параметр або виділені полігони з вказаною датою.
   enableButton = () => {
     const {markerRequest, polyRequest, queryParam, date, year} = this.props;
-
-    console.log(queryParam);
-    console.log(year);
-
-    if (queryParam || ((date.dateSet || year) && (polyRequest || markerRequest))) {
+    if ((queryParam.length > 0) || ((date.dateSet || year) && (polyRequest || markerRequest))) {
       this.setState({enableSearchButton: true});
     } else {
       this.setState({enableSearchButton: false})
     }
   };
 
-  onYearsChange = (event) => {
-    this.props.setYear(event.target.value);
-    setTimeout(this.enableButton, 500)
-  };
-
   clearSource = () => {
     this.props.setQuery([]);
     this.typeahead.getInstance().clear();
+    this.enableButton();
   };
 
   onRefreshClick = () => {
@@ -135,10 +128,12 @@ class MenuComponent extends React.Component {
     ], 6);
     this.props.setCardItem([]);
     this.props.clearMap();
-
     this.props.PolySelected("");
     this.props.MarkerSelected("");
+
+    this.enableButton();
   };
+
   onTypeChanged = () => {
     this.clearSource();
     let type = this.selectorByField.current.value;
@@ -188,20 +183,25 @@ class MenuComponent extends React.Component {
     this.props.setLimiters(event.target.value, "limit")
   };
 
-  ApplyCalendarDate = (e) => {
-    this.props.setTime(e);
-    setTimeout(this.enableButton, 500);
+  onYearsChange = async (event) => {
+    await this.props.setYear(event.target.value);
+    this.enableButton();
   };
 
-  unControlledInput = (searchParam) => {
-    this.props.setQuery(searchParam);
-    this.setState({queryParam: searchParam});
-    setTimeout(this.enableButton, 500);
+  ApplyCalendarDate = async (e) => {
+    await this.props.setTime(e);
+    this.enableButton();
+  };
+
+  unControlledInput = async (searchParam) => {
+    console.log("OnCHANGE!");
+    await this.props.setQuery(searchParam);
+    this.enableButton();
   };
 
   render() {
     //Це деструктуризація, пиши якщо багато даних
-    const {areLimitAndOffsetDisabled, counter, packLink} = this.props;
+    const {areLimitAndOffsetDisabled, counter, packLink, polyRequest} = this.props;
 
     return (<div className="main_map container-fluid p-0">
       <Map setWeather={this.props.setWeather} api={this.props.api}
@@ -236,7 +236,7 @@ class MenuComponent extends React.Component {
             <div className="form-inline row m-1">
               <div className="col-5  mb-1">
                 <label htmlFor="type">Тип поля</label>
-                <select defaultValue="ctry_full" ref={this.selectorByField} disabled={this.props.polyRequest}
+                <select defaultValue="ctry_full" ref={this.selectorByField} disabled={polyRequest}
                         className="custom-select"
                         onChange={this.onTypeChanged} id="type">
                   <option>id</option>
@@ -274,7 +274,8 @@ class MenuComponent extends React.Component {
             <div className="col-auto mb-1">
               <label htmlFor="querystr">Пошуковий параметр</label>
               <div className={"input-group"}>
-                <Typeahead disabled={false} multiple={true} isLoading={this.state.isLoading}
+
+                <Typeahead className={polyRequest && "disabledQueryInput"} disabled={polyRequest} multiple={true} isLoading={this.state.isLoading}
                            placeholder="Пошуковий параметр"
                            onChange={this.unControlledInput} ref={(typeahead) => this.typeahead = typeahead}
                            options={this.state.source}/>
@@ -358,7 +359,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   setQuery: (param) => {
-    dispatch({type: "SET_ANY_INPUT_DATA", param: param})
+    dispatch({type: "SET_QUERY", param: param})
   },
   disableLimitAndOffset: (flag) => {
     dispatch({type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag})

@@ -59,9 +59,8 @@ class MapX extends Component {
 
     mymap.on('pm:remove', (e) => {
       this.props.deleteLastPoly(e);
-      this.props.PolySelected("");
+      this.props.PolySelected("", false);
       this.props.MarkerSelected("");
-
       this.clearCardAndMarkers();
     });
 
@@ -129,7 +128,7 @@ class MapX extends Component {
     e = e.layer;
     //Save our req
     let req = api.createPolyRequest(e);
-    PolySelected(req);
+    PolySelected(req, true);
     //Не помятаю з якими параметрами працює полігон. Розкоментуєш.
     api.getStationsFromMapEvent({
       e: e,
@@ -209,11 +208,11 @@ const mapDispatchToProps = dispatch => ({
   setLastPoly: (event) => {
     dispatch({type: "SET_LAST_POLY", event: event})
   },
-  MarkerSelected: (flag, req) => {
+  MarkerSelected: (req) => {
     dispatch({type: "IF_MARKER_SELECTED", req: req})
   },
-  PolySelected: (flag, req) => {
-    dispatch({type: "IF_POLY_SELECTED", req: req})
+  PolySelected: (req, flag) => {
+    dispatch({type: "IF_POLY_SELECTED", req: req, flag: flag})
   },
   setPackLink: (link) => {
     dispatch({type: "SET_PACK_LINK", link: link})
