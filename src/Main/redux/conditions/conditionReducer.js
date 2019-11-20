@@ -4,8 +4,7 @@ import {types} from './conditionActions'
 const conditionReducer = (state = conditionState, action) => {
   switch (action.type) {
     case types.IF_POLY_SELECTED:
-      let flag = (action.req);
-      console.log(flag)
+      let flag = (!!action.req);
       return {
         ...state,
         areLimitAndOffsetDisabled: flag,

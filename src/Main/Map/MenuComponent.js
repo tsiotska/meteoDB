@@ -35,7 +35,7 @@ class MenuComponent extends React.Component {
       .then((data) => {
         if (data && data.response) {
           this.setState({
-            source: data.response.map((i) => i.Name), //.item1
+            source: data.response.map((i) => i.name),
             isLoading: false
           });
           let cnt = 0;
@@ -116,8 +116,10 @@ class MenuComponent extends React.Component {
   };
 
   currentStation = () => {
-    return (<div id="flyn_current_station" className="w-100 d-flex flex-column flyn_current_station">
-      {this.props.currentStation}</div>);
+    if(this.props.currentStation) {
+      return (<div id="flyn_current_station" className="w-100 d-flex flex-column flyn_current_station">
+        {this.props.currentStation}</div>);
+    } else  return null;
   };
 
   //Кнопка пошуку активується якщо є пошуковий параметр або виділені полігони з вказаною датою.
@@ -290,11 +292,11 @@ class MenuComponent extends React.Component {
                 <DatePicker OnClear={this.ApplyCalendarDate} OnApply={this.ApplyCalendarDate}/>
               </div>
             </div>
-            <div className="col-auto mb-1">
+
+            <div className={polyRequest ? "disabledQueryInput" : "col-auto mb-1"} >
               <label htmlFor="querystr">Пошуковий параметр</label>
               <div className={"input-group"}>
-
-                <Typeahead className={polyRequest && "disabledQueryInput"} disabled={polyRequest} multiple={true} isLoading={this.state.isLoading}
+                <Typeahead disabled={polyRequest} multiple={true} isLoading={this.state.isLoading}
                            placeholder="Пошуковий параметр"
                            onChange={this.unControlledInput} ref={(typeahead) => this.typeahead = typeahead}
                            options={this.state.source}/>
@@ -345,14 +347,15 @@ class MenuComponent extends React.Component {
           </nav>
 
           {stationPackLink &&
-          <Button download className="" target="_blank"
+          <Button download  target="_blank"
                   href={baseUrl + stationPackLink + "?saveas=stations.json"}>
-            Download
+            Stations
           </Button>}
+
           {weatherPackLink &&
-          <Button download className="" target="_blank"
-                  href={baseUrl + weatherPackLink + "?saveas=stations.json"}>
-            Download
+          <Button download  target="_blank"
+                  href={baseUrl + weatherPackLink + "?saveas=weather.json"}>
+            Weather
           </Button>}
 
           {this.currentStation()}
@@ -380,6 +383,10 @@ const mapStateToProps = state => ({
   queryParam: state.dataReducer.queryParam,
   year: state.dataReducer.year,
   date: state.dataReducer.date,
+  neigh: state.dataReducer.neigh,
+  nearest: state.dataReducer.nearest,
+  limit: state.dataReducer.limit,
+  offset: state.dataReducer.offset
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -68,7 +68,8 @@ class Main extends Component {
     this.setState({
       MapMarkers: [],
       stationsAll: null,
-      daysItems: []
+      daysItems: [],
+      currentStation: null
     })
   };
 
@@ -109,7 +110,6 @@ class Main extends Component {
   };
 
   setCardItem = (station) => {
-    console.log(station);
     this.setState({currentStation: createStation(station, 0)});
   };
 
@@ -155,7 +155,7 @@ class Main extends Component {
     });
     if (fx)
       this.setState({
-        stationsAll: fx.map((i) => createStation(i, cnt++))
+        stationsAll: fx.map((i) => createStation(i, cnt++, this.setCardItem))
       });
     const markers = [], area_latlon = [];
     for (let i = 0; i < fx.length; i++) {

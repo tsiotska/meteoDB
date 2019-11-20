@@ -17,10 +17,9 @@ const dataReducer = (state = dataState, action) => {
     case types.SET_WEATHER_PACK_LINK:
       return {
         ...state,
-        stationPackLink: action.link,
+        weatherPackLink: action.link,
       };
     case types.SET_YEAR:
-      //Перевірки можна робити в редюсері
       if (action.year.length === 4) {
         return {
           ...state,
