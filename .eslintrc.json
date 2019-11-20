@@ -1,0 +1,23 @@
+{
+  "plugins": [
+    "react"
+  ],
+  "extends": [
+    "plugin:react/recommended"
+  ],
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true,
+      "modules": true,
+      "arrowFunctions": true,
+      "experimentalObjectRestSpread": true
+    }
+  },
+  "rules": {
+    "react/prop-types": 0,
+    "react/display-name": 0
+  }
+}

@@ -1,0 +1,6 @@
+version '3'
+
+services:
+  smdb_front:
+    restart: always
+    command: bash -c "npm run build && serve -s build"
