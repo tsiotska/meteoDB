@@ -59,9 +59,9 @@ class MapX extends Component {
 
     mymap.on('pm:remove', (e) => {
       this.props.deleteLastPoly(e);
+      this.props.onToolRemove(e);
       this.props.PolySelected("", false);
       this.props.MarkerSelected("");
-      this.clearCardAndMarkers();
     });
 
     mymap.on('pm:create', (e) => {
@@ -75,10 +75,6 @@ class MapX extends Component {
       });
       this.fetchMarkers(e)
     });
-  };
-
-  clearCardAndMarkers = () => {
-    this.props.onToolRemove();
   };
 
   componentDidMount() {

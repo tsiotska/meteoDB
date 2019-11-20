@@ -54,6 +54,7 @@ class Main extends Component {
       currentSelected: [],
       stationsCounter: null,
       lockM: true,
+      MapMarkers: []
     };
 
     this.onMarkerClick = throttle(this.onMarkerClickBase, 500)
@@ -73,8 +74,18 @@ class Main extends Component {
     })
   };
 
+  //Ось тут править треба.
   setMarkers = (e) => {
-    this.setState({MapMarkers: e})
+    let markers;
+    if (this.state.MapMarkers.length > 0) {
+      let prevMarkers = this.state.MapMarkers;
+      console.log(prevMarkers);
+      console.log(e);
+      markers = Object.assign(e, prevMarkers);
+    } else {
+      markers = e;
+    }
+    this.setState({MapMarkers: markers})
   };
 
   getOneStationData = (e) => {
@@ -93,7 +104,7 @@ class Main extends Component {
 
     this.state.api.getPackFromMapEvent({e: data, pack: true})
       .then((pack) => {
-        this.props.setWeatherPackLink(pack.response[0]);
+        this.props.setStationPackLink(pack.response[0]);
       }).catch((error) => console.log(error));
 
     if (date.dateSet || year) {
@@ -146,6 +157,7 @@ class Main extends Component {
     if (data.response && Array.isArray(data.response) && data.response[0].item) {
       data.response = flatten(data.response.map((e) => e.data));
     }
+
     if (markerGroup) mymap.removeLayer(markerGroup);
     markerGroup = L.layerGroup().addTo(mymap);
 
@@ -164,6 +176,8 @@ class Main extends Component {
       area_latlon.push(coords);
       markers.push(createMaker(coords, this.onMarkerClick, createStation(location), i, location));
     }
+    console.log("Set markers")
+    console.log(markers);
     this.setMarkers(markers);
 
     mymap.fitBounds(L.latLngBounds(area_latlon));
@@ -201,6 +215,8 @@ class Main extends Component {
     this.setCardItem([]);
     this.clearMap();
     this.props.PolySelected("", false);
+
+    console.log(this.state.MapMarkers);
     this.props.MarkerSelected("");
   };
 
