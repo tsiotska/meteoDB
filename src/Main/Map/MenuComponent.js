@@ -147,7 +147,7 @@ class MenuComponent extends React.Component {
     mymap.setView([
       48.289559, 31.3205566 // Ukraine centered
     ], 6);
-    this.props.setCardItem([]);
+    //this.props.setCardItem([]);
     this.props.clearMap();
     this.props.PolySelected("");
     this.props.MarkerSelected("");
@@ -221,9 +221,11 @@ class MenuComponent extends React.Component {
   };
 
   render() {
-    //Це деструктуризація, пиши якщо багато даних
+    //Це деструктуризація, пиши якщо багато даних.
     const {areLimitAndOffsetDisabled, counter, stationPackLink, weatherPackLink, polyRequest} = this.props;
 
+    //1. Поправити Typeahead, він скачє.
+    //2. Придумати шось з disabledQueryInput class
     return (<div className="main_map container-fluid p-0">
       <Map setWeather={this.props.setWeather} api={this.props.api}
            activeMarker={this.props.activeMarker}
@@ -296,25 +298,25 @@ class MenuComponent extends React.Component {
             <div className={polyRequest ? "disabledQueryInput" : "col-auto mb-1"} >
               <label htmlFor="querystr">Пошуковий параметр</label>
               <div className={"input-group"}>
-                <Typeahead disabled={polyRequest} multiple={true} isLoading={this.state.isLoading}
+                <Typeahead id="typeahead" disabled={polyRequest} multiple={true} isLoading={this.state.isLoading}
                            placeholder="Пошуковий параметр"
                            onChange={this.unControlledInput} ref={(typeahead) => this.typeahead = typeahead}
                            options={this.state.source}/>
               </div>
             </div>
-            <div className="form-group w-50 ml-4 mb-1 form-check">
 
+            <div className={polyRequest ? "disabledQueryInput" : "form-group w-50 ml-4 mb-1 form-check"}>
               <input type="checkbox" className="form-check-input" id="nbs_chk" onChange={this.onNeighChange}/>
               <label className="form-check-label" htmlFor="exampleCheck1">Сусідні країни</label>
-
             </div>
-            <div className="form-group w-50 ml-4 mb-1 form-check">
-              <input type="text" className="form-check-input" id="nearest_chk" onChange={this.onNearestChange}/>
+
+            <div className={ polyRequest ? "disabledQueryInput" : "form-group w-50 ml-4 mb-1 form-check"}>
               <label className="form-check-label" htmlFor="exampleCheck1">Найближчі N станцій</label>
+              <input type="text" className="form-check-input" id="nearest_chk" onChange={this.onNearestChange}/>
             </div>
 
             <div className="col-auto d-flex w-100">
-              <button id="reeval" onClick={this.onSearchClick}
+              <button id="reeval" onClick={this.state.enableSearchButton && this.onSearchClick}
                       className={(this.state.enableSearchButton ? "" : "disabled ") + "btn btn-primary m-2 mb-1 mt-auto"}>Пошук
               </button>
               <button id="refresh" onClick={this.onRefreshClick}

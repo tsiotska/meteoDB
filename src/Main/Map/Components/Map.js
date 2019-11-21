@@ -60,11 +60,10 @@ class MapX extends Component {
     mymap.on('pm:remove', (e) => {
       this.props.deleteLastPoly(e);
       this.props.onToolRemove(e);
-      this.props.PolySelected("", false);
-      this.props.MarkerSelected("");
     });
 
     mymap.on('pm:create', (e) => {
+
       this.props.setLastPoly(e);
 
       e.layer.on('pm:dragend', () => {

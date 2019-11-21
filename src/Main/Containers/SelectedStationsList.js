@@ -15,7 +15,9 @@ export default class SelectedStationsList extends Component {
   };
 
   render() {
-    let array = this.props.selectedStations || false;
+
+
+    let array = this.props.selectedStations.length > 0 ? this.props.selectedStations : false;
     let displayEmptyPage = (array);
 
     return (<div className="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">

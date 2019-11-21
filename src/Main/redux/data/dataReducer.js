@@ -44,18 +44,21 @@ const dataReducer = (state = dataState, action) => {
         [action.kind]: action.data,
       };
     case types.SET_LAST_POLY:
-      let array = state.lastPoly;
-      array.push(action.event);
+      let array = [action.event];
+      if(state.lastPoly.length > 0){
+        Array.prototype.push.apply(array, state.lastPoly);
+      }
       return {
         ...state,
         lastPoly: array,
       };
     case types.DELETE_LAST_POLY:
       let lastPoly = state.lastPoly;
-      let tg = lastPoly.filter((pl) => pl.layer !== action.event.layer);
+      let rest = lastPoly.filter((pl) => pl.layer !== action.event.layer);
+      console.log(rest)
       return {
         ...state,
-        lastPoly: tg,
+        lastPoly: rest,
       };
     default:
       return state;

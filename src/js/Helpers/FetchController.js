@@ -20,17 +20,11 @@ class FetchController{
     this.Errors = null;
   }
 
-  clear = () => {
-    this.Status = status.UNDEFINED;
-    this.Result = this.Errors = null;
-  };
-
   Get = async (link) => {
    this.loaderVisibility(true);
     console.log(link);
     try {
       const response = await axios.get(link);
-      console.log("FetchController: ");
       console.log(response);
       this.Status = response.data.code;
       this.Result = response.data.response;
