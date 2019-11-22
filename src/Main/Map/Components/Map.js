@@ -58,19 +58,21 @@ class MapX extends Component {
     mymap.pm.addControls(options);
 
     mymap.on('pm:remove', (e) => {
+      console.log(e);
       this.props.deleteLastPoly(e);
       this.props.onToolRemove(e);
     });
 
     mymap.on('pm:create', (e) => {
-
       this.props.setLastPoly(e);
 
       e.layer.on('pm:dragend', () => {
+        console.log("DRAGEND");
+        console.log(e);
         this.fetchMarkers(e)
       });
       e.layer.on('pm:markerdragend', () => {
-        this.fetchMarkers(e)
+        //this.fetchMarkers(e)
       });
       this.fetchMarkers(e)
     });
@@ -120,29 +122,27 @@ class MapX extends Component {
       api, date, year, /* neigh, nearest, offset, limit */
     } = this.props;
 
-    e = e.layer;
-
-    let req = api.createPolyRequest(e);
+    let req = api.createPolyRequest(e.layer);
     PolySelected(req, true);
 
     api.getStationsFromMapEvent({
-      e: e,
+      e: e.layer,
     }).then((stations) => {
-      onStationsData(stations, e._latlngs);
+      onStationsData(stations, e);
     }).catch((error) => console.log(error));
 
-    api.getPackFromMapEvent({e: e, pack: true}).then((pack) => {
+    api.getPackFromMapEvent({e: e.layer, pack: true}).then((pack) => {
       console.log(pack);
       setStationPackLink(pack.response[0])
     }).catch((error) => console.log(error));
 
     if (date.dateSet || year) {
-      api.getWeatherFromMapEvent({e: e, date: date, year: year})
+      api.getWeatherFromMapEvent({e: e.layer, date: date, year: year})
         .then((weather) => {
           setWeather(weather.response);
         }).catch((error) => console.log(error));
 
-      api.getPackFromMapEvent({e: e, date: date, year: year, pack: true}).then((pack) => {
+      api.getPackFromMapEvent({e: e.layer, date: date, year: year, pack: true}).then((pack) => {
         console.log(pack);
         setWeatherPackLink(pack.response[0])
       }).catch((error) => console.log(error));
