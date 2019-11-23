@@ -54,7 +54,8 @@ class Main extends Component {
       currentSelected: [],
       stationsCounter: null,
       lockM: true,
-      MapMarkers: []
+      MapMarkers: [],
+      polygons: []
     };
 
     this.onMarkerClick = throttle(this.onMarkerClickBase, 500)
@@ -75,26 +76,81 @@ class Main extends Component {
   };
 
   partialClear = (poly) => {
-    console.log(this.state.MapMarkers);
-
     let withoutRemovedMarkers = this.state.MapMarkers.filter((marker) => {
       return !poly.layer.contains(marker.position)
     });
 
+    let withoutRemovedStations = this.state.stationsAll.filter((station) => {
+      let LatLng = {lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon)};
+      return !poly.layer.contains(LatLng)
+    });
+
+    console.log(this.state.stationsAll)
+    console.log(this.state.daysItems)
+
+    let withoutRemovedWeather = [];
+    for (let i in withoutRemovedStations) {
+      let existingWeather = this.state.daysItems.filter((weather) => {
+        console.log(weather.props);
+        console.log(this.state.stationsAll[i].props)
+        return weather.props.data.uid === withoutRemovedStations[i].props.props.uid
+      });
+      Array.prototype.push.apply(withoutRemovedWeather, existingWeather);
+    }
+
+    console.log(this.state.daysItems)
+    console.log(withoutRemovedWeather);
+
+
     this.setState({
       MapMarkers: withoutRemovedMarkers,
-      stationsAll: [],
-      daysItems: [],
+      stationsAll: withoutRemovedStations,
+      daysItems: withoutRemovedWeather,
       currentStation: null
     })
   };
 
-  setMarkers = (e) => {
-    if (this.state.MapMarkers.length > 0) {
-      let prevMarkers = this.state.MapMarkers;
-      Array.prototype.push.apply(e, prevMarkers);
+  beforeMove = (poly) => {
+    console.log("All POLYS")
+    console.log(this.state.polygons);
+    let withoutOldPoly = this.state.polygons.filter((elem) => {
+      return poly.layer !== elem.layer
+    });
+    console.log("withoutOldPoly")
+    console.log(withoutOldPoly);
+    this.setState({polygons: withoutOldPoly})
+  };
+
+  setMarkers = (newMarkers, currentPoly) => {
+    let withNewPoly = [currentPoly];
+    Array.prototype.push.apply(withNewPoly, this.state.polygons);
+    this.setState({polygons: withNewPoly});
+    //console.log(this.state.polygons);
+    let prevMarkers = this.state.MapMarkers;
+
+    console.log(this.state.polygons)
+
+    let sortedMarkers = [];
+    if (prevMarkers.length > 0) {
+      for (let i in this.state.polygons) {
+        let markersOfPoly = prevMarkers.filter((marker) => {
+          {
+            return this.state.polygons[i].layer.contains(marker.position);
+          }
+        });
+        Array.prototype.push.apply(sortedMarkers, markersOfPoly);
+      }
     }
-    this.setState({MapMarkers: e})
+
+    console.log("sortedMarkers");
+    console.log(sortedMarkers);
+    console.log("newMarkers");
+    console.log(newMarkers);
+    Array.prototype.push.apply(newMarkers, sortedMarkers);
+    console.log("RESULT");
+    console.log(newMarkers);
+
+    this.setState({MapMarkers: newMarkers})
   };
 
   getOneStationData = (e) => {
@@ -156,7 +212,7 @@ class Main extends Component {
     this.getOneStationData(e);
   };
 
-  onStationsData = async (station) => {
+  onStationsData = (station, poly) => {
     this.setState({lockM: true});
     this.setState({stationsCounter: <CountCircle response={station}/>});
     if (station.code === 33)
@@ -176,25 +232,25 @@ class Main extends Component {
     });
 
 
-     if (fx) {
+    if (fx) {
       let cnt = this.state.stationsAll.length;
       let mrk = cnt;
 
       let withNewStations = fx.map((i) => createStation(i, cnt++, this.setCardItem));
       Array.prototype.push.apply(withNewStations, this.state.stationsAll);
-     await this.setState({
+      this.setState({
         stationsAll: withNewStations
       });
 
-    const markers = [], area_latlon = [];
-    for (let i = 0; i < fx.length; i++) {
-      let location = fx[i];
-      let coords = L.latLng(location.lat, location.lon);
-      area_latlon.push(coords);
-      markers.push(createMaker(coords, this.onMarkerClick, createStation(location), mrk++, location));
-    }
-    this.setMarkers(markers);
-    mymap.fitBounds(L.latLngBounds(area_latlon));
+      const markers = [], area_latlon = [];
+      for (let i = 0; i < fx.length; i++) {
+        let location = fx[i];
+        let coords = L.latLng(location.lat, location.lon);
+        area_latlon.push(coords);
+        markers.push(createMaker(coords, this.onMarkerClick, createStation(location), mrk++, location));
+      }
+      this.setMarkers(markers, poly);
+      mymap.fitBounds(L.latLngBounds(area_latlon));
     } else alert("No data, sorry");
   };
 
@@ -227,12 +283,11 @@ class Main extends Component {
 
   //Якщо видаляється лише один полігон. Тут треба погратись
   onToolRemove = (event) => {
-   // this.setCardItem([]);
     this.partialClear(event);
 
     console.log(this.props.lastPoly);
 
-    if(this.props.lastPoly.length === 0){
+    if (this.props.lastPoly.length === 0) {
       this.props.PolySelected("", false);
       this.props.MarkerSelected("");
     }
@@ -255,7 +310,8 @@ class Main extends Component {
       onMarkerClick: this.onMarkerClick,
       onToolRemove: this.onToolRemove,
       clearMap: this.clearMap,
-      setCardItem: this.setCardItem
+      setCardItem: this.setCardItem,
+      beforeMove: this.beforeMove
     };
 
     let conts = {

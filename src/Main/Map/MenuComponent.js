@@ -51,7 +51,7 @@ class MenuComponent extends React.Component {
       markerRequest, polyRequest, queryParam,
       date, year, offset, limit, neigh, nearest,
     } = this.props;
-    //Якщо дозагрузка погоди
+    //Якщо дозагрузка погоди/Лише для полі і маркера. Без query догрузки
     if (markerRequest || polyRequest) {
       this.props.api.uploadWeather({
         date: date, year: year,
@@ -59,7 +59,7 @@ class MenuComponent extends React.Component {
       }).then((weather) => {
         this.props.setWeather(weather.response);
       }).catch((error) => console.log(error))
-    } //Якщо повністю новий запит
+    } //Якщо звичайний query запит.
     else if (queryParam) {
       this.props.api.searchStationsByQuery({
         offset: offset, limit: limit,
@@ -231,7 +231,8 @@ class MenuComponent extends React.Component {
            activeMarker={this.props.activeMarker}
            onStationsData={this.props.onStationsData} markers={this.state.selectedPage}
            currentSelected={this.props.markers}
-           setCardItem={this.props.setCardItem} onToolRemove={this.props.onToolRemove}/>
+           setCardItem={this.props.setCardItem} onToolRemove={this.props.onToolRemove}
+           beforeMove={this.props.beforeMove}/>
 
       <div className="cur_count_wrapper">
         <div className={"cur_count " + (

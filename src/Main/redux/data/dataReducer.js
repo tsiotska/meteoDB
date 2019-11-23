@@ -55,7 +55,6 @@ const dataReducer = (state = dataState, action) => {
     case types.DELETE_LAST_POLY:
       let lastPoly = state.lastPoly;
       let rest = lastPoly.filter((pl) => pl.layer !== action.event.layer);
-      console.log(rest)
       return {
         ...state,
         lastPoly: rest,
