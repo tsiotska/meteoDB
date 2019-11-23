@@ -232,7 +232,7 @@ class MenuComponent extends React.Component {
            onStationsData={this.props.onStationsData} markers={this.state.selectedPage}
            currentSelected={this.props.markers}
            setCardItem={this.props.setCardItem} onToolRemove={this.props.onToolRemove}
-           beforeMove={this.props.beforeMove}/>
+           beforeMove={this.props.beforeMove} onCutRemove={this.props.onCutRemove}/>
 
       <div className="cur_count_wrapper">
         <div className={"cur_count " + (

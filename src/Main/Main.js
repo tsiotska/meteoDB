@@ -75,6 +75,12 @@ class Main extends Component {
     })
   };
 
+  onCutRemove = (poly) => {
+    console.log(this.state.MapMarkers.filter((marker) => {
+      return poly.layer.contains(marker.position)
+    }))
+  };
+
   partialClear = (poly) => {
     let withoutRemovedMarkers = this.state.MapMarkers.filter((marker) => {
       return !poly.layer.contains(marker.position)
@@ -84,9 +90,6 @@ class Main extends Component {
       let LatLng = {lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon)};
       return !poly.layer.contains(LatLng)
     });
-
-    console.log(this.state.stationsAll)
-    console.log(this.state.daysItems)
 
     let withoutRemovedWeather = [];
     for (let i in withoutRemovedStations) {
@@ -98,10 +101,6 @@ class Main extends Component {
       Array.prototype.push.apply(withoutRemovedWeather, existingWeather);
     }
 
-    console.log(this.state.daysItems)
-    console.log(withoutRemovedWeather);
-
-
     this.setState({
       MapMarkers: withoutRemovedMarkers,
       stationsAll: withoutRemovedStations,
@@ -111,25 +110,31 @@ class Main extends Component {
   };
 
   beforeMove = (poly) => {
-    console.log("All POLYS")
-    console.log(this.state.polygons);
     let withoutOldPoly = this.state.polygons.filter((elem) => {
       return poly.layer !== elem.layer
     });
-    console.log("withoutOldPoly")
-    console.log(withoutOldPoly);
     this.setState({polygons: withoutOldPoly})
   };
 
   setMarkers = (newMarkers, currentPoly) => {
-    let withNewPoly = [currentPoly];
-    Array.prototype.push.apply(withNewPoly, this.state.polygons);
-    this.setState({polygons: withNewPoly});
-    //console.log(this.state.polygons);
+    //Повертаємо полігони, якщо новий currentPoly це не старий який редагують
+    let withoutRepeatingPoly = this.state.polygons.filter((poly) => {
+      return poly.layer._leaflet_id !== currentPoly.layer._leaflet_id;
+    });
+//Добавляємо якщо він новий і обновляємо
+    if (withoutRepeatingPoly.length === this.state.polygons.length) {
+      let withNewPoly = [currentPoly];
+      Array.prototype.push.apply(withNewPoly, this.state.polygons);
+      this.setState({polygons: withNewPoly});
+    } else {
+      let updatedPolygons = withoutRepeatingPoly;
+      Array.prototype.push.apply(updatedPolygons, currentPoly);
+      this.setState({polygons: updatedPolygons});
+    }
+
     let prevMarkers = this.state.MapMarkers;
 
-    console.log(this.state.polygons)
-
+//Чи колишні маркери входять в наш полігон
     let sortedMarkers = [];
     if (prevMarkers.length > 0) {
       for (let i in this.state.polygons) {
@@ -141,16 +146,19 @@ class Main extends Component {
         Array.prototype.push.apply(sortedMarkers, markersOfPoly);
       }
     }
+//Чи нові маркери це збігаються зі старими
+    let withoutRepeatingMarkers = [];
+    for (let i in sortedMarkers) {
+      let markersGroup = newMarkers.filter((marker) => {
+        return marker.data.uid !== sortedMarkers[i].data.uid;
+      });
+      Array.prototype.push.apply(withoutRepeatingMarkers, markersGroup);
+    }
+    //Обєднуємо нові маркери без повторів зі старими, які входять в наші полігони
+    Array.prototype.push.apply(sortedMarkers, withoutRepeatingMarkers);
 
-    console.log("sortedMarkers");
-    console.log(sortedMarkers);
-    console.log("newMarkers");
-    console.log(newMarkers);
-    Array.prototype.push.apply(newMarkers, sortedMarkers);
-    console.log("RESULT");
-    console.log(newMarkers);
 
-    this.setState({MapMarkers: newMarkers})
+    this.setState({MapMarkers: sortedMarkers})
   };
 
   getOneStationData = (e) => {
@@ -311,7 +319,8 @@ class Main extends Component {
       onToolRemove: this.onToolRemove,
       clearMap: this.clearMap,
       setCardItem: this.setCardItem,
-      beforeMove: this.beforeMove
+      beforeMove: this.beforeMove,
+      onCutRemove: this.onCutRemove
     };
 
     let conts = {
@@ -333,25 +342,32 @@ class Main extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  year: state.dataReducer.year,
-  date: state.dataReducer.date,
-  lastPoly: state.dataReducer.lastPoly
-});
+const
+  mapStateToProps = state => ({
+    year: state.dataReducer.year,
+    date: state.dataReducer.date,
+    lastPoly: state.dataReducer.lastPoly
+  });
 
-const mapDispatchToProps = dispatch => ({
-  PolySelected: (req, flag) => {
-    dispatch({type: "IF_POLY_SELECTED", req: req, flag: flag})
-  },
-  MarkerSelected: (req) => {
-    dispatch({type: "IF_MARKER_SELECTED", req: req})
-  },
-  setStationPackLink: (link) => {
-    dispatch({type: "SET_STATION_PACK_LINK", link: link})
-  },
-  setWeatherPackLink: (link) => {
-    dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
-  },
-});
+const
+  mapDispatchToProps = dispatch => ({
+    PolySelected: (req, flag) => {
+      dispatch({type: "IF_POLY_SELECTED", req: req, flag: flag})
+    },
+    MarkerSelected: (req) => {
+      dispatch({type: "IF_MARKER_SELECTED", req: req})
+    },
+    setStationPackLink: (link) => {
+      dispatch({type: "SET_STATION_PACK_LINK", link: link})
+    },
+    setWeatherPackLink: (link) => {
+      dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
+    },
+  });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Main);
+export default connect(mapStateToProps, mapDispatchToProps)
+
+(
+  Main
+)
+;

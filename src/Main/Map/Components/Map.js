@@ -68,18 +68,27 @@ class MapX extends Component {
     });
 
     mymap.on('pm:create', (e) => {
+      console.log(e)
       this.props.setLastPoly(e);
 
       e.layer.on('pm:dragend', () => {
         this.fetchMarkers(e)
       });
+
       e.layer.on('pm:dragstart', () => {
         console.log("Drag start")
         this.props.beforeMove(e)
       });
-      /*e.layer.on('pm:cut', () => {
+
+      e.layer.on('pm:edit', () => {
         this.fetchMarkers(e)
-      });*/
+      });
+
+      e.layer.on('pm:cut', () => {
+        console.log(e)
+        //this.props.cutLastPoly(e);
+        this.props.onCutRemove(e);
+      });
       this.fetchMarkers(e)
     });
   };
