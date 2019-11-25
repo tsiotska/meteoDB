@@ -1,0 +1,11 @@
+@import "partials/variables";
+
+@import "~compass-mixins/lib/compass/_css3";
+
+
+.btn { 
+    @include box-shadow(0px 0px 5px 5px #c1c1c194);
+    height: 1em;
+    width: 3em;
+    
+}

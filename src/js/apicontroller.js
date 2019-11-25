@@ -1,4 +1,4 @@
-import {baseUrl} from "../js/const"
+import { baseUrl } from "../js/const"
 import FetchController from "../js/Helpers/FetchController";
 
 export class ApiController {
@@ -23,11 +23,11 @@ export class ApiController {
   resetController = () => {
     this._time =
       this._year =
-        this._offset =
-          this._limit =
-            this._pack =
-              this._nearest =
-                this._hasNeighbours = null;
+      this._offset =
+      this._limit =
+      this._pack =
+      this._nearest =
+      this._hasNeighbours = null;
   };
 
   YieldsToWeatherRequest = () => {
@@ -143,7 +143,7 @@ export class ApiController {
     let searchType = selectedField;
     let queryType = '&query=' + query;
     let queryValue = 'stations?field=' + searchType + queryType;
-    return baseUrl + '/api/gsod/' + queryValue;
+    return baseUrl + '/api/' + this.database + '/' + queryValue;
   };
 
   // Final builder
@@ -214,7 +214,7 @@ export class ApiController {
   };
 
   getStationsCount() {
-    return this.fetchData(baseUrl + "/api/gsod/countries/stationsCount")
+    return this.fetchData(baseUrl + "/api/" + this.database + "/countries/stationsCount")
   }
 
   //extractors

@@ -1,4 +1,23 @@
-.typeahead:not(input) {
+.rbt {
+    .rbt-token:focus {
+        outline: none;
+    }
+
+    .rbt-input-wrapper {
+        display: flex;
+    }
+
+    >.form-control {
+        width: 100%
+    }
+
+    ul {
+        border-radius: 10px;
+        box-shadow: 0 5px 5px #bfbfbf;
+    }
+}
+
+/* .typeahead:not(input) {
     position: absolute;
     top: 0;
     left: 0;
@@ -37,3 +56,4 @@
 .typeahead.hidden {
     display: none;
 }
+ */

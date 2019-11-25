@@ -1,15 +1,15 @@
 import React from 'react';
 import Map from './Components/Map';
-import {mymap} from './Components/Map';
-import {baseUrl} from '../../js/const';
+import { mymap } from './Components/Map';
+import { baseUrl } from '../../js/const';
 import DatePicker from '../../Main/Controls/DatePicker'
 import $ from 'jquery';
-import {Button, Input} from 'reactstrap';
-import {Typeahead} from 'react-bootstrap-typeahead';
+import { Button, Input } from 'reactstrap';
+import { Typeahead } from 'react-bootstrap-typeahead';
 import CountryItem from '../../Main/Elements/CountryItemTemplate';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-daterangepicker/daterangepicker.css';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
 class MenuComponent extends React.Component {
   constructor(props) {
@@ -40,7 +40,7 @@ class MenuComponent extends React.Component {
           });
           let cnt = 0;
           this.props.setCtrList(data.response.map((i) => {
-            return <CountryItem key={cnt++} setQuery={this.setQuery} e={i}/>;
+            return <CountryItem key={cnt++} setQuery={this.setQuery} e={i} />;
           }))
         }
       });
@@ -94,11 +94,13 @@ class MenuComponent extends React.Component {
           this.props.setWeather(weather.response);
         }).catch((error) => console.log(error));
 
-        this.props.api.getPackByQuery({ date: date, year: year,
+        this.props.api.getPackByQuery({
+          date: date, year: year,
           offset: offset, limit: limit,
           neighbors: neigh, nearest: nearest,
           query: queryParam,
-          selectedField: this.selectorByField.current.value, pack: true})
+          selectedField: this.selectorByField.current.value, pack: true
+        })
           .then((pack) => {
             console.log(pack)
             this.props.setWeatherPackLink(pack.response[0]);
@@ -112,23 +114,23 @@ class MenuComponent extends React.Component {
   onChangePage = (selectedPage, index) => {
     this.props.PageChanged(selectedPage);
     this.props.mapSelectedIndex(index);
-    this.setState({selectedPage});
+    this.setState({ selectedPage });
   };
 
   currentStation = () => {
-    if(this.props.currentStation) {
+    if (this.props.currentStation) {
       return (<div id="flyn_current_station" className="w-100 d-flex flex-column flyn_current_station">
         {this.props.currentStation}</div>);
-    } else  return null;
+    } else return null;
   };
 
   //Кнопка пошуку активується якщо є пошуковий параметр або виділені полігони з вказаною датою.
   enableButton = () => {
-    const {markerRequest, polyRequest, queryParam, date, year} = this.props;
+    const { markerRequest, polyRequest, queryParam, date, year } = this.props;
     if ((queryParam.length > 0) || ((date.dateSet || year) && (polyRequest || markerRequest))) {
-      this.setState({enableSearchButton: true});
+      this.setState({ enableSearchButton: true });
     } else {
-      this.setState({enableSearchButton: false})
+      this.setState({ enableSearchButton: false })
     }
   };
 
@@ -183,7 +185,7 @@ class MenuComponent extends React.Component {
         });
 
         console.log(array);
-        this.setState({source: array});
+        this.setState({ source: array });
       }).catch((error) => console.log(error))
     //}
   };
@@ -222,17 +224,17 @@ class MenuComponent extends React.Component {
 
   render() {
     //Це деструктуризація, пиши якщо багато даних.
-    const {areLimitAndOffsetDisabled, counter, stationPackLink, weatherPackLink, polyRequest} = this.props;
+    const { areLimitAndOffsetDisabled, counter, stationPackLink, weatherPackLink, polyRequest } = this.props;
 
     //1. Поправити Typeahead, він скачє.
     //2. Придумати шось з disabledQueryInput class
     return (<div className="main_map container-fluid p-0">
       <Map setWeather={this.props.setWeather} api={this.props.api}
-           activeMarker={this.props.activeMarker}
-           onStationsData={this.props.onStationsData} markers={this.state.selectedPage}
-           currentSelected={this.props.markers}
-           setCardItem={this.props.setCardItem} onToolRemove={this.props.onToolRemove}
-           beforeMove={this.props.beforeMove} onCutRemove={this.props.onCutRemove}/>
+        activeMarker={this.props.activeMarker}
+        onStationsData={this.props.onStationsData} markers={this.state.selectedPage}
+        currentSelected={this.props.markers}
+        setCardItem={this.props.setCardItem} onToolRemove={this.props.onToolRemove}
+        beforeMove={this.props.beforeMove} onCutRemove={this.props.onCutRemove} />
 
       <div className="cur_count_wrapper">
         <div className={"cur_count " + (
@@ -241,28 +243,45 @@ class MenuComponent extends React.Component {
             : "fade")} id="result-info">{counter}</div>
       </div>
       <div className="panel flyn active  card card-body">
-        <div className="flyn-inputs-container scrollable">
+        <div className="flyn-inputs-container">
 
 
-          {/*       <div class="flyn-grid container d-flex">
-        <div class="col-sm-12 col-md-12">
-          <div class="flyn-region"></div>
-        </div>
-        <div class="col-sm-12 col-md-12">
-          <div class="flyn-region"></div>
-        </div>
-        <div class="col-sm-12 col-md-12">
-          <div class="flyn-region"></div>
-        </div>
-      </div> */}
+          <div class="flyn-grid container d-flex">
+            <div class="col-sm-12 col-md-12">
+              <div class="flyn-region"></div>
+            </div>
+            <div class="col-sm-12 col-md-12">
+              <div class="flyn-region"></div>
+            </div>
+            <div class="col-sm-12 col-md-12">
+              <div class="flyn-region"></div>
+            </div>
+          </div>
 
           <div className="form-inline ">
             <div className="form-inline row m-1">
+              <div id="datex" className="col-auto mb-1 mt-4">
+                <DatePicker OnClear={this.ApplyCalendarDate} OnApply={this.ApplyCalendarDate} />
+              </div>
+
+              <div id="yearsx" className="col-5 mb-1">
+                <label htmlFor="years">Рік</label>
+                <div className="input-group">
+                  <input type="text" id="years"
+                    onChange={this.onYearsChange}
+                    className="form-control typeahead"
+                    placeholder="Рік" data-provide="typeahead" />
+                  <div className="cssload-container fade">
+                    <div className="cssload-whirlpool" />
+                  </div>
+                </div>
+              </div>
+
               <div className="col-5  mb-1">
                 <label htmlFor="type">Тип поля</label>
                 <select defaultValue="ctry_full" ref={this.selectorByField} disabled={polyRequest}
-                        className="custom-select"
-                        onChange={this.onTypeChanged} id="type">
+                  className="custom-select"
+                  onChange={this.onTypeChanged} id="type">
                   <option>id</option>
                   <option>wban</option>
                   <option>stname</option>
@@ -278,95 +297,88 @@ class MenuComponent extends React.Component {
                 </select>
 
               </div>
-              <div id="yearsx" className="col-5 mb-1">
-                <label htmlFor="years">Рік</label>
-                <div className="input-group">
-                  <input type="text" id="years"
-                         onChange={this.onYearsChange}
-                         className="form-control typeahead"
-                         placeholder="Рік" data-provide="typeahead"/>
-                  <div className="cssload-container fade">
-                    <div className="cssload-whirlpool"/>
+
+            </div>
+
+            <div className={polyRequest ? "disabledQueryInput" : "col-auto w-100 mb-1"} >
+              <label htmlFor="querystr">Пошуковий параметр</label>
+              <div className={""}>
+                <Typeahead id="typeahead" disabled={polyRequest}
+                  multiple={true}
+                  isLoading={this.state.isLoading}
+                  placeholder="Пошуковий параметр"
+                  onChange={this.unControlledInput}
+                  ref={(typeahead) => this.typeahead = typeahead}
+                  options={this.state.source} />
+              </div>
+            </div>
+
+            <div className={polyRequest ? "disabledQueryInput" : "form-group mr-2 ml-auto my-2 mb-1 form-check"}>
+              <input type="checkbox" id="nbs_chk" className="mx-2" onChange={this.onNeighChange} />
+
+              <label className="" htmlFor="nbs_chk">Сусідні країни</label>
+
+            </div>
+
+            <div className={polyRequest ? "disabledQueryInput" : "input-group mx-3  mb-1 form-check"}>
+
+              <div class="input-group-prepend">
+                <label className="input-group-text" htmlFor="exampleCheck1">Найближчі N станцій</label>
+              </div>
+              <input type="text" className="form-control" id="nearest_chk" onChange={this.onNearestChange} />
+            </div>
+
+            <div className="form-inline mx-3">
+              <div className="row my-2">
+                <div className="input-group  col-6 p-1">
+                  <div className="input-group-prepend">
+                    <span className="input-group-text">Count</span>
                   </div>
+                  <Input type="text" id="count" className="form-control typeahead" placeholder="Count"
+                    data-provide="typeahead" onChange={this.onLimitChange} disabled={areLimitAndOffsetDisabled} />
+                </div>
+                <div className="input-group  col-6 p-1">
+                  <div className="input-group-prepend">
+                    <span className="input-group-text">Offset</span>
+                  </div>
+                  <Input type="text" id="offset" className="form-control typeahead" placeholder="Offset"
+                    data-provide="typeahead" onChange={this.onOffsetChange} disabled={areLimitAndOffsetDisabled} />
                 </div>
               </div>
-
-              <div id="datex" className="col-auto  mb-1 ">
-                <DatePicker OnClear={this.ApplyCalendarDate} OnApply={this.ApplyCalendarDate}/>
-              </div>
             </div>
-
-            <div className={polyRequest ? "disabledQueryInput" : "col-auto mb-1"} >
-              <label htmlFor="querystr">Пошуковий параметр</label>
-              <div className={"input-group"}>
-                <Typeahead id="typeahead" disabled={polyRequest} multiple={true} isLoading={this.state.isLoading}
-                           placeholder="Пошуковий параметр"
-                           onChange={this.unControlledInput} ref={(typeahead) => this.typeahead = typeahead}
-                           options={this.state.source}/>
-              </div>
-            </div>
-
-            <div className={polyRequest ? "disabledQueryInput" : "form-group w-50 ml-4 mb-1 form-check"}>
-              <input type="checkbox" className="form-check-input" id="nbs_chk" onChange={this.onNeighChange}/>
-              <label className="form-check-label" htmlFor="exampleCheck1">Сусідні країни</label>
-            </div>
-
-            <div className={ polyRequest ? "disabledQueryInput" : "form-group w-50 ml-4 mb-1 form-check"}>
-              <label className="form-check-label" htmlFor="exampleCheck1">Найближчі N станцій</label>
-              <input type="text" className="form-check-input" id="nearest_chk" onChange={this.onNearestChange}/>
-            </div>
-
-            <div className="col-auto d-flex w-100">
+            <div className="col-auto d-flex my-2 w-100">
               <button id="reeval" onClick={this.state.enableSearchButton && this.onSearchClick}
-                      className={(this.state.enableSearchButton ? "" : "disabled ") + "btn btn-primary m-2 mb-1 mt-auto"}>Пошук
+                className={(this.state.enableSearchButton ? "" : "disabled ") + "btn btn-primary m-2 mb-1 mt-auto"}>Пошук
               </button>
               <button id="refresh" onClick={this.onRefreshClick}
-                      className="btn btn-secondary m-2 mb-1 mt-auto">Очистити
+                className="btn btn-secondary m-2 mb-1 mt-auto">Очистити
               </button>
             </div>
           </div>
 
-          <div className="form-inline mx-auto">
-            <div className="row m-2">
-              <div className="input-group  col-6 p-1">
-                <div className="input-group-prepend">
-                  <span className="input-group-text">Count</span>
-                </div>
-                <Input type="text" id="count" className="form-control typeahead" placeholder="Count"
-                       data-provide="typeahead" onChange={this.onLimitChange} disabled={areLimitAndOffsetDisabled}/>
-              </div>
-              <div className="input-group  col-6 p-1">
-                <div className="input-group-prepend">
-                  <span className="input-group-text">Offset</span>
-                </div>
-                <Input type="text" id="offset" className="form-control typeahead" placeholder="Offset"
-                       data-provide="typeahead" onChange={this.onOffsetChange} disabled={areLimitAndOffsetDisabled}/>
-              </div>
-            </div>
-          </div>
 
           <nav aria-label="Page nav" className="mx-auto">
-            <ul id="stNav" className="pagination justify-content-center"/>
+            <ul id="stNav" className="pagination justify-content-center" />
           </nav>
 
           {stationPackLink &&
-          <Button download  target="_blank"
-                  href={baseUrl + stationPackLink + "?saveas=stations.json"}>
-            Stations
+            <Button download target="_blank"
+              href={baseUrl + stationPackLink + "?saveas=stations.json"}>
+              Stations
           </Button>}
 
           {weatherPackLink &&
-          <Button download  target="_blank"
-                  href={baseUrl + weatherPackLink + "?saveas=weather.json"}>
-            Weather
+            <Button download target="_blank"
+              href={baseUrl + weatherPackLink + "?saveas=weather.json"}>
+              Weather
           </Button>}
 
           {this.currentStation()}
 
           <Button id="flyn_toggle" className="fx btn asside btn-md"
-                  onClick={() => $('.flyn').toggleClass('active')}>
-            <span className="fx1"/>
-            <span className="fx2"/>
+            onClick={() => $('.flyn').toggleClass('active')}>
+            <span className="fx1" />
+            <span className="fx2" />
           </Button>
         </div>
       </div>
@@ -394,32 +406,32 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   setQuery: (param) => {
-    dispatch({type: "SET_QUERY", param: param})
+    dispatch({ type: "SET_QUERY", param: param })
   },
   disableLimitAndOffset: (flag) => {
-    dispatch({type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag})
+    dispatch({ type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag })
   },
   setStationPackLink: (link) => {
-    dispatch({type: "SET_STATION_PACK_LINK", link: link})
+    dispatch({ type: "SET_STATION_PACK_LINK", link: link })
   },
   setWeatherPackLink: (link) => {
-    dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
+    dispatch({ type: "SET_WEATHER_PACK_LINK", link: link })
   },
   setYear: (year) => {
-    dispatch({type: "SET_YEAR", year: year})
+    dispatch({ type: "SET_YEAR", year: year })
   },
   setTime: (date) => {
-    dispatch({type: "SET_TIME", date: date})
+    dispatch({ type: "SET_TIME", date: date })
   },
   //Працює для  limit offset nearest neigh
   setLimiters: (data, kind) => {
-    dispatch({type: "SET_ANY_INPUT_DATA", data: data, kind: kind})
+    dispatch({ type: "SET_ANY_INPUT_DATA", data: data, kind: kind })
   },
   PolySelected: (req) => {
-    dispatch({type: "IF_POLY_SELECTED", req: req})
+    dispatch({ type: "IF_POLY_SELECTED", req: req })
   },
   MarkerSelected: (flag, req) => {
-    dispatch({type: "IF_MARKER_SELECTED", req: req})
+    dispatch({ type: "IF_MARKER_SELECTED", req: req })
   },
 });
 
