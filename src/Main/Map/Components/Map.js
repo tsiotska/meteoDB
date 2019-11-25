@@ -147,7 +147,6 @@ class MapX extends Component {
     }).catch((error) => console.log(error));
 
     api.getPackFromMapEvent({e: e.layer, pack: true}).then((pack) => {
-      console.log(pack);
       setStationPackLink(pack.response[0])
     }).catch((error) => console.log(error));
 
@@ -158,7 +157,6 @@ class MapX extends Component {
         }).catch((error) => console.log(error));
 
       api.getPackFromMapEvent({e: e.layer, date: date, year: year, pack: true}).then((pack) => {
-        console.log(pack);
         setWeatherPackLink(pack.response[0])
       }).catch((error) => console.log(error));
     }
@@ -171,7 +169,6 @@ class MapX extends Component {
     } else if (this.props.markers) {
       return this.props.markers.map((w) => this.renderOne(w));
     } else if (!this.props.currentSelected) {
-      console.log(this.props.currentSelected);
       return null;
     }
   };

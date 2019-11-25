@@ -111,8 +111,10 @@ class Main extends Component {
 
   beforeMove = (poly) => {
     let withoutOldPoly = this.state.polygons.filter((elem) => {
-      return poly.layer !== elem.layer
+      return poly.layer._leaflet_id !== elem.layer._leaflet_id
     });
+    console.log(this.state.polygons)
+    console.log(withoutOldPoly)
     this.setState({polygons: withoutOldPoly})
   };
 
@@ -123,14 +125,22 @@ class Main extends Component {
     });
 //Добавляємо якщо він новий і обновляємо
     if (withoutRepeatingPoly.length === this.state.polygons.length) {
-      let withNewPoly = [currentPoly];
+      console.log("This is new Polygon!")
+      let withNewPoly = []; withNewPoly.push(currentPoly);
+
       Array.prototype.push.apply(withNewPoly, this.state.polygons);
+      console.log(this.state.polygons);
+      console.log(withNewPoly);
       this.setState({polygons: withNewPoly});
     } else {
+      console.log("This is old Polygon!")
       let updatedPolygons = withoutRepeatingPoly;
       Array.prototype.push.apply(updatedPolygons, currentPoly);
       this.setState({polygons: updatedPolygons});
     }
+
+    console.log(this.state.polygons)
+
 
     let prevMarkers = this.state.MapMarkers;
 
@@ -145,17 +155,31 @@ class Main extends Component {
         });
         Array.prototype.push.apply(sortedMarkers, markersOfPoly);
       }
+//Чи нові маркери не збігаються зі старими
+      let withoutRepeatingMarkers = [];
+      for (let i in newMarkers) {
+        let flag = true;
+        for (let j in sortedMarkers) {
+         if(newMarkers[i].data.uid === sortedMarkers[j].data.uid){
+           flag = false;
+         }
+        }
+        if(flag) {
+
+          let mark = newMarkers[i]
+          console.log(mark)
+          withoutRepeatingMarkers.push(mark)
+          console.log(withoutRepeatingMarkers)
+        }
+      }
+
+      console.log(sortedMarkers)
+      console.log(withoutRepeatingMarkers)
+      //Обєднуємо нові маркери без повторів зі старими, які входять в наші полігони
+      Array.prototype.push.apply(sortedMarkers, withoutRepeatingMarkers);
+    } else {
+      sortedMarkers = newMarkers;
     }
-//Чи нові маркери це збігаються зі старими
-    let withoutRepeatingMarkers = [];
-    for (let i in sortedMarkers) {
-      let markersGroup = newMarkers.filter((marker) => {
-        return marker.data.uid !== sortedMarkers[i].data.uid;
-      });
-      Array.prototype.push.apply(withoutRepeatingMarkers, markersGroup);
-    }
-    //Обєднуємо нові маркери без повторів зі старими, які входять в наші полігони
-    Array.prototype.push.apply(sortedMarkers, withoutRepeatingMarkers);
 
 
     this.setState({MapMarkers: sortedMarkers})
