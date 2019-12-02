@@ -12,7 +12,8 @@ $background-panels: #000c2c;
 $background-theme-main: #fdfdfd;
 $text-color-theme-main: rgb(29, 29, 29);
 $button-accent: #98cdff;
-
+$button-primary:#007bff;
+$button-default:tint(shade(#007bff, 50%), 20%);
 $button-accent-20: tint($button-accent, 20%);
 $button-border: #30475c;
 // fonts 
@@ -32,3 +33,4 @@ $navbar-height: 3.5em;
 $map-zindex:1000;
 $button-height: $footer-height;
 $rounding-default: 7em;
+$app-input-border-radius: 1em;

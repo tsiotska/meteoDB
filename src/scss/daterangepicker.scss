@@ -1,7 +1,30 @@
-.daterangepicker .prev,
-.daterangepicker .next {}
+@import "partials/variables";
 
+@import "~compass-mixins/lib/compass/_css3";
+
+.daterangepicker {
+    @include box-shadow(0px 0px 2px 2px #c1c1c194);
+
+    .range_inputs {
+        button {
+            @include border-radius(1em);
+            background-color: $button-primary;
+
+            &.btn-default {
+                background-color: $button-border;
+                color: white;
+            }
+        }
+
+        display: inline;
+    }
+}
 
 .drp {
-    float: right;
+    .drp_btn {
+        background-color: $button-default;
+        float: right;
+    }
+
+    justify-content: start !important;
 }

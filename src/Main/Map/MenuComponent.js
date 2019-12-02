@@ -244,8 +244,6 @@ class MenuComponent extends React.Component {
       </div>
       <div className="panel flyn active  card card-body">
         <div className="flyn-inputs-container">
-
-
           <div class="flyn-grid container d-flex">
             <div class="col-sm-12 col-md-12">
               <div class="flyn-region"></div>
@@ -258,29 +256,23 @@ class MenuComponent extends React.Component {
             </div>
           </div>
 
-          <div className="form-inline ">
-            <div className="form-inline row m-1">
-              <div id="datex" className="col-auto mb-1 mt-4">
+          <div className="form-inline flyn-input-controls">
+            <div className="form-inline row top-group">
+              <div id="datex" className="col-auto">
                 <DatePicker OnClear={this.ApplyCalendarDate} OnApply={this.ApplyCalendarDate} />
               </div>
-
-              <div id="yearsx" className="col-5 mb-1">
-                <label htmlFor="years">Рік</label>
-                <div className="input-group">
-                  <input type="text" id="years"
-                    onChange={this.onYearsChange}
-                    className="form-control typeahead"
-                    placeholder="Рік" data-provide="typeahead" />
-                  <div className="cssload-container fade">
-                    <div className="cssload-whirlpool" />
-                  </div>
-                </div>
+              <div id="yearsx" className="col-5 input-group">
+                <input type="text" id="years"
+                  onChange={this.onYearsChange}
+                  className="form-control typeahead"
+                  placeholder="Рік" data-provide="typeahead" />
               </div>
 
-              <div className="col-5  mb-1">
-                <label htmlFor="type">Тип поля</label>
-                <select defaultValue="ctry_full" ref={this.selectorByField} disabled={polyRequest}
-                  className="custom-select"
+              <div className="input-group col">
+                <div class="input-group-prepend">
+                  <label className="input-group-text" htmlFor="exampleCheck1">Тип поля</label>
+                </div>
+                <select defaultValue="ctry_full" className="form-control custom-select" ref={this.selectorByField} disabled={polyRequest}
                   onChange={this.onTypeChanged} id="type">
                   <option>id</option>
                   <option>wban</option>
@@ -300,9 +292,8 @@ class MenuComponent extends React.Component {
 
             </div>
 
-            <div className={polyRequest ? "disabledQueryInput" : "col-auto w-100 mb-1"} >
-              <label htmlFor="querystr">Пошуковий параметр</label>
-              <div className={""}>
+            <div className={polyRequest ? "disabledQueryInput" : "input-group  w-100"} >
+              <div className={" w-100"}>
                 <Typeahead id="typeahead" disabled={polyRequest}
                   multiple={true}
                   isLoading={this.state.isLoading}
@@ -313,14 +304,17 @@ class MenuComponent extends React.Component {
               </div>
             </div>
 
-            <div className={polyRequest ? "disabledQueryInput" : "form-group mr-2 ml-auto my-2 mb-1 form-check"}>
-              <input type="checkbox" id="nbs_chk" className="mx-2" onChange={this.onNeighChange} />
-
-              <label className="" htmlFor="nbs_chk">Сусідні країни</label>
-
+            <div className={polyRequest ? "disabledQueryInput" : "input-group   form-check"}>
+              <div class="input-group-prepend">
+                <label className="input-group-text" htmlFor="nbs_chk">Сусідні країни</label>
+              </div> <div class="input-group-append">
+                <div className="input-group-text">
+                  <input type="checkbox" id="nbs_chk" className="" onChange={this.onNeighChange} />
+                </div>
+              </div>
             </div>
 
-            <div className={polyRequest ? "disabledQueryInput" : "input-group mx-3  mb-1 form-check"}>
+            <div className={polyRequest ? "disabledQueryInput" : "input-group"}>
 
               <div class="input-group-prepend">
                 <label className="input-group-text" htmlFor="exampleCheck1">Найближчі N станцій</label>
@@ -328,16 +322,16 @@ class MenuComponent extends React.Component {
               <input type="text" className="form-control" id="nearest_chk" onChange={this.onNearestChange} />
             </div>
 
-            <div className="form-inline mx-3">
-              <div className="row my-2">
-                <div className="input-group  col-6 p-1">
+            <div className="form-inline">
+              <div className="row">
+                <div className="input-group col-6">
                   <div className="input-group-prepend">
                     <span className="input-group-text">Count</span>
                   </div>
                   <Input type="text" id="count" className="form-control typeahead" placeholder="Count"
                     data-provide="typeahead" onChange={this.onLimitChange} disabled={areLimitAndOffsetDisabled} />
                 </div>
-                <div className="input-group  col-6 p-1">
+                <div className="input-group col-6">
                   <div className="input-group-prepend">
                     <span className="input-group-text">Offset</span>
                   </div>
@@ -346,7 +340,8 @@ class MenuComponent extends React.Component {
                 </div>
               </div>
             </div>
-            <div className="col-auto d-flex my-2 w-100">
+
+            <div className="col-auto d-flex w-100 justify-content-center">
               <button id="reeval" onClick={this.state.enableSearchButton && this.onSearchClick}
                 className={(this.state.enableSearchButton ? "" : "disabled ") + "btn btn-primary m-2 mb-1 mt-auto"}>Пошук
               </button>
@@ -354,6 +349,7 @@ class MenuComponent extends React.Component {
                 className="btn btn-secondary m-2 mb-1 mt-auto">Очистити
               </button>
             </div>
+
           </div>
 
 

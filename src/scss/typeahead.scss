@@ -1,19 +1,66 @@
+@import "partials/variables";
+
 .rbt {
-    .rbt-token:focus {
-        outline: none;
+    .rbt-token {
+        background-color: $button-accent;
+        border-radius: $app-input-border-radius;
+        padding: 0 .5em;
+        margin: 3px 3px;
+        white-space: nowrap;
+        display: flex;
+
+        &:focus {
+            outline: none;
+        }
+
+        button {
+            padding: 5px;
+            height: 0;
+            transform: translateY(50%);
+            line-height: .1;
+        }
     }
 
     .rbt-input-wrapper {
-        display: flex;
+        display: inline-flex;
+        flex-wrap: wrap;
+
+        .rbt-input-main {
+            // margin-top: 5px;
+        }
     }
 
     >.form-control {
-        width: 100%
+        width: 100%;
+        display: table;
     }
 
     ul {
         border-radius: 10px;
         box-shadow: 0 5px 5px #bfbfbf;
+    }
+
+    .rbt-input {
+        border-radius: $app-input-border-radius;
+    }
+
+    .rbt-menu {
+        .dropdown-item:hover {
+            background-color: transparent;
+        }
+
+        li:not([role="separator"]) {
+            min-height: 2em;
+            box-shadow: 0 0 1px 1px #dcdcdc;
+
+            span {
+                min-height: 1em;
+                white-space: normal;
+            }
+            &:hover{
+                box-shadow: 0 0 6px 1px #dcdcdc;
+            }
+        }
     }
 }
 
