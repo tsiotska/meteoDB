@@ -1,10 +1,9 @@
-import {dataState} from '../state';
-import {types} from './dataActions';
+import { dataState } from '../state';
+import { types } from './dataActions';
 
 const dataReducer = (state = dataState, action) => {
   switch (action.type) {
     case types.SET_QUERY:
-      console.log(action.param);
       return {
         ...state,
         queryParam: action.param,
@@ -19,20 +18,22 @@ const dataReducer = (state = dataState, action) => {
         ...state,
         weatherPackLink: action.link,
       };
-    case types.SET_YEAR:
-      if (action.year.length === 4) {
-        return {
-          ...state,
-          year: action.year,
-        };
-      } else {
-        return {
-          ...state,
-          year: null,
-        };
-      }
+    case types.SET_YEARS:
+      return {
+        ...state,
+        year: action.years,
+      };
+    case types.SET_MONTHS:
+      return {
+        ...state,
+        year: action.months,
+      };
+    case types.SET_DAYS:
+      return {
+        ...state,
+        year: action.days,
+      };
     case types.SET_TIME:
-      console.log(action.date)
       return {
         ...state,
         date: action.date,
@@ -45,7 +46,7 @@ const dataReducer = (state = dataState, action) => {
       };
     case types.SET_LAST_POLY:
       let array = [action.event];
-      if(state.lastPoly.length > 0){
+      if (state.lastPoly.length > 0) {
         Array.prototype.push.apply(array, state.lastPoly);
       }
       return {

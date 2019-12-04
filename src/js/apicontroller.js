@@ -4,28 +4,34 @@ import FetchController from "../js/Helpers/FetchController";
 export class ApiController {
   constructor(loaderVisibility) {
     this.api = new FetchController(loaderVisibility)
-    this.database = "gsod";
     this.resetController();
+    this.database = "gsod";
   }
 
   setController = (context) => {
     console.log(context.date);
-
+    this.database = context.database || "gsod";
     context.date && (this.time = context.date);
-    context.year && (this.year = context.year);
+    context.years && (this.years = context.years);
+    context.months && (this.months = context.months);
+    context.days && (this.days = context.days);
     this.withOffset(context.offset);
     this.withLimit(context.limit);
     this.withNeighbors(context.neighbors);
+    this.withBuffer(context.buffer);
     this.withNearest(context.nearest);
     this.withPack(context.pack);
   };
 
   resetController = () => {
-    this._time =
-      this._year =
+      this._time =
+      this._years =
+      this._months =
+      this._days =
       this._offset =
       this._limit =
       this._pack =
+      this._buffer =
       this._nearest =
       this._hasNeighbours = null;
   };
@@ -45,38 +51,83 @@ export class ApiController {
   }
 
   get year() {
-    return this._year === null
+    return this._years === null
       ? ''
-      : this._year;
+      : this._years;
   }
 
   set year(value) {
-    this._year = value;
+    this._years = value;
   }
 
-  withYear = (value) => {
+  get months() {
+    return this._months === null
+      ? ''
+      : this._months;
+  }
+
+  set months(value) {
+    this._months = value;
+  }
+
+  get days() {
+    return this._days === null
+      ? ''
+      : this._days;
+  }
+
+  set days(value) {
+    this._days = value;
+  }
+
+
+  withYears = (value) => {
     this._time = null;
-    this._year = value;
+    this._years = value;
     return this;
   };
 
+
+  withMonths = (value) => {
+    this._months = null;
+    this._months = value;
+    return this;
+  };
+
+
+  withDays = (value) => {
+    this._days = null;
+    this._days = value;
+    return this;
+  };
+
+  // nearest N stations related to current (one or each in poly) 
+  // uses Kd-tree or R-tree
   withNearest = (value) => {
     this._nearest = value;
     return this;
   };
 
+  // with an exterior buffer for polygon 
+  withBuffer = (value) => {
+    this._buffer = value;
+    return this;
+  };
+
+  // all stations from neighbor countries (limited by 'limit' param)
   withNeighbors = (value) => {
     this._hasNeighbours = value;
     return this;
   };
 
+  // link for file
   withPack = (flag) => {
     this._pack = flag;
     return this;
   };
 
   withTimeRange = (value) => {
-    this._year = null;
+    this._years = null;
     this._time = value;
     return this;
   }
@@ -97,12 +148,23 @@ export class ApiController {
     return this._hasNeighbours ? '&nbs' : ''
   };
 
+  _getDateRangeParams = (e) => {
+    return ('&since=' + this.time.startDate.format('DD.MM.YYYY') +
+      '&until=' + this.time.endDate.format('DD.MM.YYYY'))
+  }
+  _getSingleTimeParams = (e) => {
+    return (this._year ? "&years=" + this._year : '') +
+      (this._months ? "&months=" + this._months : '') +
+      (this._days ? "&days=" + this._days : '');
+  }
   addTime = () => {
     return this.time.dateSet
-      ? ('&since=' + this.time.startDate.format('DD.MM.YYYY') +
-        '&until=' + this.time.endDate.format('DD.MM.YYYY'))
-      : (this.year ? "&year=" + this.year : '');
+      ? this._getDateRangeParams()
+      : this._getSingleTimeParams();
   };
+  addBuffer = () => {
+    return this._buffer ? '&buffer=' + this._buffer : '';
+  }
 
   addPack = () => {
     return this._pack ? '&pack' : '';
@@ -152,13 +214,13 @@ export class ApiController {
       this.addLimiters() +
       this.addNearestStations() +
       this.addNeighbours() +
+      this.addBuffer() +
       this.addTime() +
       this.addStatistics() +
       this.addPack();
 
     this.resetController();
     return this.api.Get(req)
-
   };
 
   getDataForMapOrMarker(context) {

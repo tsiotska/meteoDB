@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {TileLayer, Map, Marker, Tooltip} from 'react-leaflet';
+import React, { Component } from 'react';
+import { TileLayer, Map, Marker, Tooltip } from 'react-leaflet';
 import L from 'leaflet';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import $ from 'jquery';
@@ -61,7 +61,7 @@ class MapX extends Component {
       console.log(e)
       console.log(!e.layer.options.hasOwnProperty("position"))
 
-     if(!e.layer.options.hasOwnProperty("position")){
+      if (!e.layer.options.hasOwnProperty("position")) {
         this.props.deleteLastPoly(e);
         this.props.onToolRemove(e);
       }
@@ -107,7 +107,7 @@ class MapX extends Component {
         mymap.scrollWheelZoom.enable();
       }
     });
-    L.control.zoom({position: 'topright'}).addTo(mymap);
+    L.control.zoom({ position: 'topright' }).addTo(mymap);
     markerGroup = L.layerGroup().addTo(mymap);
   }
 
@@ -134,7 +134,7 @@ class MapX extends Component {
   fetchMarkers = (e) => {
     const {
       PolySelected, onStationsData, setWeather, setStationPackLink, setWeatherPackLink,
-      api, date, year, /* neigh, nearest, offset, limit */
+      api, date, years, months, days /* neigh, nearest, offset, limit */
     } = this.props;
 
     let req = api.createPolyRequest(e.layer);
@@ -146,19 +146,21 @@ class MapX extends Component {
       onStationsData(stations, e);
     }).catch((error) => console.log(error));
 
-    api.getPackFromMapEvent({e: e.layer, pack: true}).then((pack) => {
+    api.getPackFromMapEvent({ e: e.layer, pack: true }).then((pack) => {
       setStationPackLink(pack.response[0])
     }).catch((error) => console.log(error));
 
-    if (date.dateSet || year) {
-      api.getWeatherFromMapEvent({e: e.layer, date: date, year: year})
+    if (date.dateSet || years) {
+      api.getWeatherFromMapEvent({ e: e.layer, date: date, years: years, months: months, days: days })
         .then((weather) => {
           setWeather(weather.response);
         }).catch((error) => console.log(error));
 
-      api.getPackFromMapEvent({e: e.layer, date: date, year: year, pack: true}).then((pack) => {
+      api.getPackFromMapEvent({ e: e.layer, date: date, years: years, months: months, days: days, pack: true }).then((pack) => {
         setWeatherPackLink(pack.response[0])
       }).catch((error) => console.log(error));
+    } else if (months || days) {
+      alert("you must select any year")
     }
   };
 
@@ -184,50 +186,54 @@ class MapX extends Component {
     const position = [this.state.lat, this.state.lng];
     const markers = this.renderMarkers();
 
-    return (<Map id="mapid" className="markercluster-map" whenReady={this.whenReady} center={position} style={{
-      height: "100%",
-      width: "100%",
-      position: "relative"
-    }} zoom={this.state.zoom} preferCanvas="True" scrollWheelZoom={false} zoomControl={false}>
-      <TileLayer attribution={this.state.attribution} url={this.state.tiles}/>
+    return (<Map id="mapid" className="markercluster-map"
+      whenReady={this.whenReady} center={position}
+      style={{
+        height: "100%",
+        width: "100%",
+        position: "relative"
+      }} zoom={this.state.zoom} preferCanvas="True"
+      scrollWheelZoom={false} zoomControl={false}>
+      <TileLayer attribution={this.state.attribution} url={this.state.tiles} />
       {markers &&
-      <MarkerClusterGroup chunkedLoadind={true} showCoverageOnHover={true}
-                          iconCreateFunction={createClusterCustomIcon}>
-        {markers}
-      </MarkerClusterGroup>
+        <MarkerClusterGroup chunkedLoadind={true} showCoverageOnHover={true}
+          iconCreateFunction={createClusterCustomIcon}>
+          {markers}
+        </MarkerClusterGroup>
       }
     </Map>);
   }
 }
 
 const mapStateToProps = state => ({
-  year: state.dataReducer.year,
+  years: state.dataReducer.years,
+  months: state.dataReducer.months,
+  days: state.dataReducer.days,
   date: state.dataReducer.date,
   neigh: state.dataReducer.neigh,
   nearest: state.dataReducer.nearest,
   offset: state.dataReducer.offset,
   limit: state.dataReducer.limit,
-
 });
 
 const mapDispatchToProps = dispatch => ({
   deleteLastPoly: (event) => {
-    dispatch({type: "DELETE_LAST_POLY", event: event})
+    dispatch({ type: "DELETE_LAST_POLY", event: event })
   },
   setLastPoly: (event) => {
-    dispatch({type: "SET_LAST_POLY", event: event})
+    dispatch({ type: "SET_LAST_POLY", event: event })
   },
   MarkerSelected: (req) => {
-    dispatch({type: "IF_MARKER_SELECTED", req: req})
+    dispatch({ type: "IF_MARKER_SELECTED", req: req })
   },
   PolySelected: (req, flag) => {
-    dispatch({type: "IF_POLY_SELECTED", req: req, flag: flag})
+    dispatch({ type: "IF_POLY_SELECTED", req: req, flag: flag })
   },
   setStationPackLink: (link) => {
-    dispatch({type: "SET_STATION_PACK_LINK", link: link})
+    dispatch({ type: "SET_STATION_PACK_LINK", link: link })
   },
   setWeatherPackLink: (link) => {
-    dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
+    dispatch({ type: "SET_WEATHER_PACK_LINK", link: link })
   },
 });
 

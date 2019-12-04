@@ -366,7 +366,7 @@ class Main extends Component {
 
 const
   mapStateToProps = state => ({
-    year: state.dataReducer.year,
+    years: state.dataReducer.years,
     date: state.dataReducer.date,
     lastPoly: state.dataReducer.lastPoly
   });

@@ -178,7 +178,7 @@ $flyn-animation-dur: .7s;
 
   .cur_count {
     position: absolute;
-    bottom: 2em;
+    bottom: 3em;
     z-index: 1000;
     right: 1em;
     background-color: white;
@@ -230,5 +230,10 @@ $flyn-animation-dur: .7s;
         box-shadow: none;
       }
     }
+  }
+  .time-selector-tabs{
+     .nav-item{
+       border: none;
+     }
   }
 }

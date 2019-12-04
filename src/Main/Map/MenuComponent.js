@@ -30,7 +30,12 @@ class MenuComponent extends React.Component {
     };
   }
 
+  componentDidUpdate() {
+    $('[data-toggle="tooltip"]').tooltip();
+  }
+
   componentDidMount() {
+    $('[data-toggle="tooltip"]').tooltip();
     this.props.api.getStationsCount()
       .then((data) => {
         if (data && data.response) {
@@ -49,12 +54,15 @@ class MenuComponent extends React.Component {
   onSearchClick = () => {
     const {
       markerRequest, polyRequest, queryParam,
-      date, year, offset, limit, neigh, nearest,
+      date, years, months, days, offset, limit, neigh, nearest,
     } = this.props;
     //Якщо дозагрузка погоди/Лише для полі і маркера. Без query догрузки
     if (markerRequest || polyRequest) {
       this.props.api.uploadWeather({
-        date: date, year: year,
+        date: date,
+        years: years,
+        months: months,
+        days: days,
         polyRequest: polyRequest, markerRequest: markerRequest
       }).then((weather) => {
         this.props.setWeather(weather.response);
@@ -83,9 +91,9 @@ class MenuComponent extends React.Component {
         }).catch((error) => console.log(error));
 
 
-      if (year || date.dateSet) {
+      if (years || date.dateSet) {
         this.props.api.getWeatherByQuery({
-          date: date, year: year,
+          date: date, years: years,
           offset: offset, limit: limit,
           neighbors: neigh, nearest: nearest,
           query: queryParam,
@@ -95,7 +103,10 @@ class MenuComponent extends React.Component {
         }).catch((error) => console.log(error));
 
         this.props.api.getPackByQuery({
-          date: date, year: year,
+          date: date,
+          years: years,
+          months: months,
+          days: days,
           offset: offset, limit: limit,
           neighbors: neigh, nearest: nearest,
           query: queryParam,
@@ -126,8 +137,8 @@ class MenuComponent extends React.Component {
 
   //Кнопка пошуку активується якщо є пошуковий параметр або виділені полігони з вказаною датою.
   enableButton = () => {
-    const { markerRequest, polyRequest, queryParam, date, year } = this.props;
-    if ((queryParam.length > 0) || ((date.dateSet || year) && (polyRequest || markerRequest))) {
+    const { markerRequest, polyRequest, queryParam, date, years,  } = this.props;
+    if ((queryParam.length > 0) || ((date.dateSet || years) && (polyRequest || markerRequest))) {
       this.setState({ enableSearchButton: true });
     } else {
       this.setState({ enableSearchButton: false })
@@ -207,7 +218,17 @@ class MenuComponent extends React.Component {
   };
 
   onYearsChange = async (event) => {
-    await this.props.setYear(event.target.value);
+    await this.props.setYears(event.target.value);
+    this.enableButton();
+  };
+
+  onMonthsChange = async (event) => {
+    await this.props.setMonths(event.target.value);
+    this.enableButton();
+  };
+
+  onDaysChange = async (event) => {
+    await this.props.setDays(event.target.value);
     this.enableButton();
   };
 
@@ -244,34 +265,83 @@ class MenuComponent extends React.Component {
       </div>
       <div className="panel flyn active  card card-body">
         <div className="flyn-inputs-container">
-          <div class="flyn-grid container d-flex">
-            <div class="col-sm-12 col-md-12">
-              <div class="flyn-region"></div>
-            </div>
-            <div class="col-sm-12 col-md-12">
-              <div class="flyn-region"></div>
-            </div>
-            <div class="col-sm-12 col-md-12">
-              <div class="flyn-region"></div>
-            </div>
-          </div>
-
           <div className="form-inline flyn-input-controls">
+            <div className="current-database">
+              <div className="input-group">
+                <div className="input-group-prepend">
+                  <label className="input-group-text" htmlFor="database-selectors">Database</label>
+                </div>
+                <select className="custom-select" id="database-selectors">
+                  {
+                    // TODO: fetch items from API
+                  }
+                  <option defaultValue value="gsod" data-toggle="tooltip" title="Global Summary Of Day (GSOD, NOAA)">GSOD</option>
+                  <option disabled value="gh" data-toggle="tooltip" title="Global Hourly dataset (GH, NOAA)">Global Hourly</option>
+                  <option disabled value="isd-lite" data-toggle="tooltip" title="Integrated surface data Lite (ISD, NOAA)">ISD Lite</option>
+                  <option disabled value="isd" data-toggle="tooltip" title="Integrated surface data FULL (ISD, NOAA)">ISD</option>
+                </select>
+              </div>
+            </div>
+            <div className="time-selector-tabs w-100 mx-auto justify-content-center">
+              <ul className="nav nav-tabs" id="myTab" role="tablist">
+                <li className="nav-item">
+                  <a className="nav-link active" id="date-range-tab-top" data-toggle="tab"
+                    href="#date-range-tab" role="tab" aria-controls="date-range-tab" aria-selected="true">Dates range</a>
+                </li>
+                <li className="nav-item">
+                  <a className="nav-link" id="time-range-tab-top" data-toggle="tab"
+                    href="#time-range-tab" role="tab" aria-controls="time-range-tab" aria-selected="false">Vary time selector</a>
+                </li>
+              </ul>
+              <div className="tab-content" id="range-selectors">
+                <div className="tab-pane fade show active" id="date-range-tab" role="tabpanel" aria-labelledby="date-range-tab">
+                  <div className="d-flex justify-content-center flex-column">
+                    <div id="datex" className="mx-auto">
+                      <p className="text-center mx-2  mt-2">Aggregates query with date range</p>
+                      <DatePicker OnClear={this.ApplyCalendarDate} OnApply={this.ApplyCalendarDate} className="mx-auto d-flex justify-content-center" />
+                    </div>
+                  </div>
+                </div>
+                <div className="tab-pane fade" id="time-range-tab" role="tabpanel" aria-labelledby="time-range-tab">
+                  <div className="input-group aggregate-selector row justify-content-center d-flex flex-column">
+                    <p className="text-center mx-2">Aggregates query with any disperse date items</p>
+                    <div id="yearsx" className="mx-auto input-group m-1">
+                      <Input type="text" id="years"
+                        onChange={this.onYearsChange}
+                        className="form-control typeahead"
+                        data-toggle="tooltip" data-html="true" data-placement="left" title="<div className='tooltip-info'> Examples: <br>2018-2019<br>2010,2014-2016,2019</div>"
+                        placeholder="Years" data-provide="typeahead" />
+                    </div>
+
+                    <div id="monthx" className="mx-auto input-group m-1">
+                      <Input type="text" id="months"
+                        onChange={this.onMonthsChange}
+                        className="form-control typeahead"
+                        data-toggle="tooltip" data-html="true" data-placement="left" title="<div className='tooltip-info'> Examples: <br>1-10<br>1,3-6,10-12</div>"
+                        placeholder="Months" data-provide="typeahead" />
+                    </div>
+
+                    <div id="daysx" className="mx-auto input-group m-1">
+                      <Input type="text" id="days"
+                        onChange={this.onDaysChange}
+                        className="form-control typeahead"
+                        data-toggle="tooltip" data-html="true" data-placement="left" title="<div className='tooltip-info'> Examples: <br>1-31<br>1,23-26,30</div>"
+                        placeholder="Days" data-provide="typeahead" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="form-inline row top-group">
-              <div id="datex" className="col-auto">
-                <DatePicker OnClear={this.ApplyCalendarDate} OnApply={this.ApplyCalendarDate} />
-              </div>
-              <div id="yearsx" className="col-5 input-group">
-                <input type="text" id="years"
-                  onChange={this.onYearsChange}
-                  className="form-control typeahead"
-                  placeholder="Рік" data-provide="typeahead" />
-              </div>
 
               <div className="input-group col">
-                <div class="input-group-prepend">
-                  <label className="input-group-text" htmlFor="exampleCheck1">Тип поля</label>
+                <div className="input-group-prepend">
+                  <label className="input-group-text" htmlFor="exampleCheck1">Field type</label>
                 </div>
+                {
+                  // TODO: fetch values from API
+                }
                 <select defaultValue="ctry_full" className="form-control custom-select" ref={this.selectorByField} disabled={polyRequest}
                   onChange={this.onTypeChanged} id="type">
                   <option>id</option>
@@ -294,10 +364,10 @@ class MenuComponent extends React.Component {
 
             <div className={polyRequest ? "disabledQueryInput" : "input-group  w-100"} >
               <div className={" w-100"}>
-                <Typeahead id="typeahead" disabled={polyRequest}
+                <Typeahead id="typeahead" disabled={polyRequest ? true : false}
                   multiple={true}
                   isLoading={this.state.isLoading}
-                  placeholder="Пошуковий параметр"
+                  placeholder="Query parameter"
                   onChange={this.unControlledInput}
                   ref={(typeahead) => this.typeahead = typeahead}
                   options={this.state.source} />
@@ -305,21 +375,22 @@ class MenuComponent extends React.Component {
             </div>
 
             <div className={polyRequest ? "disabledQueryInput" : "input-group   form-check"}>
-              <div class="input-group-prepend">
-                <label className="input-group-text" htmlFor="nbs_chk">Сусідні країни</label>
-              </div> <div class="input-group-append">
+              <div className="input-group-prepend">
+                <label className="input-group-text" htmlFor="nbs_chk">With neighbors</label>
+              </div>
+              <div className="input-group-append">
                 <div className="input-group-text">
-                  <input type="checkbox" id="nbs_chk" className="" onChange={this.onNeighChange} />
+                  <Input type="checkbox" id="nbs_chk" className="" onChange={this.onNeighChange} />
                 </div>
               </div>
             </div>
 
             <div className={polyRequest ? "disabledQueryInput" : "input-group"}>
 
-              <div class="input-group-prepend">
-                <label className="input-group-text" htmlFor="exampleCheck1">Найближчі N станцій</label>
+              <div className="input-group-prepend">
+                <label className="input-group-text" htmlFor="exampleCheck1">Nearest N stations</label>
               </div>
-              <input type="text" className="form-control" id="nearest_chk" onChange={this.onNearestChange} />
+              <Input type="text" className="form-control" id="nearest_chk" onChange={this.onNearestChange} />
             </div>
 
             <div className="form-inline">
@@ -342,11 +413,11 @@ class MenuComponent extends React.Component {
             </div>
 
             <div className="col-auto d-flex w-100 justify-content-center">
-              <button id="reeval" onClick={this.state.enableSearchButton && this.onSearchClick}
-                className={(this.state.enableSearchButton ? "" : "disabled ") + "btn btn-primary m-2 mb-1 mt-auto"}>Пошук
+              <button id="reeval" onClick={() => this.state.enableSearchButton && this.onSearchClick}
+                className={(this.state.enableSearchButton ? "" : "disabled ") + "btn btn-primary m-2 mb-1 mt-auto"}>Search
               </button>
               <button id="refresh" onClick={this.onRefreshClick}
-                className="btn btn-secondary m-2 mb-1 mt-auto">Очистити
+                className="btn btn-secondary m-2 mb-1 mt-auto">Clear
               </button>
             </div>
 
@@ -392,7 +463,9 @@ const mapStateToProps = state => ({
   stationPackLink: state.dataReducer.stationPackLink,
   weatherPackLink: state.dataReducer.weatherPackLink,
   queryParam: state.dataReducer.queryParam,
-  year: state.dataReducer.year,
+  years: state.dataReducer.years,
+  months: state.dataReducer.months,
+  days: state.dataReducer.days,
   date: state.dataReducer.date,
   neigh: state.dataReducer.neigh,
   nearest: state.dataReducer.nearest,
@@ -413,8 +486,14 @@ const mapDispatchToProps = dispatch => ({
   setWeatherPackLink: (link) => {
     dispatch({ type: "SET_WEATHER_PACK_LINK", link: link })
   },
-  setYear: (year) => {
-    dispatch({ type: "SET_YEAR", year: year })
+  setYears: (years) => {
+    dispatch({ type: "SET_YEARS", years: years })
+  },
+  setMonths: (months) => {
+    dispatch({ type: "SET_MONTHS", months: months })
+  },
+  setDays: (days) => {
+    dispatch({ type: "SET_DAYS", days: days })
   },
   setTime: (date) => {
     dispatch({ type: "SET_TIME", date: date })

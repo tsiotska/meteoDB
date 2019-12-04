@@ -1,6 +1,6 @@
 import React from 'react';
 import DateRangePicker from 'react-bootstrap-daterangepicker';
-import {Button} from 'reactstrap';
+import { Button } from 'reactstrap';
 import 'bootstrap-daterangepicker/daterangepicker.css';
 export default class DatePicker extends React.Component {
   constructor(props) {
@@ -19,27 +19,27 @@ export default class DatePicker extends React.Component {
         "customRangeLabel": "Custom",
         "weekLabel": "W",
         "daysOfWeek": [
-          "Пн",
-          "Вт",
-          "Ср",
-          "Чт",
-          "Пт",
-          "Сб",
-          "Нд"
+          "Mon",
+          "Tu",
+          "Wed",
+          "Thu",
+          "Fri",
+          "Sat",
+          "Sun"
         ],
         "monthNames": [
-          "Січень",
-          "Лютий",
-          "Березень",
-          "Квітень",
-          "Травень",
-          "Червень",
-          "Липень",
-          "Серпень",
-          "Вересень",
-          "Жовтень",
-          "Листопад",
-          "Грудень"
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December"
         ],
         "firstDay": 0
       },
@@ -60,8 +60,8 @@ export default class DatePicker extends React.Component {
   }
 
   dateName() {
-    var date = this.state.startDate && this.state.startDate.format('DD.MM.YYYY') + " до " + this.state.endDate.format('DD.MM.YYYY')
-    return date || "Вибрати дату"
+    var date = this.state.startDate && "since " + this.state.startDate.format('DD.MM.YYYY') + " until " + this.state.endDate.format('DD.MM.YYYY')
+    return date || "Select dates range"
   }
   onEraseClick = () => {
     var e = {
@@ -73,13 +73,13 @@ export default class DatePicker extends React.Component {
     this.props.OnClear(e)
   }
   render() {
-    return (<div className="drp mx-auto d-flex justify-content-center w-100 m-2">
+    return (<div className={"drp " + this.props.className}>
       <DateRangePicker locale={this.state.locale} onApply={this.handleChange}>
         <button className="drp_btn btn btn-secondary">{this.dateName()}</button>
       </DateRangePicker>
       {
         this.state.dateSet
-          ? <Button onClick={this.onEraseClick}>X</Button>
+          ? <Button onClick={this.onEraseClick} className="drp_close border-0 btn btn-outline-dark">X</Button>
           : null
       }
     </div>);
