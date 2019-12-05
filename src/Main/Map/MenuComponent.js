@@ -58,7 +58,7 @@ class MenuComponent extends React.Component {
     } = this.props;
     //Якщо дозагрузка погоди/Лише для полі і маркера. Без query догрузки
     if (markerRequest || polyRequest) {
-      this.props.api.uploadWeather({
+      this.props.api.getWeather({
         date: date,
         years: years,
         months: months,
@@ -137,7 +137,7 @@ class MenuComponent extends React.Component {
 
   //Кнопка пошуку активується якщо є пошуковий параметр або виділені полігони з вказаною датою.
   enableButton = () => {
-    const { markerRequest, polyRequest, queryParam, date, years,  } = this.props;
+    const { markerRequest, polyRequest, queryParam, date, years, } = this.props;
     if ((queryParam.length > 0) || ((date.dateSet || years) && (polyRequest || markerRequest))) {
       this.setState({ enableSearchButton: true });
     } else {
@@ -413,12 +413,14 @@ class MenuComponent extends React.Component {
             </div>
 
             <div className="col-auto d-flex w-100 justify-content-center">
-              <button id="reeval" onClick={() => this.state.enableSearchButton && this.onSearchClick}
-                className={(this.state.enableSearchButton ? "" : "disabled ") + "btn btn-primary m-2 mb-1 mt-auto"}>Search
-              </button>
-              <button id="refresh" onClick={this.onRefreshClick}
-                className="btn btn-secondary m-2 mb-1 mt-auto">Clear
-              </button>
+              <Button id="reeval" onClick={() => this.state.enableSearchButton && this.onSearchClick}
+                color="primary"  
+                className={(this.state.enableSearchButton ? "" : "disabled ") + "m-2 mb-1 mt-auto"}>Search
+              </Button>
+              <Button id="refresh" onClick={this.onRefreshClick}
+                color="secondary"
+                className="m-2 mb-1 mt-auto">Clear
+              </Button>
             </div>
 
           </div>

@@ -243,7 +243,7 @@ export class ApiController {
   };
 
   //upload Weather if we already have stations
-  uploadWeather = (context) => {
+  getWeather = (context) => {
     this.setController(context);
 
     if (context.markerRequest) {

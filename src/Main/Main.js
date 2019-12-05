@@ -280,7 +280,7 @@ class Main extends Component {
         markers.push(createMaker(coords, this.onMarkerClick, createStation(location), mrk++, location));
       }
       this.setMarkers(markers, poly);
-      mymap.fitBounds(L.latLngBounds(area_latlon));
+      mymap.fitBounds(L.latLngBounds(area_latlon).pad(.3));
     } else alert("No data, sorry");
   };
 
@@ -291,7 +291,7 @@ class Main extends Component {
     }
     let t = e.map((r) => r.position);
     if (t.length > 0) {
-      mymap.fitBounds(t);
+      mymap.fitBounds(t.pad(.3));
     }
   };
 
