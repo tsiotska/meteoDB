@@ -59,19 +59,22 @@ class MenuComponent extends React.Component {
     //Якщо дозагрузка погоди/Лише для полі і маркера. Без query догрузки
     if (markerRequest || polyRequest) {
       this.props.api.getWeather({
-        date: date,
-        years: years,
-        months: months,
-        days: days,
-        polyRequest: polyRequest, markerRequest: markerRequest
+        date,
+        years,
+        months,
+        days,
+        polyRequest,
+        markerRequest
       }).then((weather) => {
         this.props.setWeather(weather.response);
       }).catch((error) => console.log(error))
     } //Якщо звичайний query запит.
     else if (queryParam) {
       this.props.api.searchStationsByQuery({
-        offset: offset, limit: limit,
-        neighbors: neigh, nearest: nearest,
+        offset,
+        limit,
+        neigh,
+        nearest,
         query: queryParam,
         selectedField: this.selectorByField.current.value
       }).then((stations) => {
@@ -136,7 +139,7 @@ class MenuComponent extends React.Component {
   };
 
   //Кнопка пошуку активується якщо є пошуковий параметр або виділені полігони з вказаною датою.
-  enableButton = () => {
+  enableButton = () => { 
     const { markerRequest, polyRequest, queryParam, date, years, } = this.props;
     if ((queryParam.length > 0) || ((date.dateSet || years) && (polyRequest || markerRequest))) {
       this.setState({ enableSearchButton: true });
@@ -274,6 +277,7 @@ class MenuComponent extends React.Component {
                 <select className="custom-select" id="database-selectors">
                   {
                     // TODO: fetch items from API
+                    // api/weather/databases
                   }
                   <option defaultValue value="gsod" data-toggle="tooltip" title="Global Summary Of Day (GSOD, NOAA)">GSOD</option>
                   <option disabled value="gh" data-toggle="tooltip" title="Global Hourly dataset (GH, NOAA)">Global Hourly</option>
@@ -341,6 +345,7 @@ class MenuComponent extends React.Component {
                 </div>
                 {
                   // TODO: fetch values from API
+                  // api/gsod/stations/types
                 }
                 <select defaultValue="ctry_full" className="form-control custom-select" ref={this.selectorByField} disabled={polyRequest}
                   onChange={this.onTypeChanged} id="type">
@@ -413,8 +418,8 @@ class MenuComponent extends React.Component {
             </div>
 
             <div className="col-auto d-flex w-100 justify-content-center">
-              <Button id="reeval" onClick={() => this.state.enableSearchButton && this.onSearchClick}
-                color="primary"  
+              <Button id="reeval" onClick={this.onSearchClick}
+                color="primary"
                 className={(this.state.enableSearchButton ? "" : "disabled ") + "m-2 mb-1 mt-auto"}>Search
               </Button>
               <Button id="refresh" onClick={this.onRefreshClick}

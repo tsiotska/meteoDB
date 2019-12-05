@@ -1,6 +1,6 @@
 
 import axios from 'axios';
- 
+
 let status = {
   OK: 100,
   SERVER_ERROR: 88,
@@ -12,7 +12,7 @@ let status = {
   GENERIC_ERROR: 0
 };
 
-class FetchController{
+class FetchController {
   constructor(loaderVisibility) {
     this.loaderVisibility = loaderVisibility;
     this.Status = status.UNDEFINED;
@@ -21,7 +21,7 @@ class FetchController{
   }
 
   Get = async (link) => {
-   this.loaderVisibility(true);
+    this.loaderVisibility(true);
     console.log(link);
     try {
       const response = await axios.get(link);
@@ -34,6 +34,10 @@ class FetchController{
     }
     catch (error) {
       console.log(error);
+    }
+    // TODO: use a human readable error when schema ready
+    if (this.Errors !== null && this.Errors.length) {
+      console.log(this.Errors)
     }
   };
 }

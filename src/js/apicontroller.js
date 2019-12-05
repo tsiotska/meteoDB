@@ -1,8 +1,10 @@
 import { baseUrl } from "../js/const"
 import FetchController from "../js/Helpers/FetchController";
+import ControllerContext from "./ControllerContext";
 
-export class ApiController {
+export class ApiController extends ControllerContext {
   constructor(loaderVisibility) {
+    super()
     this.api = new FetchController(loaderVisibility)
     this.resetController();
     this.database = "gsod";
@@ -21,132 +23,15 @@ export class ApiController {
     this.withBuffer(context.buffer);
     this.withNearest(context.nearest);
     this.withPack(context.pack);
-  };
-
-  resetController = () => {
-      this._time =
-      this._years =
-      this._months =
-      this._days =
-      this._offset =
-      this._limit =
-      this._pack =
-      this._buffer =
-      this._nearest =
-      this._hasNeighbours = null;
-  };
-
-  YieldsToWeatherRequest = () => {
-    return (this.year || this.time.dateSet)
-  };
-
-  get time() {
-    return this._time === null
-      ? ''
-      : this._time;
   }
 
-  set time(value) {
-    this._time = value;
-  }
-
-  get year() {
-    return this._years === null
-      ? ''
-      : this._years;
-  }
-
-  set year(value) {
-    this._years = value;
-  }
-
-  get months() {
-    return this._months === null
-      ? ''
-      : this._months;
-  }
-
-  set months(value) {
-    this._months = value;
-  }
-
-  get days() {
-    return this._days === null
-      ? ''
-      : this._days;
-  }
-
-  set days(value) {
-    this._days = value;
-  }
-
-
-  withYears = (value) => {
-    this._time = null;
-    this._years = value;
-    return this;
-  };
-
-
-  withMonths = (value) => {
-    this._months = null;
-    this._months = value;
-    return this;
-  };
-
-
-  withDays = (value) => {
-    this._days = null;
-    this._days = value;
-    return this;
-  };
-
-  // nearest N stations related to current (one or each in poly) 
-  // uses Kd-tree or R-tree
-  withNearest = (value) => {
-    this._nearest = value;
-    return this;
-  };
-
-  // with an exterior buffer for polygon 
-  withBuffer = (value) => {
-    this._buffer = value;
-    return this;
-  };
-
-  // all stations from neighbor countries (limited by 'limit' param)
-  withNeighbors = (value) => {
-    this._hasNeighbours = value;
-    return this;
-  };
-
-  // link for file
-  withPack = (flag) => {
-    this._pack = flag;
-    return this;
-  };
-
-  withTimeRange = (value) => {
-    this._years = null;
-    this._time = value;
-    return this;
-  }
-
-  withOffset = (value) => {
-    this._offset = value;
-    return this;
-  }
-
-  withLimit = (value) => {
-    this._limit = value;
-    return this;
-  };
+  resetController = () => this.resetContext()
 
   // Link builders
 
   addNeighbours = () => {
     return this._hasNeighbours ? '&nbs' : ''
-  };
+  }
 
   _getDateRangeParams = (e) => {
     return ('&since=' + this.time.startDate.format('DD.MM.YYYY') +
@@ -161,14 +46,14 @@ export class ApiController {
     return this.time.dateSet
       ? this._getDateRangeParams()
       : this._getSingleTimeParams();
-  };
+  }
   addBuffer = () => {
     return this._buffer ? '&buffer=' + this._buffer : '';
   }
 
   addPack = () => {
     return this._pack ? '&pack' : '';
-  };
+  }
 
   addLimiters = () => {
     return (this._offset ? '&offset=' + this._offset : '') +
@@ -199,14 +84,14 @@ export class ApiController {
       req = baseUrl + '/api/' + this.database + '/poly?type=poly&value=[' + lngs.join('],[') + ']';
     }
     return req;
-  };
+  }
 
   createQueryLink = (selectedField, query) => {
     let searchType = selectedField;
     let queryType = '&query=' + query;
     let queryValue = 'stations?field=' + searchType + queryType;
     return baseUrl + '/api/' + this.database + '/' + queryValue;
-  };
+  }
 
   // Final builder
   fetchData = (link) => {
@@ -221,7 +106,7 @@ export class ApiController {
 
     this.resetController();
     return this.api.Get(req)
-  };
+  }
 
   getDataForMapOrMarker(context) {
     this.setController(context);
@@ -236,56 +121,39 @@ export class ApiController {
 
   getWeatherFromMapEvent = (context) => {
     return this.getDataForMapOrMarker(context);
-  };
+  }
 
   getPackFromMapEvent = (context) => {
     return this.getDataForMapOrMarker(context);
-  };
+  }
 
-  //upload Weather if we already have stations
+  //fetch weather data if we already have stations
   getWeather = (context) => {
     this.setController(context);
-
-    if (context.markerRequest) {
-      console.log("Marker section")
-      return this.fetchData(context.markerRequest)
-
-    } else if (context.polyRequest) {
-      console.log("Poly section")
-      return this.fetchData(context.polyRequest)
-
-    } else if (context.polyRequest || context.markerRequest) {
-      alert("Nothing to search...") //Бо тут буде помилка. Необхідно повернути пустий проміс.
-    }
-  };
+    return this.fetchData(context.markerRequest ? context.markerRequest : context.polyRequest)
+  }
 
   //simple query searching for stations
   searchStationsByQuery = (context) => {
     this.setController(context);
     return this.fetchData(this.createQueryLink(context.selectedField, context.query));
-  };
+  }
 
   getWeatherByQuery = (context) => {
     this.setController(context);
     return this.fetchData(this.createQueryLink(context.selectedField, context.query));
-  };
+  }
 
   getPackByQuery = (context) => {
     this.setController(context);
     return this.fetchData(this.createQueryLink(context.selectedField, context.query));
-  };
+  }
 
   getStationsCount() {
     return this.fetchData(baseUrl + "/api/" + this.database + "/countries/stationsCount")
   }
 
-  //extractors
-  //Цей екстрактор мав би повертати обмежений лист query, якщо за той рік немає даних по якомусь параметру
-  /* getByTypeAndYear = (year, type) => {
-     let link = baseUrl + "/api/" + this.database + "/stations?extract=" + type + "&year=" + year;
-     return this.fetchData(link)
-   };*/
-
+  //extractors 
   getByType = (type, offsetValue, countValue) => {
     let offset = "", count = "";
     if (offsetValue) {
@@ -296,5 +164,5 @@ export class ApiController {
     }
     let link = baseUrl + "/api/" + this.database + "/stations?extract=" + type + offset + count;
     return this.fetchData(link)
-  };
+  }
 }
