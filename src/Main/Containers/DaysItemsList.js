@@ -13,7 +13,7 @@ export default class DaysItemsList extends Component {
   };
 
   render() {
-    return (<div className="tab-pane fade" id="nav-res" role="tabpanel" aria-labelledby="nav-res-tab">
+    return (<div className="container" /* className="tab-pane fade" id="nav-res" role="tabpanel" aria-labelledby="nav-res-tab" */>
       <div className="container d-flex  flex-column justify-content-center">
         {
           this.props.daysItems && this.props.daysItems.length > 0

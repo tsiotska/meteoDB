@@ -1,8 +1,8 @@
 
-#ctr-list {
-    max-height: 20em;
+#ctr-list { 
     overflow-y: scroll;
-  
+    overflow: auto;
+ height: 100%;
     li {
       min-height: 3em;
     }

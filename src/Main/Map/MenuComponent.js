@@ -1,5 +1,4 @@
 import React from 'react';
-import Map from './Components/Map';
 import { mymap } from './Components/Map';
 import { baseUrl } from '../../js/const';
 import DatePicker from '../../Main/Controls/DatePicker'
@@ -139,7 +138,7 @@ class MenuComponent extends React.Component {
   };
 
   //Кнопка пошуку активується якщо є пошуковий параметр або виділені полігони з вказаною датою.
-  enableButton = () => { 
+  enableButton = () => {
     const { markerRequest, polyRequest, queryParam, date, years, } = this.props;
     if ((queryParam.length > 0) || ((date.dateSet || years) && (polyRequest || markerRequest))) {
       this.setState({ enableSearchButton: true });
@@ -252,21 +251,8 @@ class MenuComponent extends React.Component {
 
     //1. Поправити Typeahead, він скачє.
     //2. Придумати шось з disabledQueryInput class
-    return (<div className="main_map container-fluid p-0">
-      <Map setWeather={this.props.setWeather} api={this.props.api}
-        activeMarker={this.props.activeMarker}
-        onStationsData={this.props.onStationsData} markers={this.state.selectedPage}
-        currentSelected={this.props.markers}
-        setCardItem={this.props.setCardItem} onToolRemove={this.props.onToolRemove}
-        beforeMove={this.props.beforeMove} onCutRemove={this.props.onCutRemove} />
-
-      <div className="cur_count_wrapper">
-        <div className={"cur_count " + (
-          counter
-            ? ""
-            : "fade")} id="result-info">{counter}</div>
-      </div>
-      <div className="panel flyn active  card card-body">
+    return (
+      <div className="panel flyn active mr-3 p-0">
         <div className="flyn-inputs-container">
           <div className="form-inline flyn-input-controls">
             <div className="current-database">
@@ -448,16 +434,14 @@ class MenuComponent extends React.Component {
           </Button>}
 
           {this.currentStation()}
-
+{/* 
           <Button id="flyn_toggle" className="fx btn asside btn-md"
             onClick={() => $('.flyn').toggleClass('active')}>
             <span className="fx1" />
             <span className="fx2" />
-          </Button>
+          </Button> */}
         </div>
-      </div>
-
-    </div>);
+      </div>);
   }
 }
 

@@ -20,7 +20,7 @@ export default class SelectedStationsList extends Component {
     let array = this.props.selectedStations.length > 0 ? this.props.selectedStations : false;
     let displayEmptyPage = (array);
 
-    return (<div className="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+    return (<div className="container" /* className="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab" */>
       {
         displayEmptyPage
           ? <Pagination items={array} onSelected={this.props.index}

@@ -8,13 +8,17 @@ import MenuComponent from './Map/MenuComponent'
 import throttle from 'lodash/throttle';
 import Nav from './NavbarTop';
 import Loader from './Elements/AtomLoader';
-import Containers from "./Containers";
+// import Containers from "./Containers";
+import Map from './Map/Components/Map';
+import CountryList from './Containers/CountryList';
+import DaysItemsList from './Containers/DaysItemsList';
+import SelectedStationsList from './Containers/SelectedStationsList'
 import CountCircle from './Elements/CountCircle';
 import 'leaflet.pm';
 import Footer from './Elements/Footer'
 import { ApiController } from '../js/apicontroller'
 import 'js/map_extensions'
-
+import FlyoutContainer from "./Containers/FlyoutContainer"
 
 var markerGroup = null;
 
@@ -55,7 +59,8 @@ class Main extends Component {
       stationsCounter: null,
       lockM: true,
       MapMarkers: [],
-      polygons: []
+      polygons: [],
+      selectedPage: []
     };
 
     this.onMarkerClick = throttle(this.onMarkerClickBase, 500)
@@ -356,9 +361,37 @@ class Main extends Component {
 
     return (<div className="container-fluid p-0">
       <Nav />
-      <MenuComponent {...comp} />
       {this.state.isVisible && <Loader isVisible={this.state.isVisible} />}
-      <Containers {...conts} />
+
+      <Map setWeather={comp.setWeather} api={comp.api}
+        activeMarker={comp.activeMarker}
+        onStationsData={comp.onStationsData} markers={this.state.selectedPage}
+        currentSelected={comp.markers}
+        setCardItem={comp.setCardItem} onToolRemove={comp.onToolRemove}
+        beforeMove={comp.beforeMove} onCutRemove={comp.onCutRemove} />
+
+      <FlyoutContainer  title="Search" >
+        <MenuComponent {...comp} />
+      </FlyoutContainer>
+
+      <FlyoutContainer position="left" title="Countries">
+        <CountryList ctr_list={conts.ctr_list} />
+      </FlyoutContainer>
+
+      <FlyoutContainer position="right" title="Stations">
+        <SelectedStationsList
+          onStationsChange={conts.onStationsChange}
+          index={conts.mapSelectedIndex}
+          selectedStations={conts.selectedStations} />
+      </FlyoutContainer>
+
+      <FlyoutContainer position="bottom" title="Weather">
+        <DaysItemsList
+          selectedPage={this.state.selectedPage}
+          daysItems={conts.daysItems} />
+      </FlyoutContainer>
+
+      {/* <Containers {...conts} /> */}
       <Footer />
     </div>)
   }

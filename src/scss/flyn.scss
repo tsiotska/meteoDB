@@ -13,11 +13,11 @@ $flyn-animation-dur: .7s;
     transform: none;
   }
 
-  height: inherit;
+  height: 100vh;
   -webkit-transition: 0.4s ease;
   -o-transition: 0.4s ease;
   transition: 0.4s ease;
-  position: absolute;
+  position: relative;
   top: 0;
   padding-top: calc(#{$navbar-height} + 1em);
   width: $flyn-width;
@@ -44,7 +44,7 @@ $flyn-animation-dur: .7s;
     z-index: 10000;
   }
 
-  position: absolute;
+  position: relative;
   right: -2em;
   top: 6em;
   height: 4em;

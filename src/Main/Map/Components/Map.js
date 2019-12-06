@@ -186,23 +186,34 @@ class MapX extends Component {
   render() {
     const position = [this.state.lat, this.state.lng];
     const markers = this.renderMarkers();
+    let { counter } = this.props;
+    return (
 
-    return (<Map id="mapid" className="markercluster-map"
-      whenReady={this.whenReady} center={position}
-      style={{
-        height: "100%",
-        width: "100%",
-        position: "relative"
-      }} zoom={this.state.zoom} preferCanvas="True"
-      scrollWheelZoom={false} zoomControl={false}>
-      <TileLayer attribution={this.state.attribution} url={this.state.tiles} />
-      {markers &&
-        <MarkerClusterGroup chunkedLoadind={true} showCoverageOnHover={true}
-          iconCreateFunction={createClusterCustomIcon}>
-          {markers}
-        </MarkerClusterGroup>
-      }
-    </Map>);
+      <div className="main_map container-fluid p-0">
+
+        <div className="cur_count_wrapper">
+          <div className={"cur_count " + (
+            counter
+              ? ""
+              : "fade")} id="result-info">{counter}</div>
+        </div>
+        <Map id="mapid" className="markercluster-map"
+          whenReady={this.whenReady} center={position}
+          style={{
+            height: "100%",
+            width: "100%",
+            position: "relative"
+          }} zoom={this.state.zoom} preferCanvas="True"
+          scrollWheelZoom={false} zoomControl={false}>
+          <TileLayer attribution={this.state.attribution} url={this.state.tiles} />
+          {markers &&
+            <MarkerClusterGroup chunkedLoadind={true} showCoverageOnHover={true}
+              iconCreateFunction={createClusterCustomIcon}>
+              {markers}
+            </MarkerClusterGroup>
+          }
+        </Map>
+      </div>);
   }
 }
 

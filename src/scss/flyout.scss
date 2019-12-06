@@ -1,0 +1,146 @@
+@import "partials/variables";
+@import "partials/mixins";
+@import "~compass-mixins/lib/compass/_css3";
+
+$rotate-right: 45deg;
+$rotate-left: -$rotate-right;
+$flyn-animation-dur: .7s;
+$selectors: '.left',
+'.right',
+'.bottom',
+'.top';
+$fl-button-height: 4em;
+
+body {
+    overflow-x: hidden;
+}
+
+.flyout {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    @each $selector in $selectors {
+        @for $i from 1 through 5 {
+
+            &:nth-of-type(#{$i})#{$selector} {
+                .flyout-flag {
+                    margin-top: $fl-button-height * $i - $fl-button-height;
+                }
+
+            }
+        }
+    }
+
+    .flyout-flag {
+        position: absolute;
+        top: 10%; 
+        background-color: $button-accent;
+        z-index: 15000;
+
+        span {
+            pointer-events: none;
+
+            &:after,
+            &:before {
+                content: "";
+                @include transition($flyn-animation-dur * 0.5 all ease);
+                position: absolute;
+                width: 0.1em;
+                height: $fl-button-height;
+                top: 0.25em;
+                border: 1px solid $button-accent;
+                background-color: $button-accent;
+                border-radius: 5px;
+                @include transform(rotate($rotate-left))
+            }
+        }
+    }
+
+    .flyout-content {
+        transition: all .7s ease;
+        position: relative;
+        overflow: auto;
+        top: 0;
+        left: 0;
+        transform: translate(0);
+        z-index: 500;
+        background-color: whitesmoke;
+    }
+
+    &.left {
+        .flyout-content {
+            left: 0; 
+            padding-bottom: $flyout-padding-bottom; 
+            padding-top: $flyout-padding-top; 
+            transform: translateX(-100%);
+        }
+    }
+
+    &.right {
+        .flyout-content {
+            right: 0;
+            left: initial; 
+            position: absolute;
+            padding-bottom: $flyout-padding-bottom; 
+            padding-top: $flyout-padding-top; 
+            transform: translateX(100%);
+        }
+    }
+
+    &.bottom {
+        .flyout-content {
+            bottom: 0;
+            left: 0;
+            right: 0;
+            top: initial; 
+            transform: translateY(100%);
+        }
+    }
+
+    &.top {
+        .flyout-content {
+            top: 0;
+            left: 0;
+            right: 0; 
+            transform: translateY(-100%);
+        }
+    }
+
+    &.active {
+
+        .flyout-content {
+            transition: all .7s ease;
+            transform: none;
+        }
+        &.left {
+            .flyout-content { 
+                padding-left: $flyout-padding-left; 
+                padding-bottom: $flyout-padding-bottom; 
+                padding-top: $flyout-padding-top; 
+            }
+        }
+    
+        &.right {
+            .flyout-content { 
+                padding-right: $flyout-padding-right; 
+                padding-bottom: $flyout-padding-bottom; 
+                padding-top: $flyout-padding-top; 
+            }
+        }
+    
+        &.bottom {
+            .flyout-content { 
+                padding-bottom: $flyout-padding-bottom; 
+            }
+        }
+    
+        &.top {
+            .flyout-content { 
+                padding-top: $flyout-padding-top; 
+            }
+        }
+    }
+}
