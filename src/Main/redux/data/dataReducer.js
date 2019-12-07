@@ -1,5 +1,5 @@
-import { dataState } from '../state';
-import { types } from './dataActions';
+import {dataState} from '../state';
+import {types} from './dataActions';
 
 const dataReducer = (state = dataState, action) => {
   switch (action.type) {
@@ -44,21 +44,25 @@ const dataReducer = (state = dataState, action) => {
         ...state,
         [action.kind]: action.data,
       };
-    case types.SET_LAST_POLY:
-      let array = [action.event];
-      if (state.lastPoly.length > 0) {
-        Array.prototype.push.apply(array, state.lastPoly);
-      }
+    case types.ADD_POLY:
+      let array = [action.polygon];
+      Array.prototype.push.apply(array, state.polygons);
+      console.log(array);
       return {
         ...state,
-        lastPoly: array,
+        polygons: array,
+      };
+    case types.SET_POLYGONS:
+      return {
+        ...state,
+        polygons: action.polygons
       };
     case types.DELETE_LAST_POLY:
-      let lastPoly = state.lastPoly;
-      let rest = lastPoly.filter((pl) => pl.layer !== action.event.layer);
+      console.log(state.polygons)
+      let rest = state.polygons.filter((poly) => poly.layer !== action.polygon.layer);
       return {
         ...state,
-        lastPoly: rest,
+        polygons: rest,
       };
     default:
       return state;
