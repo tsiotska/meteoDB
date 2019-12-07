@@ -351,12 +351,6 @@ class Main extends Component {
       <Nav/>
       {this.state.isVisible && <Loader isVisible={this.state.isVisible}/>}
 
-      <Map setWeather={comp.setWeather} api={comp.api}
-           activeMarker={comp.activeMarker}
-           onStationsData={comp.onStationsData} markers={this.state.selectedPage}
-           currentSelected={comp.markers}
-           setCardItem={comp.setCardItem} onToolRemove={comp.onToolRemove}
-           beforeMove={comp.beforeMove} onCutRemove={comp.onCutRemove}/>
 
       <FlyoutContainer title="Search">
         <MenuComponent {...comp} />
@@ -379,7 +373,12 @@ class Main extends Component {
           daysItems={conts.daysItems}/>
       </FlyoutContainer>
 
-      {/* <Containers {...conts} /> */}
+      <Map setWeather={comp.setWeather} api={comp.api}
+           activeMarker={comp.activeMarker}
+           onStationsData={comp.onStationsData} markers={this.state.selectedPage}
+           currentSelected={comp.markers}
+           setCardItem={comp.setCardItem} onToolRemove={comp.onToolRemove}
+           beforeMove={comp.beforeMove} onCutRemove={comp.onCutRemove}/> 
       <Footer/>
     </div>)
   }

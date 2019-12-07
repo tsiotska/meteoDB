@@ -96,13 +96,14 @@ class MapX extends Component {
 
   whenReady() {
     mymap = this;
-    mymap.on('click', () => {
+    // disable zoom toggle on click in new layout
+    /* mymap.on('click', () => {
       if (mymap.scrollWheelZoom.enabled()) {
         mymap.scrollWheelZoom.disable();
       } else {
         mymap.scrollWheelZoom.enable();
       }
-    });
+    }); */
     L.control.zoom({ position: 'topright' }).addTo(mymap);
     markerGroup = L.layerGroup().addTo(mymap);
   }
