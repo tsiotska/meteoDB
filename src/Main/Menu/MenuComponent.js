@@ -1,11 +1,11 @@
 import React from 'react';
-import { mymap } from './Components/Map';
+import { mymap } from '../Map/MapComponent';
 import { baseUrl } from '../../js/const';
-import DatePicker from '../../Main/Controls/DatePicker'
+import DatePicker from '../Controls/DatePicker'
 import $ from 'jquery';
 import { Button, Input } from 'reactstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import CountryItem from '../../Main/Elements/CountryItemTemplate';
+import CountryItem from '../Elements/CountryItemTemplate';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-daterangepicker/daterangepicker.css';
 import { connect } from 'react-redux';
@@ -413,11 +413,6 @@ class MenuComponent extends React.Component {
             </div>
 
           </div>
-
-
-          <nav aria-label="Page nav" className="mx-auto">
-            <ul id="stNav" className="pagination justify-content-center" />
-          </nav>
 
           {stationPackLink &&
             <Button download target="_blank"

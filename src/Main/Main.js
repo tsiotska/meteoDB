@@ -1,33 +1,33 @@
-import React, {Component} from 'react';
-import {mymap} from './Map/Components/Map';
-import {connect} from 'react-redux';
+import React, { Component } from 'react';
+import { mymap } from './Map/MapComponent';
+import MapComponent from './Map/MapComponent';
+import Sidebar from './Sidebar';
+import { connect } from 'react-redux';
 import L from 'leaflet';
 import WeatherControl from "./Elements/WeatherControl";
 import Station from './Elements/StationTemplate';
-import MenuComponent from './Map/MenuComponent'
+import MenuComponent from './Menu/MenuComponent'
 import throttle from 'lodash/throttle';
-import Nav from './NavbarTop';
 import Loader from './Elements/AtomLoader';
 // import Containers from "./Containers";
-import Map from './Map/Components/Map';
 import CountryList from './Containers/CountryList';
 import DaysItemsList from './Containers/DaysItemsList';
 import SelectedStationsList from './Containers/SelectedStationsList'
 import CountCircle from './Elements/CountCircle';
 import 'leaflet.pm';
 import Footer from './Elements/Footer'
-import {ApiController} from '../js/apicontroller'
+import { ApiController } from '../js/apicontroller'
 import 'js/map_extensions'
 import FlyoutContainer from "./Containers/FlyoutContainer"
 
 var markerGroup = null;
 
 function createMaker(e, click, content, cnt, i) {
-  return {position: e, click, content, id_cnt: cnt, data: i}
+  return { position: e, click, content, id_cnt: cnt, data: i }
 }
 
 export function createStation(e, cnt, click) {
-  return <Station click={click} key={cnt} id={cnt} props={e}/>;
+  return <Station click={click} key={cnt} id={cnt} props={e} />;
 }
 
 function flatten(arr) {
@@ -66,7 +66,7 @@ class Main extends Component {
   }
 
   loaderVisibility = (flag) => {
-    this.setState({isVisible: flag});
+    this.setState({ isVisible: flag });
   };
 
   //Full clear
@@ -82,48 +82,48 @@ class Main extends Component {
 
   partialClear = (poly) => {
 
-      let withoutRemovedPolygon = this.props.polygons.filter((polygon) => {
-        return polygon.layer._leaflet_id !== poly.layer._leaflet_id
+    let withoutRemovedPolygon = this.props.polygons.filter((polygon) => {
+      return polygon.layer._leaflet_id !== poly.layer._leaflet_id
+    });
+    this.props.setPolygons(withoutRemovedPolygon);
+
+    // && !newMarkers.some((newMarker) => newMarker.data.id === marker.data.id)
+
+    let withoutRemovedMarkers = [], withoutRemovedStations = [], withoutRemovedWeather = [];
+    for (let i in this.props.polygons) {
+      let markersInOnePoly = this.state.MapMarkers.filter((marker) => {
+        return this.props.polygons[i].layer.contains(marker.position)
+          && !withoutRemovedMarkers.some((repeat) => repeat.data.id === marker.data.id)
       });
-      this.props.setPolygons (withoutRemovedPolygon);
-
-      // && !newMarkers.some((newMarker) => newMarker.data.id === marker.data.id)
-
-      let withoutRemovedMarkers = [], withoutRemovedStations = [], withoutRemovedWeather = [];
-      for (let i in this.props.polygons) {
-        let markersInOnePoly = this.state.MapMarkers.filter((marker) => {
-          return this.props.polygons[i].layer.contains(marker.position)
-            && !withoutRemovedMarkers.some((repeat) => repeat.data.id === marker.data.id)
-        });
-        Array.prototype.push.apply(withoutRemovedMarkers, markersInOnePoly);
+      Array.prototype.push.apply(withoutRemovedMarkers, markersInOnePoly);
 
 
-        let stationsInOnePoly = this.state.stationsAll.filter((station) => {
-          let LatLng = {lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon)};
-          return this.props.polygons[i].layer.contains(LatLng)
-            && !withoutRemovedStations.some((repeat) => repeat.props.props.id === station.props.props.id)
-        });
-        Array.prototype.push.apply(withoutRemovedStations, stationsInOnePoly);
-      }
+      let stationsInOnePoly = this.state.stationsAll.filter((station) => {
+        let LatLng = { lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon) };
+        return this.props.polygons[i].layer.contains(LatLng)
+          && !withoutRemovedStations.some((repeat) => repeat.props.props.id === station.props.props.id)
+      });
+      Array.prototype.push.apply(withoutRemovedStations, stationsInOnePoly);
+    }
 
-      console.log(withoutRemovedStations)
-      console.log(this.state.daysItems)
+    console.log(withoutRemovedStations)
+    console.log(this.state.daysItems)
 
-      for (let i in withoutRemovedStations) {
-        console.log("ITERATION!")
-        let existingWeather = this.state.daysItems.filter((weather) => {
+    for (let i in withoutRemovedStations) {
+      console.log("ITERATION!")
+      let existingWeather = this.state.daysItems.filter((weather) => {
 
-          return weather.props.data.id === withoutRemovedStations[i].props.props.id
-        });
-        Array.prototype.push.apply(withoutRemovedWeather, existingWeather);
-      }
+        return weather.props.data.id === withoutRemovedStations[i].props.props.id
+      });
+      Array.prototype.push.apply(withoutRemovedWeather, existingWeather);
+    }
 
-      this.setState({
-        MapMarkers: withoutRemovedMarkers,
-        stationsAll: withoutRemovedStations,
-        daysItems: withoutRemovedWeather,
-        currentStation: null
-      })
+    this.setState({
+      MapMarkers: withoutRemovedMarkers,
+      stationsAll: withoutRemovedStations,
+      daysItems: withoutRemovedWeather,
+      currentStation: null
+    })
   };
 
   beforeMove = (poly) => {
@@ -144,7 +144,7 @@ class Main extends Component {
     });
 
     console.log(withoutRepeatingPoly)
-//Добавляємо якщо він новий і обновляємо
+    //Добавляємо якщо він новий і обновляємо
     if (withoutRepeatingPoly.length === this.props.polygons.length) {
       console.log("This is new Polygon!")
       let withNewPoly = [];
@@ -160,7 +160,7 @@ class Main extends Component {
     }
     let prevMarkers = this.state.MapMarkers;
 
-//Чи колишні маркери входять в наш полігон
+    //Чи колишні маркери входять в наш полігон
     let sortedMarkers = [];
 
     if (prevMarkers.length > 0) {
@@ -179,11 +179,11 @@ class Main extends Component {
       sortedMarkers = newMarkers;
     }
     console.log(sortedMarkers);
-    this.setState({MapMarkers: sortedMarkers})
+    this.setState({ MapMarkers: sortedMarkers })
   };
 
   getOneStationData = (e) => {
-    const {MarkerSelected, date, year} = this.props;
+    const { MarkerSelected, date, year } = this.props;
 
     let data = e;
     data.options = {};
@@ -192,22 +192,22 @@ class Main extends Component {
     let req = this.state.api.createPolyRequest(data);
     MarkerSelected(req);
 
-    this.state.api.getStationsFromMapEvent({e: data}).then((station) => {
+    this.state.api.getStationsFromMapEvent({ e: data }).then((station) => {
       this.setCardItem(station.response[0]);
     }).catch((error) => console.log(error));
 
-    this.state.api.getPackFromMapEvent({e: data, pack: true})
+    this.state.api.getPackFromMapEvent({ e: data, pack: true })
       .then((pack) => {
         this.props.setStationPackLink(pack.response[0]);
       }).catch((error) => console.log(error));
 
     if (date.dateSet || year) {
-      this.state.api.getWeatherFromMapEvent({e: data, date: date, year: year})
+      this.state.api.getWeatherFromMapEvent({ e: data, date: date, year: year })
         .then((weather) => {
           this.setWeather(weather.response);
         }).catch((error) => console.log(error));
 
-      this.state.api.getPackFromMapEvent({e: data, date: date, year: year, pack: true})
+      this.state.api.getPackFromMapEvent({ e: data, date: date, year: year, pack: true })
         .then((pack) => {
           this.props.setWeatherPackLink(pack.response[0]);
         }).catch((error) => console.log(error));
@@ -215,7 +215,7 @@ class Main extends Component {
   };
 
   setCardItem = (station) => {
-    this.setState({currentStation: createStation(station, 0)});
+    this.setState({ currentStation: createStation(station, 0) });
   };
 
   setWeather = (weather) => {
@@ -229,7 +229,7 @@ class Main extends Component {
   };
 
   creativeDay = (e, cnt) => {
-    return <WeatherControl key={cnt} data={e}/>;
+    return <WeatherControl key={cnt} data={e} />;
   };
 
   onMarkerClick() {
@@ -242,8 +242,8 @@ class Main extends Component {
   };
 
   onStationsData = (station, poly) => {
-    this.setState({lockM: true});
-    this.setState({stationsCounter: <CountCircle response={station}/>});
+    this.setState({ lockM: true });
+    this.setState({ stationsCounter: <CountCircle response={station} /> });
     if (station.code === 33)
       return; // not found
     // const data = !resp.Item2 ? resp : resp.Item2; // hardcoded. maybe review API models
@@ -285,7 +285,7 @@ class Main extends Component {
 
   onMapPageChanged = (e) => {
     if (this.state.lockM) {
-      this.setState({lockM: false});
+      this.setState({ lockM: false });
       return;
     }
     let t = e.map((r) => r.position);
@@ -303,11 +303,11 @@ class Main extends Component {
   };
 
   setCtrList = (list) => {
-    this.setState({ctr_list: list})
+    this.setState({ ctr_list: list })
   };
 
   selectedIndexChange = (e) => {
-    this.setState({mapSelectedIndex: e})
+    this.setState({ mapSelectedIndex: e })
   };
 
 
@@ -351,39 +351,38 @@ class Main extends Component {
       daysItems: this.state.daysItems,
     };
 
-    return (<div className="container-fluid p-0">
-      <Nav/>
-      {this.state.isVisible && <Loader isVisible={this.state.isVisible}/>}
+    return (<div className="d-flex container-fluid p-0">
+      {this.state.isVisible && <Loader isVisible={this.state.isVisible} />}
+      <Sidebar>
+        <FlyoutContainer title="Search">
+          <MenuComponent {...comp} />
+        </FlyoutContainer>
 
+        <FlyoutContainer position="left" title="Countries">
+          <CountryList ctr_list={conts.ctr_list} />
+        </FlyoutContainer>
 
-      <FlyoutContainer title="Search">
-        <MenuComponent {...comp} />
-      </FlyoutContainer>
+        <FlyoutContainer position="right" title="Stations">
+          <SelectedStationsList
+            onStationsChange={conts.onStationsChange}
+            index={conts.mapSelectedIndex}
+            selectedStations={conts.selectedStations} />
+        </FlyoutContainer>
 
-      <FlyoutContainer position="left" title="Countries">
-        <CountryList ctr_list={conts.ctr_list}/>
-      </FlyoutContainer>
+        <FlyoutContainer position="bottom" title="Weather">
+          <DaysItemsList
+            selectedPage={this.state.selectedPage}
+            daysItems={conts.daysItems} />
+        </FlyoutContainer>
+      </Sidebar>
 
-      <FlyoutContainer position="right" title="Stations">
-        <SelectedStationsList
-          onStationsChange={conts.onStationsChange}
-          index={conts.mapSelectedIndex}
-          selectedStations={conts.selectedStations}/>
-      </FlyoutContainer>
-
-      <FlyoutContainer position="bottom" title="Weather">
-        <DaysItemsList
-          selectedPage={this.state.selectedPage}
-          daysItems={conts.daysItems}/>
-      </FlyoutContainer>
-
-      <Map setWeather={comp.setWeather} api={comp.api}
-           activeMarker={comp.activeMarker}
-           onStationsData={comp.onStationsData} markers={this.state.selectedPage}
-           currentSelected={comp.markers}
-           setCardItem={comp.setCardItem} onToolRemove={comp.onToolRemove}
-           beforeMove={comp.beforeMove} onCutRemove={comp.onCutRemove}/> 
-      <Footer/>
+      <MapComponent setWeather={comp.setWeather} api={comp.api}
+        activeMarker={comp.activeMarker}
+        onStationsData={comp.onStationsData} markers={this.state.selectedPage}
+        currentSelected={comp.markers}
+        setCardItem={comp.setCardItem} onToolRemove={comp.onToolRemove}
+        beforeMove={comp.beforeMove} onCutRemove={comp.onCutRemove} />
+      <Footer />
     </div>)
   }
 }
@@ -398,19 +397,19 @@ const
 const
   mapDispatchToProps = dispatch => ({
     PolySelected: (req, flag) => {
-      dispatch({type: "IF_POLY_SELECTED", req: req, flag: flag})
+      dispatch({ type: "IF_POLY_SELECTED", req: req, flag: flag })
     },
     MarkerSelected: (req) => {
-      dispatch({type: "IF_MARKER_SELECTED", req: req})
+      dispatch({ type: "IF_MARKER_SELECTED", req: req })
     },
     setStationPackLink: (link) => {
-      dispatch({type: "SET_STATION_PACK_LINK", link: link})
+      dispatch({ type: "SET_STATION_PACK_LINK", link: link })
     },
     setWeatherPackLink: (link) => {
-      dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
+      dispatch({ type: "SET_WEATHER_PACK_LINK", link: link })
     },
     setPolygons: (polygons) => {
-      dispatch({type: "SET_POLYGONS", polygons: polygons})
+      dispatch({ type: "SET_POLYGONS", polygons: polygons })
     }
   });
 

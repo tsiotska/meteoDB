@@ -22,7 +22,7 @@ const createClusterCustomIcon = function (cluster) {
   });
 };
 
-class MapX extends Component {
+class MapComponent extends Component {
   constructor(props) {
     super(props);
 
@@ -254,4 +254,4 @@ const mapDispatchToProps = dispatch => ({
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(MapX);
+export default connect(mapStateToProps, mapDispatchToProps)(MapComponent);

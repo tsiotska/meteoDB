@@ -26,7 +26,7 @@ body {
         @for $i from 1 through 5 {
             &:nth-of-type(#{$i})#{$selector} {
                 .flyout-flag {
-                    margin-top: $fl-button-height * $i - $fl-button-height;
+                    margin-top: 7em+ $fl-button-height * $i - $fl-button-height;
                 }
             }
         }
@@ -34,12 +34,13 @@ body {
 
     .flyout-flag {
         position: absolute;
-        top: 10%; 
+        top: 10%;
         background-color: $button-accent;
         z-index: 15000;
 
         span {
             pointer-events: none;
+
             &:after,
             &:before {
                 content: "";
@@ -69,9 +70,9 @@ body {
 
     &.left {
         .flyout-content {
-            left: 0; 
-            padding-bottom: $flyout-padding-bottom; 
-            padding-top: $flyout-padding-top; 
+            left: 0;
+            padding-bottom: $flyout-padding-bottom;
+            padding-top: $flyout-padding-top;
             transform: translateX(-100%);
         }
     }
@@ -79,10 +80,10 @@ body {
     &.right {
         .flyout-content {
             right: 0;
-            left: initial; 
+            left: initial;
             position: absolute;
-            padding-bottom: $flyout-padding-bottom; 
-            padding-top: $flyout-padding-top; 
+            padding-bottom: $flyout-padding-bottom;
+            padding-top: $flyout-padding-top;
             transform: translateX(100%);
         }
     }
@@ -92,7 +93,7 @@ body {
             bottom: 0;
             left: 0;
             right: 0;
-            top: initial; 
+            top: initial;
             transform: translateY(100%);
         }
     }
@@ -101,7 +102,7 @@ body {
         .flyout-content {
             top: 0;
             left: 0;
-            right: 0; 
+            right: 0;
             transform: translateY(-100%);
         }
     }
@@ -112,31 +113,32 @@ body {
             transition: all .7s ease;
             transform: none;
         }
+
         &.left {
-            .flyout-content { 
-                padding-left: $flyout-padding-left; 
-                padding-bottom: $flyout-padding-bottom; 
-                padding-top: $flyout-padding-top; 
+            .flyout-content {
+                padding-left: $flyout-padding-left;
+                padding-bottom: $flyout-padding-bottom;
+                padding-top: $flyout-padding-top;
             }
         }
-    
+
         &.right {
-            .flyout-content { 
-                padding-right: $flyout-padding-right; 
-                padding-bottom: $flyout-padding-bottom; 
-                padding-top: $flyout-padding-top; 
+            .flyout-content {
+                padding-right: $flyout-padding-right;
+                padding-bottom: $flyout-padding-bottom;
+                padding-top: $flyout-padding-top;
             }
         }
-    
+
         &.bottom {
-            .flyout-content { 
-                padding-bottom: $flyout-padding-bottom; 
+            .flyout-content {
+                padding-bottom: $flyout-padding-bottom;
             }
         }
-    
+
         &.top {
-            .flyout-content { 
-                padding-top: $flyout-padding-top; 
+            .flyout-content {
+                padding-top: $flyout-padding-top;
             }
         }
     }
