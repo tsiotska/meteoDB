@@ -354,22 +354,22 @@ class Main extends Component {
     return (<div className="d-flex container-fluid p-0">
       {this.state.isVisible && <Loader isVisible={this.state.isVisible} />}
       <Sidebar>
-        <FlyoutContainer title="Search">
+        <FlyoutContainer title="Search" position="left"  iconClassName="fa fa-filter">
           <MenuComponent {...comp} />
         </FlyoutContainer>
 
-        <FlyoutContainer position="left" title="Countries">
+        <FlyoutContainer position="left" title="Countries" iconClassName="fa fa-globe">
           <CountryList ctr_list={conts.ctr_list} />
         </FlyoutContainer>
 
-        <FlyoutContainer position="right" title="Stations">
+        <FlyoutContainer position="left" title="Stations"  iconClassName="fa fa-map-marker">
           <SelectedStationsList
             onStationsChange={conts.onStationsChange}
             index={conts.mapSelectedIndex}
             selectedStations={conts.selectedStations} />
         </FlyoutContainer>
 
-        <FlyoutContainer position="bottom" title="Weather">
+        <FlyoutContainer position="left" title="Weather"  iconClassName="fa fa-sun-o">
           <DaysItemsList
             selectedPage={this.state.selectedPage}
             daysItems={conts.daysItems} />

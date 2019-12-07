@@ -9,16 +9,32 @@
         flex-direction: column;
         z-index: 10000;
 
-        .logo {
-            background: url("../img/logo-draft.png");
-            width: 100%;
+        .logo-container {
+            width: auto;
             height: 5em;
-            background-position: 5px 0px;
-            background-size: cover;
-            transform: scale(0.8);
-        }
 
+            .logo-container-inner {
+                background: url("../img/logo-draft.png");
+                background-position: 20px 0px;
+                background-size: cover; 
+                background-repeat: no-repeat;
+                width: 5em;
+                height: inherit;
+                position: absolute;
+                transition: .7s ease;
+                border-radius: 3em;
+            }
+
+            &:hover {
+                .logo-container-inner {
+                    width: 10.6em;
+                    background-position: 0px;
+                }
+            }
+        }
     }
+
+
 
     .sidebar-content {
         .sidebar-content-inner {
