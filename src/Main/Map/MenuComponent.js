@@ -240,13 +240,11 @@ class MenuComponent extends React.Component {
   };
 
   unControlledInput = async (searchParam) => {
-    console.log("OnCHANGE!");
     await this.props.setQuery(searchParam);
     this.enableButton();
   };
 
   render() {
-    //Це деструктуризація, пиши якщо багато даних.
     const { areLimitAndOffsetDisabled, counter, stationPackLink, weatherPackLink, polyRequest } = this.props;
 
     //1. Поправити Typeahead, він скачє.

@@ -53,7 +53,8 @@ class MapX extends Component {
       drawPolygon: true, // adds button to draw a polygon
       drawCircle: true, // adds button to draw a circle
       editMode: true, // adds button to toggle edit mode for all layers
-      removalMode: true, // adds a button to remove layers
+      removalMode: true, // adds a button to remove layers,
+      cutPolygon: false
     };
 
     mymap.pm.addControls(options);
@@ -77,7 +78,6 @@ class MapX extends Component {
       });
 
       e.layer.on('pm:dragstart', () => {
-        console.log("Drag start")
         this.props.beforeMove(e)
       });
 
@@ -85,11 +85,6 @@ class MapX extends Component {
         this.fetchMarkers(e)
       });
 
-      e.layer.on('pm:cut', () => {
-        console.log(e)
-        //this.props.cutLastPoly(e);
-        this.props.onCutRemove(e);
-      });
       this.fetchMarkers(e)
     });
   };

@@ -24,12 +24,10 @@ body {
 
     @each $selector in $selectors {
         @for $i from 1 through 5 {
-
             &:nth-of-type(#{$i})#{$selector} {
                 .flyout-flag {
                     margin-top: $fl-button-height * $i - $fl-button-height;
                 }
-
             }
         }
     }
@@ -42,7 +40,6 @@ body {
 
         span {
             pointer-events: none;
-
             &:after,
             &:before {
                 content: "";
