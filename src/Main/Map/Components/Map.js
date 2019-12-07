@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { TileLayer, Map, Marker, Tooltip } from 'react-leaflet';
+import React, {Component} from 'react';
+import {TileLayer, Map, Marker, Tooltip} from 'react-leaflet';
 import L from 'leaflet';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import $ from 'jquery';
@@ -28,7 +28,6 @@ class MapX extends Component {
 
     this.state = {
       innerMarker: [],
-      lastPoly: [],
       tcontent: null,
       lat: 48.289559,
       lng: 31.3205566,
@@ -70,8 +69,7 @@ class MapX extends Component {
     });
 
     mymap.on('pm:create', (e) => {
-      console.log(e)
-      this.props.setLastPoly(e);
+      this.props.addPolygon(e);
 
       e.layer.on('pm:dragend', () => {
         this.fetchMarkers(e)
@@ -103,7 +101,7 @@ class MapX extends Component {
         mymap.scrollWheelZoom.enable();
       }
     });
-    L.control.zoom({ position: 'topright' }).addTo(mymap);
+    L.control.zoom({position: 'topright'}).addTo(mymap);
     markerGroup = L.layerGroup().addTo(mymap);
   }
 
@@ -136,23 +134,31 @@ class MapX extends Component {
     let req = api.createPolyRequest(e.layer);
     PolySelected(req, true);
 
+    console.log(e)
     api.getStationsFromMapEvent({
       e: e.layer,
     }).then((stations) => {
       onStationsData(stations, e);
     }).catch((error) => console.log(error));
 
-    api.getPackFromMapEvent({ e: e.layer, pack: true }).then((pack) => {
+    api.getPackFromMapEvent({e: e.layer, pack: true}).then((pack) => {
       setStationPackLink(pack.response[0])
     }).catch((error) => console.log(error));
 
     if (date.dateSet || years) {
-      api.getWeatherFromMapEvent({ e: e.layer, date: date, years: years, months: months, days: days })
+      api.getWeatherFromMapEvent({e: e.layer, date: date, years: years, months: months, days: days})
         .then((weather) => {
           setWeather(weather.response);
         }).catch((error) => console.log(error));
 
-      api.getPackFromMapEvent({ e: e.layer, date: date, years: years, months: months, days: days, pack: true }).then((pack) => {
+      api.getPackFromMapEvent({
+        e: e.layer,
+        date: date,
+        years: years,
+        months: months,
+        days: days,
+        pack: true
+      }).then((pack) => {
         setWeatherPackLink(pack.response[0])
       }).catch((error) => console.log(error));
     } else if (months || days) {
@@ -181,7 +187,7 @@ class MapX extends Component {
   render() {
     const position = [this.state.lat, this.state.lng];
     const markers = this.renderMarkers();
-    let { counter } = this.props;
+    let {counter} = this.props;
     return (
 
       <div className="main_map container-fluid p-0">
@@ -193,19 +199,19 @@ class MapX extends Component {
               : "fade")} id="result-info">{counter}</div>
         </div>
         <Map id="mapid" className="markercluster-map"
-          whenReady={this.whenReady} center={position}
-          style={{
-            height: "100%",
-            width: "100%",
-            position: "relative"
-          }} zoom={this.state.zoom} preferCanvas="True"
-          scrollWheelZoom={false} zoomControl={false}>
-          <TileLayer attribution={this.state.attribution} url={this.state.tiles} />
+             whenReady={this.whenReady} center={position}
+             style={{
+               height: "100%",
+               width: "100%",
+               position: "relative"
+             }} zoom={this.state.zoom} preferCanvas="True"
+             scrollWheelZoom={false} zoomControl={false}>
+          <TileLayer attribution={this.state.attribution} url={this.state.tiles}/>
           {markers &&
-            <MarkerClusterGroup chunkedLoadind={true} showCoverageOnHover={true}
-              iconCreateFunction={createClusterCustomIcon}>
-              {markers}
-            </MarkerClusterGroup>
+          <MarkerClusterGroup chunkedLoadind={true} showCoverageOnHover={true}
+                              iconCreateFunction={createClusterCustomIcon}>
+            {markers}
+          </MarkerClusterGroup>
           }
         </Map>
       </div>);
@@ -221,26 +227,28 @@ const mapStateToProps = state => ({
   nearest: state.dataReducer.nearest,
   offset: state.dataReducer.offset,
   limit: state.dataReducer.limit,
+  polygons: state.dataReducer.polygons
 });
 
+
 const mapDispatchToProps = dispatch => ({
-  deleteLastPoly: (event) => {
-    dispatch({ type: "DELETE_LAST_POLY", event: event })
+  deleteLastPoly: (polygon) => {
+    dispatch({type: "DELETE_LAST_POLY", polygon: polygon})
   },
-  setLastPoly: (event) => {
-    dispatch({ type: "SET_LAST_POLY", event: event })
+  addPolygon: (polygon) => {
+    dispatch({type: "ADD_POLY", polygon: polygon})
   },
   MarkerSelected: (req) => {
-    dispatch({ type: "IF_MARKER_SELECTED", req: req })
+    dispatch({type: "IF_MARKER_SELECTED", req: req})
   },
   PolySelected: (req, flag) => {
-    dispatch({ type: "IF_POLY_SELECTED", req: req, flag: flag })
+    dispatch({type: "IF_POLY_SELECTED", req: req, flag: flag})
   },
   setStationPackLink: (link) => {
-    dispatch({ type: "SET_STATION_PACK_LINK", link: link })
+    dispatch({type: "SET_STATION_PACK_LINK", link: link})
   },
   setWeatherPackLink: (link) => {
-    dispatch({ type: "SET_WEATHER_PACK_LINK", link: link })
+    dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
   },
 });
 

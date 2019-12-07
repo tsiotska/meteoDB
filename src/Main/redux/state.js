@@ -17,7 +17,7 @@ export const dataState = {
   nearest: false,
   neigh: null,
 
-  lastPoly: []
+  polygons: []
 };
 
 

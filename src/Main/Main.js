@@ -59,7 +59,6 @@ class Main extends Component {
       stationsCounter: null,
       lockM: true,
       MapMarkers: [],
-      polygons: [],
       selectedPage: []
     };
 
@@ -79,80 +78,85 @@ class Main extends Component {
       currentStation: null
     })
   };
-  
+
 
   partialClear = (poly) => {
-    console.log(this.state.polygons)
-    console.log(poly)
-    let withoutRemovedPolygon = this.state.polygons.filter((polygon) => {
-      return polygon.layer._leaflet_id !== poly.layer._leaflet_id
-    });
-    this.setState({polygons: withoutRemovedPolygon});
 
-    // && !newMarkers.some((newMarker) => newMarker.data.id === marker.data.id)
-
-    let withoutRemovedMarkers = [];
-    for (let i in this.state.polygons) {
-      let markersInOnePoly = this.state.MapMarkers.filter((marker) => {
-        return this.state.polygons[i].layer.contains(marker.position)
-          && !withoutRemovedMarkers.some((repeat) => repeat.data.id === marker.data.id)
+      let withoutRemovedPolygon = this.props.polygons.filter((polygon) => {
+        return polygon.layer._leaflet_id !== poly.layer._leaflet_id
       });
-      Array.prototype.push.apply(withoutRemovedMarkers, markersInOnePoly);
-    }
+      this.props.setPolygons (withoutRemovedPolygon);
 
-    let withoutRemovedStations = this.state.stationsAll.filter((station) => {
-      let LatLng = {lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon)};
-      return !poly.layer.contains(LatLng)
-    });
+      // && !newMarkers.some((newMarker) => newMarker.data.id === marker.data.id)
 
-    let withoutRemovedWeather = [];
-    for (let i in withoutRemovedStations) {
-      let existingWeather = this.state.daysItems.filter((weather) => {
-        console.log(weather.props);
-        console.log(this.state.stationsAll[i].props)
-        return weather.props.data.uid === withoutRemovedStations[i].props.props.uid
-      });
-      Array.prototype.push.apply(withoutRemovedWeather, existingWeather);
-    }
+      let withoutRemovedMarkers = [], withoutRemovedStations = [], withoutRemovedWeather = [];
+      for (let i in this.props.polygons) {
+        let markersInOnePoly = this.state.MapMarkers.filter((marker) => {
+          return this.props.polygons[i].layer.contains(marker.position)
+            && !withoutRemovedMarkers.some((repeat) => repeat.data.id === marker.data.id)
+        });
+        Array.prototype.push.apply(withoutRemovedMarkers, markersInOnePoly);
 
-    this.setState({
-      MapMarkers: withoutRemovedMarkers,
-      stationsAll: withoutRemovedStations,
-      daysItems: withoutRemovedWeather,
-      currentStation: null
-    })
+
+        let stationsInOnePoly = this.state.stationsAll.filter((station) => {
+          let LatLng = {lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon)};
+          return this.props.polygons[i].layer.contains(LatLng)
+            && !withoutRemovedStations.some((repeat) => repeat.props.props.id === station.props.props.id)
+        });
+        Array.prototype.push.apply(withoutRemovedStations, stationsInOnePoly);
+      }
+
+      console.log(withoutRemovedStations)
+      console.log(this.state.daysItems)
+
+      for (let i in withoutRemovedStations) {
+        console.log("ITERATION!")
+        let existingWeather = this.state.daysItems.filter((weather) => {
+
+          return weather.props.data.id === withoutRemovedStations[i].props.props.id
+        });
+        Array.prototype.push.apply(withoutRemovedWeather, existingWeather);
+      }
+
+      this.setState({
+        MapMarkers: withoutRemovedMarkers,
+        stationsAll: withoutRemovedStations,
+        daysItems: withoutRemovedWeather,
+        currentStation: null
+      })
   };
 
   beforeMove = (poly) => {
-    let withoutOldPoly = this.state.polygons.filter((elem) => {
+    let withoutOldPoly = this.props.polygons.filter((elem) => {
       return poly.layer._leaflet_id !== elem.layer._leaflet_id
     });
-    // console.log(this.state.polygons)
+    // console.log(this.props.polygons)
     // console.log(withoutOldPoly)
-    this.setState({polygons: withoutOldPoly})
+    this.props.setPolygons(withoutOldPoly)
   };
 
   setMarkers = (newMarkers, currentPoly) => {
-    // console.log(this.state.polygons)
+    // console.log(this.props.polygons)
     //Повертаємо полігони, якщо новий currentPoly це не старий який редагують
-    let withoutRepeatingPoly = this.state.polygons.filter((poly) => {
+    console.log(this.props.polygons)
+    let withoutRepeatingPoly = this.props.polygons.filter((poly) => {
       return poly.layer._leaflet_id !== currentPoly.layer._leaflet_id;
     });
 
     console.log(withoutRepeatingPoly)
 //Добавляємо якщо він новий і обновляємо
-    if (withoutRepeatingPoly.length === this.state.polygons.length) {
+    if (withoutRepeatingPoly.length === this.props.polygons.length) {
       console.log("This is new Polygon!")
       let withNewPoly = [];
       withNewPoly.push(currentPoly);
-      Array.prototype.push.apply(withNewPoly, this.state.polygons);
-      this.setState({polygons: withNewPoly});
-      //console.log(this.state.polygons)
+      Array.prototype.push.apply(withNewPoly, this.props.polygons);
+      this.props.setPolygons(withNewPoly);
+      //console.log(this.props.polygons)
     } else {
       console.log("This is old Polygon!");
       withoutRepeatingPoly.push(currentPoly);
-      this.setState({polygons: withoutRepeatingPoly});
-      // console.log(this.state.polygons)
+      this.props.setPolygons(withoutRepeatingPoly);
+      // console.log(this.props.polygons)
     }
     let prevMarkers = this.state.MapMarkers;
 
@@ -160,11 +164,11 @@ class Main extends Component {
     let sortedMarkers = [];
 
     if (prevMarkers.length > 0) {
-      for (let i in this.state.polygons) {
+      for (let i in this.props.polygons) {
 
         let markersOfPoly = prevMarkers.filter((marker) => {
           {
-            return this.state.polygons[i].layer.contains(marker.position)
+            return this.props.polygons[i].layer.contains(marker.position)
               && !newMarkers.some((newMarker) => newMarker.data.id === marker.data.id)
           }
         });
@@ -306,11 +310,11 @@ class Main extends Component {
     this.setState({mapSelectedIndex: e})
   };
 
-  //Якщо видаляється лише один полігон. Тут треба погратись
+
   onToolRemove = (event) => {
     this.partialClear(event);
 
-    if (this.props.lastPoly.length === 0) {
+    if (this.props.polygons.length === 0) {
       this.props.PolySelected("", false);
       this.props.MarkerSelected("");
     }
@@ -389,7 +393,7 @@ const
   mapStateToProps = state => ({
     years: state.dataReducer.years,
     date: state.dataReducer.date,
-    lastPoly: state.dataReducer.lastPoly
+    polygons: state.dataReducer.polygons
   });
 
 const
@@ -406,6 +410,9 @@ const
     setWeatherPackLink: (link) => {
       dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
     },
+    setPolygons: (polygons) => {
+      dispatch({type: "SET_POLYGONS", polygons: polygons})
+    }
   });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Main);
