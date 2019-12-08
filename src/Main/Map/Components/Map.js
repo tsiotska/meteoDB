@@ -69,9 +69,9 @@ class MapX extends Component {
     });
 
     mymap.on('pm:create', (e) => {
-      this.props.addPolygon(e);
-
+      console.log(e)
       e.layer.on('pm:dragend', () => {
+        console.log(e)
         this.fetchMarkers(e)
       });
 
@@ -80,6 +80,7 @@ class MapX extends Component {
       });
 
       e.layer.on('pm:edit', () => {
+        console.log(e)
         this.fetchMarkers(e)
       });
 
@@ -169,6 +170,7 @@ class MapX extends Component {
 
   renderMarkers = () => {
     if (this.props.currentSelected) {
+      console.log(this.props.currentSelected.map((w) => this.renderOne(w)));
       return this.props.currentSelected.map((w) => this.renderOne(w));
     } else if (this.props.markers) {
       return this.props.markers.map((w) => this.renderOne(w));
@@ -227,16 +229,12 @@ const mapStateToProps = state => ({
   nearest: state.dataReducer.nearest,
   offset: state.dataReducer.offset,
   limit: state.dataReducer.limit,
-  polygons: state.dataReducer.polygons
 });
 
 
 const mapDispatchToProps = dispatch => ({
   deleteLastPoly: (polygon) => {
     dispatch({type: "DELETE_LAST_POLY", polygon: polygon})
-  },
-  addPolygon: (polygon) => {
-    dispatch({type: "ADD_POLY", polygon: polygon})
   },
   MarkerSelected: (req) => {
     dispatch({type: "IF_MARKER_SELECTED", req: req})

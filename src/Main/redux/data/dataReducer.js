@@ -44,14 +44,6 @@ const dataReducer = (state = dataState, action) => {
         ...state,
         [action.kind]: action.data,
       };
-    case types.ADD_POLY:
-      let array = [action.polygon];
-      Array.prototype.push.apply(array, state.polygons);
-      console.log(array);
-      return {
-        ...state,
-        polygons: array,
-      };
     case types.SET_POLYGONS:
       return {
         ...state,

@@ -82,48 +82,48 @@ class Main extends Component {
 
   partialClear = (poly) => {
 
-      let withoutRemovedPolygon = this.props.polygons.filter((polygon) => {
-        return polygon.layer._leaflet_id !== poly.layer._leaflet_id
+    let withoutRemovedPolygon = this.props.polygons.filter((polygon) => {
+      return polygon.layer._leaflet_id !== poly.layer._leaflet_id
+    });
+    this.props.setPolygons(withoutRemovedPolygon);
+
+    // && !newMarkers.some((newMarker) => newMarker.data.id === marker.data.id)
+
+    let withoutRemovedMarkers = [], withoutRemovedStations = [], withoutRemovedWeather = [];
+    for (let i in this.props.polygons) {
+      let markersInOnePoly = this.state.MapMarkers.filter((marker) => {
+        return this.props.polygons[i].layer.contains(marker.position)
+          && !withoutRemovedMarkers.some((repeat) => repeat.data.id === marker.data.id)
       });
-      this.props.setPolygons (withoutRemovedPolygon);
-
-      // && !newMarkers.some((newMarker) => newMarker.data.id === marker.data.id)
-
-      let withoutRemovedMarkers = [], withoutRemovedStations = [], withoutRemovedWeather = [];
-      for (let i in this.props.polygons) {
-        let markersInOnePoly = this.state.MapMarkers.filter((marker) => {
-          return this.props.polygons[i].layer.contains(marker.position)
-            && !withoutRemovedMarkers.some((repeat) => repeat.data.id === marker.data.id)
-        });
-        Array.prototype.push.apply(withoutRemovedMarkers, markersInOnePoly);
+      Array.prototype.push.apply(withoutRemovedMarkers, markersInOnePoly);
 
 
-        let stationsInOnePoly = this.state.stationsAll.filter((station) => {
-          let LatLng = {lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon)};
-          return this.props.polygons[i].layer.contains(LatLng)
-            && !withoutRemovedStations.some((repeat) => repeat.props.props.id === station.props.props.id)
-        });
-        Array.prototype.push.apply(withoutRemovedStations, stationsInOnePoly);
-      }
+      let stationsInOnePoly = this.state.stationsAll.filter((station) => {
+        let LatLng = {lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon)};
+        return this.props.polygons[i].layer.contains(LatLng)
+          && !withoutRemovedStations.some((repeat) => repeat.props.props.id === station.props.props.id)
+      });
+      Array.prototype.push.apply(withoutRemovedStations, stationsInOnePoly);
+    }
 
-      console.log(withoutRemovedStations)
-      console.log(this.state.daysItems)
+    console.log(withoutRemovedStations)
+    console.log(this.state.daysItems)
 
-      for (let i in withoutRemovedStations) {
-        console.log("ITERATION!")
-        let existingWeather = this.state.daysItems.filter((weather) => {
+    for (let i in withoutRemovedStations) {
+      console.log("ITERATION!")
+      let existingWeather = this.state.daysItems.filter((weather) => {
 
-          return weather.props.data.id === withoutRemovedStations[i].props.props.id
-        });
-        Array.prototype.push.apply(withoutRemovedWeather, existingWeather);
-      }
+        return weather.props.data.id === withoutRemovedStations[i].props.props.id
+      });
+      Array.prototype.push.apply(withoutRemovedWeather, existingWeather);
+    }
 
-      this.setState({
-        MapMarkers: withoutRemovedMarkers,
-        stationsAll: withoutRemovedStations,
-        daysItems: withoutRemovedWeather,
-        currentStation: null
-      })
+    this.setState({
+      MapMarkers: withoutRemovedMarkers,
+      stationsAll: withoutRemovedStations,
+      daysItems: withoutRemovedWeather,
+      currentStation: null
+    })
   };
 
   beforeMove = (poly) => {
@@ -136,7 +136,8 @@ class Main extends Component {
   };
 
   setMarkers = (newMarkers, currentPoly) => {
-    // console.log(this.props.polygons)
+   /* console.log(newMarkers)
+    console.log(currentPoly)
     //Повертаємо полігони, якщо новий currentPoly це не старий який редагують
     console.log(this.props.polygons)
     let withoutRepeatingPoly = this.props.polygons.filter((poly) => {
@@ -144,14 +145,15 @@ class Main extends Component {
     });
 
     console.log(withoutRepeatingPoly)
-//Добавляємо якщо він новий і обновляємо
+    console.log(this.props.polygons.length)
+    console.log(withoutRepeatingPoly.length)
+//Добавляємо якщо він новий і замінюємо якщо старий
     if (withoutRepeatingPoly.length === this.props.polygons.length) {
       console.log("This is new Polygon!")
       let withNewPoly = [];
       withNewPoly.push(currentPoly);
       Array.prototype.push.apply(withNewPoly, this.props.polygons);
       this.props.setPolygons(withNewPoly);
-      //console.log(this.props.polygons)
     } else {
       console.log("This is old Polygon!");
       withoutRepeatingPoly.push(currentPoly);
@@ -162,10 +164,8 @@ class Main extends Component {
 
 //Чи колишні маркери входять в наш полігон
     let sortedMarkers = [];
-
     if (prevMarkers.length > 0) {
       for (let i in this.props.polygons) {
-
         let markersOfPoly = prevMarkers.filter((marker) => {
           {
             return this.props.polygons[i].layer.contains(marker.position)
@@ -174,12 +174,19 @@ class Main extends Component {
         });
         Array.prototype.push.apply(sortedMarkers, markersOfPoly);
       }
+
       Array.prototype.push.apply(sortedMarkers, newMarkers);
+      console.log(sortedMarkers)
+      this.setState({MapMarkers: sortedMarkers})
     } else {
       sortedMarkers = newMarkers;
+      this.setState({MapMarkers: sortedMarkers})
     }
     console.log(sortedMarkers);
-    this.setState({MapMarkers: sortedMarkers})
+    console.log(this.props.polygons);
+*/
+   console.log(newMarkers)
+    this.setState({MapMarkers: newMarkers})
   };
 
   getOneStationData = (e) => {
@@ -278,6 +285,8 @@ class Main extends Component {
         area_latlon.push(coords);
         markers.push(createMaker(coords, this.onMarkerClick, createStation(location), mrk++, location));
       }
+      console.log(markers);
+      console.log(poly);
       this.setMarkers(markers, poly);
       mymap.fitBounds(L.latLngBounds(area_latlon).pad(.3));
     } else alert("No data, sorry");
