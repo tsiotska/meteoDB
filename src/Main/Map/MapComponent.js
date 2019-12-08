@@ -211,12 +211,7 @@ class MapComponent extends Component {
           }} zoom={this.state.zoom} preferCanvas="True"
           scrollWheelZoom={false} zoomControl={false}>
           <TileLayer attribution={this.state.attribution} url={this.state.tiles} />
-          {markers &&
-            <MarkerClusterGroup chunkedLoadind={true} showCoverageOnHover={true}
-              iconCreateFunction={createClusterCustomIcon}>
-              {markers}
-            </MarkerClusterGroup>
-          }
+          {markers}
         </Map>
       </div>);
   }
