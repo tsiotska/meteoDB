@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Button } from 'reactstrap';
+import $ from 'jquery';
 
 const { Provider, Consumer } = React.createContext();
 
@@ -15,6 +16,16 @@ export default class Sidebar extends Component {
             }
         }
     }
+
+    componentDidUpdate() {
+        $('[data-toggle="tooltip"]').tooltip();
+    }
+
+    componentDidMount() {
+        $('[data-toggle="tooltip"]').tooltip();
+    }
+
+
     SetActive = (e) => {
         let context = this.state.localContext;
         if (context.active === e)
@@ -27,12 +38,15 @@ export default class Sidebar extends Component {
         const items = [<div key="-" className="logo-container"><div className="logo-container-inner"></div></div>]
 
         items.push(<Button key="back-to-map" className={"sidebar-item fa fa-arrow-left " + (this.state.localContext.isExpanded ? "" : "fade")}
-            onClick={() => this.SetActive(this.state.localContext.active)}><span>Back to map</span></Button>)
+            onClick={() => this.SetActive(this.state.localContext.active)}><span /><p>to map</p></Button>)
 
         this.props.children.forEach((value, index) => {
-            items.push(<Button color="outline" key={index} className={value.props.iconClassName}
+            items.push(<Button color="outline" key={index} className={"sidebar-item " + value.props.iconClassName +
+                (this.state.localContext.active === value.props.title ? " active" : "")}
                 data-item-id={value.props.title}
-                onClick={(e) => this.SetActive(e.target.getAttribute('data-item-id'))}> </Button>)
+                data-toggle="tooltip" data-html="true" data-trigger="hover"
+                data-placement="left" title={"<div className='tooltip-info'> "+value.props.title+"</div>"}
+                onClick={(e) => this.SetActive(e.target.getAttribute('data-item-id'))}><span /> </Button>)
         })
         const childrenWithProps = React.Children.map(this.props.children, (child, index) =>
             <Consumer key={"item" + index}>{value => React.cloneElement(child, {
@@ -44,6 +58,7 @@ export default class Sidebar extends Component {
             <div className={"sidebar " + className}>
                 <div className="sidebar-asside">
                     {items}
+                    <span key="ind" className="sidebar-indicator"></span>
                 </div>
                 <div className="sidebar-content">
                     <div className="sidebar-content-inner">

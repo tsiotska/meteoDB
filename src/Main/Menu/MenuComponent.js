@@ -245,7 +245,7 @@ class MenuComponent extends React.Component {
   };
 
   render() {
-    const { areLimitAndOffsetDisabled, counter, stationPackLink, weatherPackLink, polyRequest } = this.props;
+    const { areLimitAndOffsetDisabled, /* counter, */ stationPackLink, weatherPackLink, polyRequest } = this.props;
 
     //1. Поправити Typeahead, він скачє.
     //2. Придумати шось з disabledQueryInput class

@@ -167,10 +167,8 @@ class Main extends Component {
       for (let i in this.props.polygons) {
 
         let markersOfPoly = prevMarkers.filter((marker) => {
-          {
-            return this.props.polygons[i].layer.contains(marker.position)
-              && !newMarkers.some((newMarker) => newMarker.data.id === marker.data.id)
-          }
+          return this.props.polygons[i].layer.contains(marker.position)
+            && !newMarkers.some((newMarker) => newMarker.data.id === marker.data.id)
         });
         Array.prototype.push.apply(sortedMarkers, markersOfPoly);
       }
@@ -354,7 +352,7 @@ class Main extends Component {
     return (<div className="d-flex container-fluid p-0">
       {this.state.isVisible && <Loader isVisible={this.state.isVisible} />}
       <Sidebar>
-        <FlyoutContainer title="Search" position="left"  iconClassName="fa fa-filter">
+        <FlyoutContainer title="Search" position="left" iconClassName="fa fa-filter">
           <MenuComponent {...comp} />
         </FlyoutContainer>
 
@@ -362,14 +360,14 @@ class Main extends Component {
           <CountryList ctr_list={conts.ctr_list} />
         </FlyoutContainer>
 
-        <FlyoutContainer position="left" title="Stations"  iconClassName="fa fa-map-marker">
+        <FlyoutContainer position="left" title="Stations" iconClassName="fa fa-map-marker">
           <SelectedStationsList
             onStationsChange={conts.onStationsChange}
             index={conts.mapSelectedIndex}
             selectedStations={conts.selectedStations} />
         </FlyoutContainer>
 
-        <FlyoutContainer position="left" title="Weather"  iconClassName="fa fa-sun-o">
+        <FlyoutContainer position="left" title="Weather" iconClassName="fa fa-sun-o">
           <DaysItemsList
             selectedPage={this.state.selectedPage}
             daysItems={conts.daysItems} />

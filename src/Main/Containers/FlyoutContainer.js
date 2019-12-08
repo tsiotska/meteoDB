@@ -8,7 +8,9 @@ export default class FlyoutContainer extends Component {
         return (
             <div className={"d-flex flyout " + [active, position, className].join(" ")}>
                 <div className="flyout-content">
-                    {this.props.children}
+                    <div className="flyout-content-inner">
+                        {this.props.children}
+                    </div>
                 </div>
             </div>
         )

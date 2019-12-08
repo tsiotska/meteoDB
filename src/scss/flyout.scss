@@ -65,14 +65,16 @@ body {
         left: 0;
         transform: translate(0);
         z-index: 500;
-        background-color: whitesmoke;
+        background-color: $background-theme-main;
+        .flyout-content-inner{
+            padding:1rem;
+        }
     }
 
     &.left {
         .flyout-content {
             left: 0;
-            padding-bottom: $flyout-padding-bottom;
-            padding-top: $flyout-padding-top;
+            padding-bottom: $flyout-padding-bottom; 
             transform: translateX(-100%);
         }
     }
@@ -82,8 +84,7 @@ body {
             right: 0;
             left: initial;
             position: absolute;
-            padding-bottom: $flyout-padding-bottom;
-            padding-top: $flyout-padding-top;
+            padding-bottom: $flyout-padding-bottom; 
             transform: translateX(100%);
         }
     }
@@ -117,16 +118,14 @@ body {
         &.left {
             .flyout-content {
                 padding-left: $flyout-padding-left;
-                padding-bottom: $flyout-padding-bottom;
-                padding-top: $flyout-padding-top;
+                padding-bottom: $flyout-padding-bottom; 
             }
         }
 
         &.right {
             .flyout-content {
                 padding-right: $flyout-padding-right;
-                padding-bottom: $flyout-padding-bottom;
-                padding-top: $flyout-padding-top;
+                padding-bottom: $flyout-padding-bottom; 
             }
         }
 
@@ -137,8 +136,7 @@ body {
         }
 
         &.top {
-            .flyout-content {
-                padding-top: $flyout-padding-top;
+            .flyout-content { 
             }
         }
     }

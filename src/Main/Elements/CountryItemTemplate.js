@@ -9,7 +9,7 @@ export default(props) => {
     return false;
   }, e = props.e;
 
-  return (<li className="list-group-item mx-auto w-50 d-flex justify-content-between align-items-center">
+  return (<li className="list-group-item mx-auto w-75 d-flex justify-content-between align-items-center">
     <a href="#!" onClick={handler}>{e.name || "Unknown"}</a>
     <h4>
       <span className="badge badge-primary">{e.value}</span>
