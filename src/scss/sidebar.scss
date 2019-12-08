@@ -1,0 +1,107 @@
+@import "partials/variables";
+@import "partials/mixins";
+
+.sidebar {
+    display: flex;
+
+    .sidebar-asside {
+        display: flex;
+        flex-direction: column;
+        z-index: 10000;
+        background-color: $background-theme-main;
+        box-shadow: -1px 0px 5px 1px grey;
+
+        .logo-container {
+            width: auto;
+            height: 5em;
+
+            .logo-container-inner {
+                background: url("../img/logo-draft.png");
+                background-position: 20px 0px;
+                background-size: cover;
+                background-repeat: no-repeat;
+                width: 4.5em;
+                height: inherit;
+                position: absolute;
+                transition: .7s ease;
+                border-radius: 3em;
+                left: -7px;
+            }
+
+            &:hover {
+                .logo-container-inner {
+                    width: 10.6em;
+                    left: 14px;
+                    background-position: 0px;
+                    box-shadow: 8px 0px 8px -5px #3ca4ff;
+                }
+            }
+        }
+
+        .sidebar-item {
+            height: 5em;
+            position: relative;
+            background-color: $background-theme-main;
+            transition: all .5s ease;
+
+            &:hover {
+                background-color: darken($background-theme-main, 5%);
+            }
+
+            &.fade {
+                height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+            }
+
+            &.active {
+                background-color: darken($background-theme-main, 3%);
+            }
+
+            &:focus {
+                box-shadow: none;
+                outline: none;
+            }
+
+            &.fa:before {
+                font-size: 1.8em;
+                color: gray;
+            }
+
+            p {
+                padding: 5px;
+                color: gray;
+                white-space: nowrap;
+            }
+        }
+
+        position: relative;
+
+        .sidebar-indicator {
+            position: absolute;
+            top: 0;
+            opacity: 0;
+            height: 5em;
+            width: .3em;
+            border-radius: 2em;
+            transition: .6s cubic-bezier(0.55, 1.09, 0.81, 1.06);
+        }
+
+        @for $i from 1 through 10 {
+            .sidebar-item:nth-of-type(#{$i}).active~.sidebar-indicator {
+                transform: translateY(#{5em *$i});
+                background-color: #0c6ef7;
+                opacity: 1;
+            }
+        }
+
+    }
+
+
+
+    .sidebar-content {
+        .sidebar-content-inner {
+            // position: relative;
+        }
+    }
+}

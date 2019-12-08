@@ -5,7 +5,7 @@
 
 body {
   margin: 0;
-  padding: 0; 
+  padding: 0;
   overflow-y: hidden;
   font-family: $third-font;
 }
@@ -20,13 +20,14 @@ button {
 
 .btn {
   border: none;
-  .btn-default{
+
+  .btn-default {
     background-color: $button-default;
   }
 }
 
 //Просто підсвіти її сірим як решту звичайних інпатів.
-.disabledQueryInput{
+.disabledQueryInput {
   display: none;
 }
 
@@ -59,6 +60,7 @@ button {
 @import "weather-elements.scss";
 @import "station.scss";
 @import "nav-tabs.scss";
+@import "sidebar";
 @import "flyn.scss";
 @import "flyout.scss";
 @import "loader.scss";
