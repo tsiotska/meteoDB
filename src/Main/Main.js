@@ -81,7 +81,6 @@ class Main extends Component {
 
 
   partialClear = (poly) => {
-
     let withoutRemovedPolygon = this.props.polygons.filter((polygon) => {
       return polygon.layer._leaflet_id !== poly.layer._leaflet_id
     });
@@ -95,11 +94,8 @@ class Main extends Component {
       });
       Array.prototype.push.apply(withoutRemovedMarkers, markersInOnePoly);
 
-
       let stationsInOnePoly = this.state.stationsAll.filter((station) => {
-
         let LatLng = {lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon)};
-
         return this.props.polygons[i].layer.contains(LatLng)
           && !withoutRemovedStations.some((repeat) => repeat.props.props.id === station.props.props.id)
       });
@@ -108,7 +104,6 @@ class Main extends Component {
 
     for (let i in withoutRemovedStations) {
       let existingWeather = this.state.daysItems.filter((weather) => {
-
         return weather.props.data.id === withoutRemovedStations[i].props.props.id
       });
       Array.prototype.push.apply(withoutRemovedWeather, existingWeather);
@@ -120,7 +115,6 @@ class Main extends Component {
       daysItems: withoutRemovedWeather,
       currentStation: null
     });
-    console.log(this.state.MapMarkers)
   };
 
   beforeMove = (poly) => {
@@ -130,13 +124,30 @@ class Main extends Component {
     this.props.setPolygons(withoutOldPoly)
   };
 
-  setMarkers = (newMarkers, newStations, currentPoly) => {
-    //Повертаємо полігони, якщо новий currentPoly це не старий який редагують
+  onWeatherData = (weather) => {
+    console.log(weather);
+    let wth = this.state.stationsAll.length;
+    let newWeather = weather.map((i) => {
+      return this.creativeDay(i, wth++);
+    });
+    const sortedWeather = [], prevWeather = this.state.daysItems;
+    for (let i in this.state.stationsAll) {
+      let weatherInOnePoly = prevWeather.filter((weather) => {
+        return weather.props.data.id === this.state.stationsAll[i].props.props.id;
+      });
+      Array.prototype.push.apply(sortedWeather, weatherInOnePoly);
+    }
+    Array.prototype.push.apply(sortedWeather, newWeather);
+      console.log(sortedWeather)
+    this.setState({daysItems: sortedWeather})
+    };
+
+  setStationsAndMarkers = (currentPoly, newMarkers, newStations) => {
+    console.log("Check if...")
     let withoutRepeatingPoly = this.props.polygons.filter((poly) => {
       return poly.layer._leaflet_id !== currentPoly.layer._leaflet_id;
     });
 
-    //Добавляємо якщо він новий і обновляємо
     if (withoutRepeatingPoly.length === this.props.polygons.length) {
       let withNewPoly = [];
       withNewPoly.push(currentPoly);
@@ -146,7 +157,7 @@ class Main extends Component {
       withoutRepeatingPoly.push(currentPoly);
       this.props.setPolygons(withoutRepeatingPoly);
     }
-    //Чи колишні маркери входять в наші полігони і не співпадають з новими. Потрібно для накладених
+
     const sortedMarkers = [], prevMarkers = this.state.MapMarkers, sortedStations = [],
       prevStations = this.state.stationsAll;
 
@@ -158,7 +169,6 @@ class Main extends Component {
         });
         Array.prototype.push.apply(sortedMarkers, markersInOnePoly);
 
-        //Чи входять станції
         let stationsInOnePoly = prevStations.filter((station) => {
           let LatLng = {lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon)};
           return this.props.polygons[i].layer.contains(LatLng)
@@ -170,11 +180,10 @@ class Main extends Component {
 
     Array.prototype.push.apply(sortedMarkers, newMarkers);
     Array.prototype.push.apply(sortedStations, newStations);
-    console.log(sortedMarkers);
     this.setState({
-        MapMarkers: sortedMarkers,
-        stationsAll: sortedStations
-      })
+      MapMarkers: sortedMarkers,
+      stationsAll: sortedStations
+    })
   };
 
   getOneStationData = (e) => {
@@ -199,7 +208,7 @@ class Main extends Component {
     if (date.dateSet || year) {
       this.state.api.getWeatherFromMapEvent({e: data, date: date, year: year})
         .then((weather) => {
-          this.setWeather(weather.response);
+          this.setWeatherForOneStation(weather.response);
         }).catch((error) => console.log(error));
 
       this.state.api.getPackFromMapEvent({e: data, date: date, year: year, pack: true})
@@ -213,7 +222,7 @@ class Main extends Component {
     this.setState({currentStation: createStation(station, 0)});
   };
 
-  setWeather = (weather) => {
+  setWeatherForOneStation = (weather) => {
     console.log(weather);
     let cnt = 0;
     this.setState({
@@ -235,12 +244,14 @@ class Main extends Component {
     this.getOneStationData(e);
   };
 
-  onStationsData = (station, poly) => {
+
+
+  onStationsData = (poly, station) => {
     this.setState({lockM: true});
     this.setState({stationsCounter: <CountCircle response={station}/>});
     if (station.code === 33)
       return; // not found
-    // const data = !resp.Item2 ? resp : resp.Item2; // hardcoded. maybe review API models
+
     const data = station;
 
     if (data.response && Array.isArray(data.response) && data.response[0].item) {
@@ -254,11 +265,9 @@ class Main extends Component {
       return i.lat && i.lon;
     });
 
-
     if (stations) {
-      let cnt = this.state.stationsAll.length;
-      console.log(cnt)
-      let mrk = cnt;
+      let cnt, mrk;
+      cnt = mrk = this.state.stationsAll.length;
       let newStations = stations.map((i) => createStation(i, cnt++, this.setCardItem));
 
       const newMarkers = [], area_latlon = [];
@@ -268,8 +277,8 @@ class Main extends Component {
         area_latlon.push(coords);
         newMarkers.push(createMaker(coords, this.onMarkerClick, createStation(location), mrk++, location));
       }
-      console.log(newStations)
-      this.setMarkers(newMarkers, newStations, poly);
+
+      this.setStationsAndMarkers(poly, newMarkers, newStations);
       mymap.fitBounds(L.latLngBounds(area_latlon).pad(.3));
     } else alert("No data, sorry");
   };
@@ -330,7 +339,7 @@ class Main extends Component {
       clearMap: this.clearMap,
       setCardItem: this.setCardItem,
       beforeMove: this.beforeMove,
-      onCutRemove: this.onCutRemove
+      onWeatherData: this.onWeatherData
     };
 
     let conts = {
@@ -367,7 +376,7 @@ class Main extends Component {
         </FlyoutContainer>
       </Sidebar>
 
-      <MapComponent setWeather={comp.setWeather} api={comp.api}
+      <MapComponent api={comp.api} onWeatherData={comp.onWeatherData}
                     activeMarker={comp.activeMarker}
                     onStationsData={comp.onStationsData} markers={this.state.selectedPage}
                     currentSelected={comp.markers}

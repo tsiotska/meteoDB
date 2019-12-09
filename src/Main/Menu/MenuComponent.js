@@ -74,7 +74,7 @@ class MenuComponent extends React.Component {
         limit,
         neigh,
         nearest,
-        query: queryParam,
+        queryParam,
         selectedField: this.selectorByField.current.value
       }).then((stations) => {
         console.log(stations);
@@ -82,9 +82,9 @@ class MenuComponent extends React.Component {
       }).catch((error) => console.log(error));
 
       this.props.api.getPackByQuery({
-        offset: offset, limit: limit,
-        neighbors: neigh, nearest: nearest,
-        query: queryParam,
+        offset, limit,
+        neigh, nearest,
+        queryParam,
         selectedField: this.selectorByField.current.value,
         pack: true
       })
@@ -92,13 +92,13 @@ class MenuComponent extends React.Component {
           this.props.setStationPackLink(pack.response[0]);
         }).catch((error) => console.log(error));
 
-
+//FIX HERE
       if (years || date.dateSet) {
         this.props.api.getWeatherByQuery({
-          date: date, years: years,
-          offset: offset, limit: limit,
-          neighbors: neigh, nearest: nearest,
-          query: queryParam,
+          date, years,
+          offset, limit,
+          neigh, nearest,
+          queryParam,
           selectedField: this.selectorByField.current.value
         }).then((weather) => {
           this.props.setWeather(weather.response);

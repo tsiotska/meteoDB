@@ -19,7 +19,7 @@ export class ApiController extends ControllerContext {
     context.days && (this.days = context.days);
     this.withOffset(context.offset);
     this.withLimit(context.limit);
-    this.withNeighbors(context.neighbors);
+    this.withNeighbors(context.neigh);
     this.withBuffer(context.buffer);
     this.withNearest(context.nearest);
     this.withPack(context.pack);
@@ -134,19 +134,22 @@ export class ApiController extends ControllerContext {
   }
 
   //simple query searching for stations
-  searchStationsByQuery = (context) => {
+  getAllDataTypesByQuery = (context)=> {
     this.setController(context);
-    return this.fetchData(this.createQueryLink(context.selectedField, context.query));
+    return this.fetchData(this.createQueryLink(context.selectedField, context.queryParam));
   }
 
+  //Can be simplified in one
+  searchStationsByQuery = (context) => {
+   return this.getAllDataTypesByQuery(context);
+  };
+
   getWeatherByQuery = (context) => {
-    this.setController(context);
-    return this.fetchData(this.createQueryLink(context.selectedField, context.query));
+    return this.getAllDataTypesByQuery(context);
   }
 
   getPackByQuery = (context) => {
-    this.setController(context);
-    return this.fetchData(this.createQueryLink(context.selectedField, context.query));
+    return this.getAllDataTypesByQuery(context);
   }
 
   getStationsCount() {
