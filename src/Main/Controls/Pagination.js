@@ -21,9 +21,6 @@ class Pagination extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if(!this.props.items || this.props.items===[]){
-      this.props.onChangePage([]);
-    }
     if (this.props.items !== prevProps.items) {
       this.setPage(this.props.initialPage);
     } else if (this.props.onSelected !== prevProps.onSelected)
@@ -39,11 +36,12 @@ class Pagination extends React.Component {
     pager = this.getPager(items.length, page);
     var pageOfItems = items.slice(pager.startIndex, pager.endIndex + 1);
 
-    this.setState({ pager });
-    this.props.onChangePage(pageOfItems, page);
+    this.setState({pager});
+    console.log(pageOfItems);
+    this.props.onChangePage(pageOfItems);
   }
 
-  getPager(totalItems, currentPage, pageSize) {
+  getPager = (totalItems, currentPage, pageSize) => {
     currentPage = currentPage || 1;
     pageSize = pageSize || 10;
     var totalPages = Math.ceil(totalItems / pageSize);

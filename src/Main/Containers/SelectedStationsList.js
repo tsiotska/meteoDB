@@ -15,8 +15,6 @@ export default class SelectedStationsList extends Component {
   };
 
   render() {
-
-
     let array = this.props.selectedStations.length > 0 ? this.props.selectedStations : false;
     let displayEmptyPage = (array);
 

@@ -101,13 +101,15 @@ class Main extends Component {
       });
       Array.prototype.push.apply(withoutRemovedStations, stationsInOnePoly);
     }
-
+    console.log(withoutRemovedStations)
     for (let i in withoutRemovedStations) {
       let existingWeather = this.state.daysItems.filter((weather) => {
         return weather.props.data.id === withoutRemovedStations[i].props.props.id
       });
       Array.prototype.push.apply(withoutRemovedWeather, existingWeather);
     }
+
+    console.log(withoutRemovedWeather)
 
     this.setState({
       MapMarkers: withoutRemovedMarkers,
@@ -125,7 +127,6 @@ class Main extends Component {
   };
 
   onWeatherData = (weather) => {
-    console.log(weather);
     let wth = this.state.stationsAll.length;
     let newWeather = weather.map((i) => {
       return this.creativeDay(i, wth++);
@@ -138,12 +139,10 @@ class Main extends Component {
       Array.prototype.push.apply(sortedWeather, weatherInOnePoly);
     }
     Array.prototype.push.apply(sortedWeather, newWeather);
-      console.log(sortedWeather)
     this.setState({daysItems: sortedWeather})
-    };
+  };
 
   setStationsAndMarkers = (currentPoly, newMarkers, newStations) => {
-    console.log("Check if...")
     let withoutRepeatingPoly = this.props.polygons.filter((poly) => {
       return poly.layer._leaflet_id !== currentPoly.layer._leaflet_id;
     });
@@ -223,7 +222,6 @@ class Main extends Component {
   };
 
   setWeatherForOneStation = (weather) => {
-    console.log(weather);
     let cnt = 0;
     this.setState({
       daysItems: weather.map((i) => {
@@ -243,7 +241,6 @@ class Main extends Component {
   onMarkerClickBase = (e) => {
     this.getOneStationData(e);
   };
-
 
 
   onStationsData = (poly, station) => {
@@ -371,7 +368,6 @@ class Main extends Component {
 
         <FlyoutContainer position="left" title="Weather" iconClassName="fa fa-sun-o">
           <DaysItemsList
-            selectedPage={this.state.selectedPage}
             daysItems={conts.daysItems}/>
         </FlyoutContainer>
       </Sidebar>

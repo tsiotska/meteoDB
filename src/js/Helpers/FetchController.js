@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 let status = {
@@ -23,6 +22,19 @@ class FetchController {
   Get = async (link) => {
     this.loaderVisibility(true);
     console.log(link);
+
+   /* return axios.get(link) .then((response) =>{
+      console.log(response);
+      this.Status = response.data.code;
+      this.Result = response.data.response;
+      this.Errors = response.data.error;
+      this.loaderVisibility(false);
+      return response.data;
+    }).catch ((error)=> {
+      console.log(error);
+    })
+    */
+
     try {
       const response = await axios.get(link);
       console.log(response);
