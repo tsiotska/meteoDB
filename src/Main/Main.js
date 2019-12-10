@@ -327,7 +327,7 @@ class Main extends Component {
       markers: this.state.MapMarkers,
       setCtrList: this.setCtrList,
       mapSelectedIndex: this.selectedIndexChange,
-      setWeather: this.setWeather,
+      setWeatherForOneStation: this.setWeatherForOneStation,
       onStationsData: this.onStationsData,
       activeMarker: this.activeMarker,
       PageChanged: this.onMapPageChanged,

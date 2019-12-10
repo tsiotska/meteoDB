@@ -65,7 +65,7 @@ class MenuComponent extends React.Component {
         polyRequest,
         markerRequest
       }).then((weather) => {
-        this.props.setWeather(weather.response);
+        this.props.setWeatherForOneStation(weather.response);
       }).catch((error) => console.log(error))
     } //Якщо звичайний query запит.
     else if (queryParam) {
