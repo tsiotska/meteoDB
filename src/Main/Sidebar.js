@@ -35,7 +35,7 @@ export default class Sidebar extends Component {
     }
     render() {
         let className = this.props.className ? this.props.className : "";
-        const items = [<div key="-" className="logo-container"><div className="logo-container-inner"/></div>]
+        const items = [<div key="-" className="logo-container"><div className="logo-container-inner" /></div>]
 
         items.push(<Button key="back-to-map" className={"sidebar-item fa fa-arrow-left " + (this.state.localContext.isExpanded ? "" : "fade")}
             onClick={() => this.SetActive(this.state.localContext.active)}><span /><p>to map</p></Button>)
@@ -45,7 +45,7 @@ export default class Sidebar extends Component {
                 (this.state.localContext.active === value.props.title ? " active" : "")}
                 data-item-id={value.props.title}
                 data-toggle="tooltip" data-html="true" data-trigger="hover"
-                data-placement="left" title={"<div className='tooltip-info'> "+value.props.title+"</div>"}
+                data-placement="left" title={"<div className='tooltip-info'> " + value.props.title + "</div>"}
                 onClick={(e) => this.SetActive(e.target.getAttribute('data-item-id'))}><span /> </Button>)
         })
         const childrenWithProps = React.Children.map(this.props.children, (child, index) =>
@@ -58,7 +58,7 @@ export default class Sidebar extends Component {
             <div className={"sidebar " + className}>
                 <div className="sidebar-asside">
                     {items}
-                    <span key="ind" className="sidebar-indicator"/>
+                    <span key="ind" className="sidebar-indicator" />
                 </div>
                 <div className="sidebar-content">
                     <div className="sidebar-content-inner">

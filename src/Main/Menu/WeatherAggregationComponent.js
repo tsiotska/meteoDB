@@ -1,15 +1,12 @@
-import React from "react";
-import {Typeahead} from "react-bootstrap-typeahead";
+import React from "react"; 
 import DatePicker from '../Controls/DatePicker';
-import {Input} from "reactstrap";
+import { Input } from "reactstrap";
 
 export default class WeatherAggregationComponent extends React.Component {
-    render() {
-        
-  const {areLimitAndOffsetDisabled, ApplyCalendarDate, onDaysChange, onYearsChange,
-    onTypeChanged, onLimitChange, onMonthsChange, onOffsetChange, onNearestChange,
-    onNeighChange, polyRequest, selectorByField, typeahead, isLoading, source, unControlledInput} = this.props;
-        return (<div>
+    render() { 
+        const { ApplyCalendarDate, onDaysChange, onYearsChange, onMonthsChange, } = this.props;
+        return (<div className={"" + this.props.className}>
+            <h2>Aggregate weather</h2>
             <div className="time-selector-tabs w-100 mx-auto justify-content-center">
                 <ul className="nav nav-tabs" id="myTab" role="tablist">
                     <li className="nav-item">

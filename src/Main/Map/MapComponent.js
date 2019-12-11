@@ -3,7 +3,7 @@ import {TileLayer, Map, Marker, Tooltip} from 'react-leaflet';
 import L from 'leaflet';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import $ from 'jquery';
-import MarkerClusterGroup from 'react-leaflet-markercluster';
+/* import MarkerClusterGroup from 'react-leaflet-markercluster'; */
 import connect from "react-redux/es/connect/connect";
 import 'leaflet.pm';
 
@@ -14,13 +14,13 @@ export var mymap = null,
 // This map Component (currently leaflet)
 // may be replaced with D3 map or other based on WebGL
 
-const createClusterCustomIcon = function (cluster) {
+/* const createClusterCustomIcon = function (cluster) {
   return L.divIcon({
     html: `<span>${cluster.getChildCount()}</span>`,
     className: 'marker-cluster-custom',
     iconSize: L.point(40, 40, true)
   });
-};
+}; */
 
 class MapComponent extends Component {
   constructor(props) {
@@ -129,8 +129,8 @@ class MapComponent extends Component {
   };
 
   fetchMarkers = (e) => {
-    const {
-      PolyRequest, onStationsData, onWeatherData, setStationPackLink, setWeatherPackLink,
+    const { 
+       onStationsData, onWeatherData, setStationPackLink, setWeatherPackLink,
       api, date, years, months, days /* neigh, nearest, offset, limit */
     } = this.props;
 
@@ -187,10 +187,8 @@ class MapComponent extends Component {
     const position = [this.state.lat, this.state.lng];
     const markers = this.renderMarkers();
     let {counter} = this.props;
-    return (
-
-      <div className="main_map container-fluid p-0">
-
+    return ( 
+      <div className="main_map container-fluid p-0"> 
         <div className="cur_count_wrapper">
           <div className={"cur_count " + (
             counter

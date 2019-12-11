@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import Pagination from '../../Main/Controls/Pagination';
-import {emptyContainer} from '../../js/const'
+import { emptyContainer } from '../../js/const'
 
 export default class DaysItemsList extends Component {
   constructor(props) {
@@ -11,18 +11,18 @@ export default class DaysItemsList extends Component {
   }
 
   onChangePage = (selectedPage) => {
-    this.setState({selectedPage});
+    this.setState({ selectedPage });
   };
 
   render() {
     let array = this.props.daysItems.length > 0 ? this.props.daysItems : false;
     let displayEmptyPage = (array);
     return (<div
-      className="container" /* className="tab-pane fade" id="nav-res" role="tabpanel" aria-labelledby="nav-res-tab" */>
+      className="container" >
 
       {
         displayEmptyPage
-          ? <Pagination items={array} onChangePage={this.onChangePage}/>
+          ? <Pagination items={array} onChangePage={this.onChangePage} />
           : ""
       }
 

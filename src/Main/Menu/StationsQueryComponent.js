@@ -1,17 +1,15 @@
 import React from 'react';
-import {mymap} from '../Map/MapComponent';
-import {baseUrl} from '../../js/const';
-import DatePicker from '../Controls/DatePicker'
+import { mymap } from '../Map/MapComponent';
+import { baseUrl } from '../../js/const';
 import $ from 'jquery';
-import {Button, Input} from 'reactstrap';
-import {Typeahead} from 'react-bootstrap-typeahead';
-import CountryItem from '../Elements/CountryItemTemplate'; 
+import { Button } from 'reactstrap';
+import CountryItem from '../Elements/CountryItemTemplate';
 import StationSearchBar from './searchBars/stationSearchBar';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-daterangepicker/daterangepicker.css';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
-class MenuComponent extends React.Component {
+class StationsQueryComponent extends React.Component {
   constructor(props) {
     super(props);
     this.axios = null;
@@ -45,7 +43,7 @@ class MenuComponent extends React.Component {
           });
           let cnt = 0;
           this.props.setCtrList(data.response.map((i) => {
-            return <CountryItem key={cnt++} setQuery={this.setQuery} e={i}/>;
+            return <CountryItem key={cnt++} setQuery={this.setQuery} e={i} />;
           }))
         }
       });
@@ -93,7 +91,7 @@ class MenuComponent extends React.Component {
           this.props.setStationPackLink(pack.response[0]);
         }).catch((error) => console.log(error));
 
-//FIX HERE
+      //FIX HERE
       if (years || date.dateSet) {
         this.props.api.getWeatherByQuery({
           date, years,
@@ -128,7 +126,7 @@ class MenuComponent extends React.Component {
   onChangePage = (selectedPage, index) => {
     this.props.PageChanged(selectedPage);
     this.props.mapSelectedIndex(index);
-    this.setState({selectedPage});
+    this.setState({ selectedPage });
   };
 
   currentStation = () => {
@@ -140,11 +138,11 @@ class MenuComponent extends React.Component {
 
   //Кнопка пошуку активується якщо є пошуковий параметр або виділені полігони з вказаною датою.
   enableButton = () => {
-    const {markerRequest, polyRequest, queryParam, date, years,} = this.props;
+    const { markerRequest, polyRequest, queryParam, date, years, } = this.props;
     if ((queryParam.length > 0) || ((date.dateSet || years) && (polyRequest || markerRequest))) {
-      this.setState({enableSearchButton: true});
+      this.setState({ enableSearchButton: true });
     } else {
-      this.setState({enableSearchButton: false})
+      this.setState({ enableSearchButton: false })
     }
   };
 
@@ -197,7 +195,7 @@ class MenuComponent extends React.Component {
         });
 
         console.log(array);
-        this.setState({source: array});
+        this.setState({ source: array });
       }).catch((error) => console.log(error))
     //}
   };
@@ -244,7 +242,7 @@ class MenuComponent extends React.Component {
   };
 
   render() {
-    const {/* counter, */ stationPackLink, weatherPackLink} = this.props;
+    const {/* counter, */ stationPackLink, weatherPackLink } = this.props;
     let toStationsBar = {
       areLimitAndOffsetDisabled: this.props.areLimitAndOffsetDisabled,
       ApplyCalendarDate: this.ApplyCalendarDate,
@@ -263,31 +261,14 @@ class MenuComponent extends React.Component {
       source: this.state.source,
       unControlledInput: this.unControlledInput
     };
-    let toWeatherBar = {
-      areLimitAndOffsetDisabled: this.props.areLimitAndOffsetDisabled,
-      ApplyCalendarDate: this.ApplyCalendarDate,
-      onDaysChange: this.onDaysChange,
-      onYearsChange: this.onYearsChange,
-      onTypeChanged: this.onTypeChanged,
-      onLimitChange: this.onLimitChange,
-      onMonthsChange: this.onMonthsChange,
-      onOffsetChange: this.onOffsetChange,
-      onNearestChange: this.onNearestChange,
-      onNeighChange: this.onNeighChange,
-      polyRequest: this.props.polyRequest,
-      selectorByField: this.selectorByField,
-      typeahead: this.typeahead,
-      isLoading: this.state.isLoading,
-      source: this.state.source,
-      unControlledInput: this.unControlledInput
-    };
-    return (
+    return (<div className={"" + this.props.className}>
+      <h2>Query stations</h2>
       <div className="panel flyn active mr-3 p-0">
         <div className="flyn-inputs-container">
           <div className="form-inline flyn-input-controls">
             <div className="current-database">
               <div className="input-group">
-  
+
                 <div className="input-group-prepend">
                   <label className="input-group-text" htmlFor="database-selectors">Database</label>
                 </div>
@@ -297,47 +278,47 @@ class MenuComponent extends React.Component {
                     // api/weather/databases
                   }
                   <option defaultValue value="gsod" data-toggle="tooltip"
-                          title="Global Summary Of Day (GSOD, NOAA)">GSOD
+                    title="Global Summary Of Day (GSOD, NOAA)">GSOD
                   </option>
                   <option disabled value="gh" data-toggle="tooltip" title="Global Hourly dataset (GH, NOAA)">Global
                     Hourly
                   </option>
                   <option disabled value="isd-lite" data-toggle="tooltip"
-                          title="Integrated surface data Lite (ISD, NOAA)">ISD Lite
+                    title="Integrated surface data Lite (ISD, NOAA)">ISD Lite
                   </option>
                   <option disabled value="isd" data-toggle="tooltip"
-                          title="Integrated surface data FULL (ISD, NOAA)">ISD
+                    title="Integrated surface data FULL (ISD, NOAA)">ISD
                   </option>
                 </select>
               </div>
             </div>
- 
-                <StationSearchBar {...toWeatherBar}/> 
+
+            <StationSearchBar {...toStationsBar} />
 
 
             <div className="col-auto d-flex w-100 justify-content-center">
               <Button id="reeval" onClick={this.onSearchClick}
-                      color="primary"
-                      className={(this.state.enableSearchButton ? "" : "disabled ") + "m-2 mb-1 mt-auto"}>Search
+                color="primary"
+                className={(this.state.enableSearchButton ? "" : "disabled ") + "m-2 mb-1 mt-auto"}>Search
               </Button>
               <Button id="refresh" onClick={this.onRefreshClick}
-                      color="secondary"
-                      className="m-2 mb-1 mt-auto">Clear
+                color="secondary"
+                className="m-2 mb-1 mt-auto">Clear
               </Button>
             </div>
 
           </div>
 
           {stationPackLink &&
-          <Button download target="_blank"
-                  href={baseUrl + stationPackLink + "?saveas=stations.json"}>
-            Stations
+            <Button download target="_blank"
+              href={baseUrl + stationPackLink + "?saveas=stations.json"}>
+              Stations
           </Button>}
 
           {weatherPackLink &&
-          <Button download target="_blank"
-                  href={baseUrl + weatherPackLink + "?saveas=weather.json"}>
-            Weather
+            <Button download target="_blank"
+              href={baseUrl + weatherPackLink + "?saveas=weather.json"}>
+              Weather
           </Button>}
 
           {this.currentStation()}
@@ -348,7 +329,8 @@ class MenuComponent extends React.Component {
             <span className="fx2" />
           </Button> */}
         </div>
-      </div>);
+      </div>
+    </div>);
   }
 }
 
@@ -373,39 +355,39 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   setQuery: (param) => {
-    dispatch({type: "SET_QUERY", param: param})
+    dispatch({ type: "SET_QUERY", param: param })
   },
   disableLimitAndOffset: (flag) => {
-    dispatch({type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag})
+    dispatch({ type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag })
   },
   setStationPackLink: (link) => {
-    dispatch({type: "SET_STATION_PACK_LINK", link: link})
+    dispatch({ type: "SET_STATION_PACK_LINK", link: link })
   },
   setWeatherPackLink: (link) => {
-    dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
+    dispatch({ type: "SET_WEATHER_PACK_LINK", link: link })
   },
   setYears: (years) => {
-    dispatch({type: "SET_YEARS", years: years})
+    dispatch({ type: "SET_YEARS", years: years })
   },
   setMonths: (months) => {
-    dispatch({type: "SET_MONTHS", months: months})
+    dispatch({ type: "SET_MONTHS", months: months })
   },
   setDays: (days) => {
-    dispatch({type: "SET_DAYS", days: days})
+    dispatch({ type: "SET_DAYS", days: days })
   },
   setTime: (date) => {
-    dispatch({type: "SET_TIME", date: date})
+    dispatch({ type: "SET_TIME", date: date })
   },
   //Працює для  limit offset nearest neigh
   setLimiters: (data, kind) => {
-    dispatch({type: "SET_ANY_INPUT_DATA", data: data, kind: kind})
+    dispatch({ type: "SET_ANY_INPUT_DATA", data: data, kind: kind })
   },
   PolySelected: (req) => {
-    dispatch({type: "IF_POLY_SELECTED", req: req})
+    dispatch({ type: "IF_POLY_SELECTED", req: req })
   },
   MarkerSelected: (flag, req) => {
-    dispatch({type: "IF_MARKER_SELECTED", req: req})
+    dispatch({ type: "IF_MARKER_SELECTED", req: req })
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(MenuComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(StationsQueryComponent);
