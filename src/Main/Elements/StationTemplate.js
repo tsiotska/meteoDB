@@ -10,10 +10,10 @@ export default (props) => {
           <div className='w_dt-header px-3 flex-row col-auto mb-0 w_s text-center'>
             <div className='text-center'>
             <span className='badge mx-2 my-1 badge-secondary' data-toggle='tooltip' data-placement='right' title=''
-                  data-original-title='ІD станції'>ID: {e.id}
+                  data-original-title='ІD станції'>ID: {e.id || "N/A"}
             </span>
               <span className='badge mx-2 my-1 badge-secondary' data-toggle='tooltip' data-placement='right' title=''
-                    data-original-title='ІD станції у WBAN'>WBAN: {e.wban}
+                    data-original-title='ІD станції у WBAN'>WBAN: {e.wban || "N/A"}
             </span>
             </div>
             {

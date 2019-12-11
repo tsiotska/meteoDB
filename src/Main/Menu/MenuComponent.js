@@ -5,9 +5,8 @@ import DatePicker from '../Controls/DatePicker'
 import $ from 'jquery';
 import {Button, Input} from 'reactstrap';
 import {Typeahead} from 'react-bootstrap-typeahead';
-import CountryItem from '../Elements/CountryItemTemplate';
+import CountryItem from '../Elements/CountryItemTemplate'; 
 import StationSearchBar from './searchBars/stationSearchBar';
-import WeatherSearchBar from './searchBars/weatherSearchBar';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-daterangepicker/daterangepicker.css';
 import {connect} from 'react-redux';
@@ -288,24 +287,7 @@ class MenuComponent extends React.Component {
           <div className="form-inline flyn-input-controls">
             <div className="current-database">
               <div className="input-group">
-
-                <div className="time-selector-tabs w-100 mx-auto justify-content-center">
-                  <ul className="nav nav-tabs" id="myTab" role="tablist">
-                    <li className="nav-item">
-                      <a className="nav-link active" id="station-range-tab-top" data-toggle="tab"
-                         href="#station-range-tab" role="tab" aria-controls="station-range-tab" aria-selected="true">Stations
-                        search</a>
-                    </li>
-                    <li className="nav-item">
-                      <a className="nav-link" id="weather-range-tab-top" data-toggle="tab"
-                         href="#weather-range-tab" role="tab" aria-controls="weather-range-tab-tab"
-                         aria-selected="false">Weather
-                        search</a>
-                    </li>
-                  </ul>
-                </div>
-
-
+  
                 <div className="input-group-prepend">
                   <label className="input-group-text" htmlFor="database-selectors">Database</label>
                 </div>
@@ -329,18 +311,8 @@ class MenuComponent extends React.Component {
                 </select>
               </div>
             </div>
-
-            <div className="tab-content" id="range-selectors">
-              <div className="tab-pane fade show active" id="station-range-tab" role="tabpanel"
-                   aria-labelledby="station-range-tab">
-                <StationSearchBar {...toStationsBar}/>
-              </div>
-
-              <div className="tab-pane fade" id="weather-range-tab" role="tabpanel"
-                   aria-labelledby="weather-range-tab">
-                <WeatherSearchBar {...toWeatherBar}/>
-              </div>
-            </div>
+ 
+                <StationSearchBar {...toWeatherBar}/> 
 
 
             <div className="col-auto d-flex w-100 justify-content-center">

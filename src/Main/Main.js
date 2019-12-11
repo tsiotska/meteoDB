@@ -7,6 +7,7 @@ import L from 'leaflet';
 import WeatherControl from "./Elements/WeatherControl";
 import Station from './Elements/StationTemplate';
 import MenuComponent from './Menu/MenuComponent'
+import WeatherAggregationComponent from './Menu/WeatherAggregationComponent'
 import throttle from 'lodash/throttle';
 import Loader from './Elements/AtomLoader';
 // import Containers from "./Containers";
@@ -371,8 +372,12 @@ class Main extends Component {
     return (<div className="d-flex container-fluid p-0">
       {this.state.isVisible && <Loader isVisible={this.state.isVisible}/>}
       <Sidebar>
-        <FlyoutContainer title="Search" position="left" iconClassName="fa fa-filter">
+        <FlyoutContainer title="Search stations" position="left" iconClassName="fa fa-search">
           <MenuComponent {...comp} />
+        </FlyoutContainer>
+
+        <FlyoutContainer title="Query weather" position="left" iconClassName="fa fa-filter">
+          <WeatherAggregationComponent {...comp} />
         </FlyoutContainer>
 
         <FlyoutContainer position="left" title="Countries" iconClassName="fa fa-globe">
