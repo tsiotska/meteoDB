@@ -4,6 +4,7 @@ import {types} from './dataActions';
 const dataReducer = (state = dataState, action) => {
   switch (action.type) {
     case types.SET_QUERY:
+      console.log(action.param)
       return {
         ...state,
         queryParam: action.param,
@@ -60,6 +61,23 @@ const dataReducer = (state = dataState, action) => {
       return {
         ...state,
         polygons: rest,
+      };
+    case types.REFRESH_EVERYTHING:
+      return {
+        ...state,
+        queryParam: [],
+        stationPackLink: null,
+        weatherPackLink: null,
+        date: {dateSet: false, startDate: null, endDate: null},
+        years: null,
+        months: null,
+        days: null,
+        limit: null,
+        offset: null,
+        nearest: false,
+        neigh: null,
+        polygons: [],
+        geoPolygons: []
       };
     default:
       return state;

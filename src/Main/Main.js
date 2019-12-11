@@ -74,6 +74,7 @@ class Main extends Component {
 
   //Full clear
   clearMap = () => {
+    this.props.setPolygons([]);
     this.setState({
       MapMarkers: [],
       stationsAll: [],
@@ -358,7 +359,7 @@ class Main extends Component {
       clearMap: this.clearMap,
       setCardItem: this.setCardItem,
       beforeMove: this.beforeMove,
-      onWeatherData: this.onWeatherData
+      onWeatherData: this.onWeatherDataа
     };
 
     let conts = {

@@ -3,9 +3,10 @@ import React from 'react';
 export default(props) => {
 
   const handler = (e) => {
-    console.log(props);
     e.preventDefault();
+    props.onRefreshClick();
     props.setQuery(props.e.name);
+    props.onSearchClick();
     return false;
   }, e = props.e;
 

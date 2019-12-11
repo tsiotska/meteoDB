@@ -1,13 +1,14 @@
 import React from 'react';
-import { mymap } from '../Map/MapComponent';
-import { baseUrl } from '../../js/const';
+import {mymap} from '../Map/MapComponent';
+import {baseUrl} from '../../js/const';
 import $ from 'jquery';
-import { Button } from 'reactstrap';
+import {Button} from 'reactstrap';
 import CountryItem from '../Elements/CountryItemTemplate';
+import {Typeahead} from "react-bootstrap-typeahead";
 import StationSearchBar from './searchBars/stationSearchBar';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-daterangepicker/daterangepicker.css';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 
 class StationsQueryComponent extends React.Component {
   constructor(props) {
@@ -15,17 +16,13 @@ class StationsQueryComponent extends React.Component {
     this.axios = null;
     this.selectorByField = React.createRef();
     this.state = {
-      markerRequest: "",
-      polyRequest: "",
-      offset: null,
-      limit: null,
       isLoading: true,
       selectedPage: [],
       source: [],
       ctr_list: [],
-      lastPoly: null,
       enableSearchButton: false
     };
+    this.typeahead = React.createRef();
   }
 
   componentDidUpdate() {
@@ -43,7 +40,9 @@ class StationsQueryComponent extends React.Component {
           });
           let cnt = 0;
           this.props.setCtrList(data.response.map((i) => {
-            return <CountryItem key={cnt++} setQuery={this.setQuery} e={i} />;
+            return <CountryItem key={cnt++} onSearchClick={this.onSearchClick} onRefreshClick={this.onRefreshClick}
+                                setQuery={this.props.setQuery} e={i}/>;
+
           }))
         }
       });
@@ -126,7 +125,7 @@ class StationsQueryComponent extends React.Component {
   onChangePage = (selectedPage, index) => {
     this.props.PageChanged(selectedPage);
     this.props.mapSelectedIndex(index);
-    this.setState({ selectedPage });
+    this.setState({selectedPage});
   };
 
   currentStation = () => {
@@ -138,23 +137,27 @@ class StationsQueryComponent extends React.Component {
 
   //Кнопка пошуку активується якщо є пошуковий параметр або виділені полігони з вказаною датою.
   enableButton = () => {
-    const { markerRequest, polyRequest, queryParam, date, years, } = this.props;
+    const {markerRequest, polyRequest, queryParam, date, years,} = this.props;
     if ((queryParam.length > 0) || ((date.dateSet || years) && (polyRequest || markerRequest))) {
-      this.setState({ enableSearchButton: true });
+      this.setState({enableSearchButton: true});
     } else {
-      this.setState({ enableSearchButton: false })
+      this.setState({enableSearchButton: false})
     }
   };
 
+  changeInputRef = (typeahead) => {
+    this.typeahead = typeahead
+  };
+
   clearSource = () => {
-    this.props.setQuery([]);
+    this.props.refreshSearchParams();
     this.typeahead.getInstance().clear();
     this.enableButton();
   };
 
   onRefreshClick = () => {
     this.clearSource();
-    this.props.lastPoly.forEach((poly) => {
+    this.props.polygons.forEach((poly) => {
       mymap.removeLayer(poly.layer)
     });
 
@@ -162,6 +165,7 @@ class StationsQueryComponent extends React.Component {
       48.289559, 31.3205566 // Ukraine centered
     ], 6);
     //this.props.setCardItem([]);
+
     this.props.clearMap();
     this.props.PolySelected("");
     this.props.MarkerSelected("");
@@ -195,7 +199,7 @@ class StationsQueryComponent extends React.Component {
         });
 
         console.log(array);
-        this.setState({ source: array });
+        this.setState({source: array});
       }).catch((error) => console.log(error))
     //}
   };
@@ -242,7 +246,7 @@ class StationsQueryComponent extends React.Component {
   };
 
   render() {
-    const {/* counter, */ stationPackLink, weatherPackLink } = this.props;
+    const {/* counter, */ stationPackLink, weatherPackLink} = this.props;
     let toStationsBar = {
       areLimitAndOffsetDisabled: this.props.areLimitAndOffsetDisabled,
       ApplyCalendarDate: this.ApplyCalendarDate,
@@ -256,7 +260,7 @@ class StationsQueryComponent extends React.Component {
       onNeighChange: this.onNeighChange,
       polyRequest: this.props.polyRequest,
       selectorByField: this.selectorByField,
-      typeahead: this.typeahead,
+      changeInputRef: this.changeInputRef,
       isLoading: this.state.isLoading,
       source: this.state.source,
       unControlledInput: this.unControlledInput
@@ -278,47 +282,47 @@ class StationsQueryComponent extends React.Component {
                     // api/weather/databases
                   }
                   <option defaultValue value="gsod" data-toggle="tooltip"
-                    title="Global Summary Of Day (GSOD, NOAA)">GSOD
+                          title="Global Summary Of Day (GSOD, NOAA)">GSOD
                   </option>
                   <option disabled value="gh" data-toggle="tooltip" title="Global Hourly dataset (GH, NOAA)">Global
                     Hourly
                   </option>
                   <option disabled value="isd-lite" data-toggle="tooltip"
-                    title="Integrated surface data Lite (ISD, NOAA)">ISD Lite
+                          title="Integrated surface data Lite (ISD, NOAA)">ISD Lite
                   </option>
                   <option disabled value="isd" data-toggle="tooltip"
-                    title="Integrated surface data FULL (ISD, NOAA)">ISD
+                          title="Integrated surface data FULL (ISD, NOAA)">ISD
                   </option>
                 </select>
               </div>
             </div>
 
-            <StationSearchBar {...toStationsBar} />
+            <StationSearchBar ref={this.typeahead} {...toStationsBar} />
 
 
             <div className="col-auto d-flex w-100 justify-content-center">
               <Button id="reeval" onClick={this.onSearchClick}
-                color="primary"
-                className={(this.state.enableSearchButton ? "" : "disabled ") + "m-2 mb-1 mt-auto"}>Search
+                      color="primary"
+                      className={(this.state.enableSearchButton ? "" : "disabled ") + "m-2 mb-1 mt-auto"}>Search
               </Button>
               <Button id="refresh" onClick={this.onRefreshClick}
-                color="secondary"
-                className="m-2 mb-1 mt-auto">Clear
+                      color="secondary"
+                      className="m-2 mb-1 mt-auto">Clear
               </Button>
             </div>
 
           </div>
 
           {stationPackLink &&
-            <Button download target="_blank"
-              href={baseUrl + stationPackLink + "?saveas=stations.json"}>
-              Stations
+          <Button download target="_blank"
+                  href={baseUrl + stationPackLink + "?saveas=stations.json"}>
+            Stations
           </Button>}
 
           {weatherPackLink &&
-            <Button download target="_blank"
-              href={baseUrl + weatherPackLink + "?saveas=weather.json"}>
-              Weather
+          <Button download target="_blank"
+                  href={baseUrl + weatherPackLink + "?saveas=weather.json"}>
+            Weather
           </Button>}
 
           {this.currentStation()}
@@ -339,7 +343,7 @@ const mapStateToProps = state => ({
   markerRequest: state.conditionReducer.markerRequest,
   areLimitAndOffsetDisabled: state.conditionReducer.areLimitAndOffsetDisabled,
 
-  lastPoly: state.dataReducer.lastPoly,
+  polygons: state.dataReducer.polygons,
   stationPackLink: state.dataReducer.stationPackLink,
   weatherPackLink: state.dataReducer.weatherPackLink,
   queryParam: state.dataReducer.queryParam,
@@ -355,39 +359,45 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   setQuery: (param) => {
-    dispatch({ type: "SET_QUERY", param: param })
+    dispatch({type: "SET_QUERY", param: param})
   },
   disableLimitAndOffset: (flag) => {
-    dispatch({ type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag })
+    dispatch({type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag})
   },
   setStationPackLink: (link) => {
-    dispatch({ type: "SET_STATION_PACK_LINK", link: link })
+    dispatch({type: "SET_STATION_PACK_LINK", link: link})
   },
   setWeatherPackLink: (link) => {
-    dispatch({ type: "SET_WEATHER_PACK_LINK", link: link })
+    dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
   },
   setYears: (years) => {
-    dispatch({ type: "SET_YEARS", years: years })
+    dispatch({type: "SET_YEARS", years: years})
   },
   setMonths: (months) => {
-    dispatch({ type: "SET_MONTHS", months: months })
+    dispatch({type: "SET_MONTHS", months: months})
   },
   setDays: (days) => {
-    dispatch({ type: "SET_DAYS", days: days })
+    dispatch({type: "SET_DAYS", days: days})
   },
   setTime: (date) => {
-    dispatch({ type: "SET_TIME", date: date })
+    dispatch({type: "SET_TIME", date: date})
   },
   //Працює для  limit offset nearest neigh
   setLimiters: (data, kind) => {
-    dispatch({ type: "SET_ANY_INPUT_DATA", data: data, kind: kind })
+    dispatch({type: "SET_ANY_INPUT_DATA", data: data, kind: kind})
   },
   PolySelected: (req) => {
-    dispatch({ type: "IF_POLY_SELECTED", req: req })
+    dispatch({type: "SET_POLY_SELECTED", req: req})
   },
   MarkerSelected: (flag, req) => {
-    dispatch({ type: "IF_MARKER_SELECTED", req: req })
+    dispatch({type: "SET_MARKER_REQUEST", req: req})
   },
+  setPolygons: (polygons) => {
+    dispatch({type: "SET_POLYGONS", polygons: polygons})
+  },
+  refreshSearchParams: () => {
+    dispatch({type: "REFRESH_EVERYTHING"})
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(StationsQueryComponent);
