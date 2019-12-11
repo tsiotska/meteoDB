@@ -19,6 +19,7 @@ import Footer from './Elements/Footer'
 import {ApiController} from '../js/apicontroller'
 import 'js/map_extensions'
 import FlyoutContainer from "./Containers/FlyoutContainer"
+import turf from 'turf';
 
 var markerGroup = null;
 
@@ -77,6 +78,23 @@ class Main extends Component {
       daysItems: [],
       currentStation: null
     })
+  };
+
+  conglameratePolygons = () => {
+    const {polygons, setPolygonsInGeo} = this.props;
+    let geoPolygons = polygons.map((poly) => {
+      return poly.layer.toGeoJSON()
+    });
+
+    let union;
+    if (polygons.length > 1) {
+      union = turf.union(...geoPolygons);
+      console.log(union)
+      setPolygonsInGeo(union)
+    } else {
+      setPolygonsInGeo(geoPolygons)
+    }
+
   };
 
 
@@ -156,6 +174,8 @@ class Main extends Component {
       withoutRepeatingPoly.push(currentPoly);
       this.props.setPolygons(withoutRepeatingPoly);
     }
+    this.conglameratePolygons();
+
 
     const sortedMarkers = [], prevMarkers = this.state.MapMarkers, sortedStations = [],
       prevStations = this.state.stationsAll;
@@ -312,7 +332,7 @@ class Main extends Component {
     this.partialClear(event);
 
     if (this.props.polygons.length === 0) {
-      this.props.PolySelected("", false);
+      this.props.PolyRequest("");
       this.props.MarkerSelected("");
     }
   };
@@ -392,11 +412,11 @@ const
 
 const
   mapDispatchToProps = dispatch => ({
-    PolySelected: (req, flag) => {
-      dispatch({type: "IF_POLY_SELECTED", req: req, flag: flag})
+    PolyRequest: (req) => {
+      dispatch({type: "SET_POLY_REQUEST", req: req})
     },
     MarkerSelected: (req) => {
-      dispatch({type: "IF_MARKER_SELECTED", req: req})
+      dispatch({type: "SET_MARKER_REQUEST", req: req})
     },
     setStationPackLink: (link) => {
       dispatch({type: "SET_STATION_PACK_LINK", link: link})
@@ -406,6 +426,9 @@ const
     },
     setPolygons: (polygons) => {
       dispatch({type: "SET_POLYGONS", polygons: polygons})
+    },
+    setPolygonsInGeo: (polygons) => {
+      dispatch({type: "SET_GEO_POLYGONS", polygons: polygons})
     }
   });
 

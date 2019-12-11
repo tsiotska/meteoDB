@@ -49,6 +49,11 @@ const dataReducer = (state = dataState, action) => {
         ...state,
         polygons: action.polygons
       };
+    case types.SET_GEO_POLYGONS:
+      return {
+        ...state,
+        geoPolygons: action.polygons
+      };
     case types.DELETE_LAST_POLY:
       console.log(state.polygons)
       let rest = state.polygons.filter((poly) => poly.layer !== action.polygon.layer);

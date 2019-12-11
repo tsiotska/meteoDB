@@ -130,12 +130,12 @@ class MapComponent extends Component {
 
   fetchMarkers = (e) => {
     const {
-      PolySelected, onStationsData, onWeatherData, setStationPackLink, setWeatherPackLink,
+      PolyRequest, onStationsData, onWeatherData, setStationPackLink, setWeatherPackLink,
       api, date, years, months, days /* neigh, nearest, offset, limit */
     } = this.props;
 
     let req = api.createPolyRequest(e.layer);
-    PolySelected(req, true);
+    //PolyRequest(req);
 
 //Погода добирається синхронно, це ще повільніше буде)
     api.getStationsFromMapEvent({
@@ -229,10 +229,10 @@ const mapDispatchToProps = dispatch => ({
     dispatch({type: "DELETE_LAST_POLY", polygon: polygon})
   },
   MarkerSelected: (req) => {
-    dispatch({type: "IF_MARKER_SELECTED", req: req})
+    dispatch({type: "SET_MARKER_REQUEST", req: req})
   },
-  PolySelected: (req, flag) => {
-    dispatch({type: "IF_POLY_SELECTED", req: req, flag: flag})
+  PolyRequest: (req) => {
+    dispatch({type: "SET_POLY_REQUEST", req: req})
   },
   setStationPackLink: (link) => {
     dispatch({type: "SET_STATION_PACK_LINK", link: link})

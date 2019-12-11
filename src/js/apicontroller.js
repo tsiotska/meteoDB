@@ -1,6 +1,7 @@
-import { baseUrl } from "../js/const"
+import {baseUrl} from "../js/const"
 import FetchController from "../js/Helpers/FetchController";
 import ControllerContext from "./ControllerContext";
+
 
 export class ApiController extends ControllerContext {
   constructor(loaderVisibility) {
@@ -69,22 +70,25 @@ export class ApiController extends ControllerContext {
     return this._nearest ? '&nearest=' + this._nearest : ''
   }
 
-  // Link builders
-  createPolyRequest = (e) => {
-    let req = "", lngs = null;
+  createGeoPolyRequest = () => {
 
-    if (e.options.radius) {
+  };
+  // Link builders
+  createPolyRequest = (newPolygon) => {
+    let req = "";
+    console.log(newPolygon)
+    if (newPolygon.options.radius) {
       //Ось тут можна правити
-      let lat = e.hasOwnProperty("_latlng") ? e._latlng.lat : e.latlng.lat;
-      let lon = e.hasOwnProperty("_latlng") ? e._latlng.lng : e.latlng.lng;
-      let res = [lat, lon, (e.options.radius / 1000) + 'km'];
+      let lat = newPolygon.hasOwnProperty("_latlng") ? newPolygon._latlng.lat : newPolygon.latlng.lat;
+      let lon = newPolygon.hasOwnProperty("_latlng") ? newPolygon._latlng.lng : newPolygon.latlng.lng;
+      let res = [lat, lon, (newPolygon.options.radius / 1000) + 'km'];
       req = baseUrl + '/api/' + this.database + '/poly?type=circle&value=[' + res + ']';
     } else {
-      lngs = e._latlngs;
+      let lngs = newPolygon._latlngs;
       req = baseUrl + '/api/' + this.database + '/poly?type=poly&value=[' + lngs.join('],[') + ']';
     }
     return req;
-  }
+  };
 
   createQueryLink = (selectedField, query) => {
     let searchType = selectedField;
@@ -134,14 +138,14 @@ export class ApiController extends ControllerContext {
   }
 
   //simple query searching for stations
-  getAllDataTypesByQuery = (context)=> {
+  getAllDataTypesByQuery = (context) => {
     this.setController(context);
     return this.fetchData(this.createQueryLink(context.selectedField, context.queryParam));
   }
 
   //Can be simplified in one
   searchStationsByQuery = (context) => {
-   return this.getAllDataTypesByQuery(context);
+    return this.getAllDataTypesByQuery(context);
   };
 
   getWeatherByQuery = (context) => {
