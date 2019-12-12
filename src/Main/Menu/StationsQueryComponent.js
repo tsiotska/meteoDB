@@ -1,14 +1,14 @@
 import React from 'react';
-import {mymap} from '../Map/MapComponent';
-import {baseUrl} from '../../js/const';
+import { mymap } from '../Map/MapComponent';
+import { baseUrl } from '../../js/const';
 import $ from 'jquery';
-import {Button} from 'reactstrap';
+import { Button } from 'reactstrap';
 import CountryItem from '../Elements/CountryItemTemplate';
-import {Typeahead} from "react-bootstrap-typeahead";
+import { Typeahead } from "react-bootstrap-typeahead";
 import StationSearchBar from './searchBars/stationSearchBar';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-daterangepicker/daterangepicker.css';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
 class StationsQueryComponent extends React.Component {
   constructor(props) {
@@ -125,7 +125,7 @@ class StationsQueryComponent extends React.Component {
   onChangePage = (selectedPage, index) => {
     this.props.PageChanged(selectedPage);
     this.props.mapSelectedIndex(index);
-    this.setState({selectedPage});
+    this.setState({ selectedPage });
   };
 
   currentStation = () => {
@@ -137,11 +137,11 @@ class StationsQueryComponent extends React.Component {
 
   //Кнопка пошуку активується якщо є пошуковий параметр або виділені полігони з вказаною датою.
   enableButton = () => {
-    const {markerRequest, polyRequest, queryParam, date, years,} = this.props;
+    const { markerRequest, polyRequest, queryParam, date, years, } = this.props;
     if ((queryParam.length > 0) || ((date.dateSet || years) && (polyRequest || markerRequest))) {
-      this.setState({enableSearchButton: true});
+      this.setState({ enableSearchButton: true });
     } else {
-      this.setState({enableSearchButton: false})
+      this.setState({ enableSearchButton: false })
     }
   };
 
@@ -199,7 +199,7 @@ class StationsQueryComponent extends React.Component {
         });
 
         console.log(array);
-        this.setState({source: array});
+        this.setState({ source: array });
       }).catch((error) => console.log(error))
     //}
   };
@@ -246,7 +246,7 @@ class StationsQueryComponent extends React.Component {
   };
 
   render() {
-    const {/* counter, */ stationPackLink, weatherPackLink} = this.props;
+    const { /* counter, */ stationPackLink, weatherPackLink } = this.props;
     let toStationsBar = {
       areLimitAndOffsetDisabled: this.props.areLimitAndOffsetDisabled,
       ApplyCalendarDate: this.ApplyCalendarDate,
@@ -359,44 +359,44 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   setQuery: (param) => {
-    dispatch({type: "SET_QUERY", param: param})
+    dispatch({ type: "SET_QUERY", param: param })
   },
   disableLimitAndOffset: (flag) => {
-    dispatch({type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag})
+    dispatch({ type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag })
   },
   setStationPackLink: (link) => {
-    dispatch({type: "SET_STATION_PACK_LINK", link: link})
+    dispatch({ type: "SET_STATION_PACK_LINK", link: link })
   },
   setWeatherPackLink: (link) => {
-    dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
+    dispatch({ type: "SET_WEATHER_PACK_LINK", link: link })
   },
   setYears: (years) => {
-    dispatch({type: "SET_YEARS", years: years})
+    dispatch({ type: "SET_YEARS", years: years })
   },
   setMonths: (months) => {
-    dispatch({type: "SET_MONTHS", months: months})
+    dispatch({ type: "SET_MONTHS", months: months })
   },
   setDays: (days) => {
-    dispatch({type: "SET_DAYS", days: days})
+    dispatch({ type: "SET_DAYS", days: days })
   },
   setTime: (date) => {
-    dispatch({type: "SET_TIME", date: date})
+    dispatch({ type: "SET_TIME", date: date })
   },
   //Працює для  limit offset nearest neigh
   setLimiters: (data, kind) => {
-    dispatch({type: "SET_ANY_INPUT_DATA", data: data, kind: kind})
+    dispatch({ type: "SET_ANY_INPUT_DATA", data: data, kind: kind })
   },
   PolySelected: (req) => {
-    dispatch({type: "SET_POLY_SELECTED", req: req})
+    dispatch({ type: "SET_POLY_SELECTED", req: req })
   },
   MarkerSelected: (flag, req) => {
-    dispatch({type: "SET_MARKER_REQUEST", req: req})
+    dispatch({ type: "SET_MARKER_REQUEST", req: req })
   },
   setPolygons: (polygons) => {
-    dispatch({type: "SET_POLYGONS", polygons: polygons})
+    dispatch({ type: "SET_POLYGONS", polygons: polygons })
   },
   refreshSearchParams: () => {
-    dispatch({type: "REFRESH_EVERYTHING"})
+    dispatch({ type: "REFRESH_EVERYTHING" })
   }
 });
 
