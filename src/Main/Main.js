@@ -183,9 +183,8 @@ class Main extends Component {
       withoutRepeatingPoly.push(currentPoly);
       this.props.setPolygons(withoutRepeatingPoly);
     }
-
+    console.log(this.props.polygons);
     this.conglameratePolygons();
-
 
     const sortedMarkers = [], prevMarkers = this.state.MapMarkers, sortedStations = [],
       prevStations = this.state.stationsAll;
@@ -195,6 +194,7 @@ class Main extends Component {
         let markersInOnePoly = prevMarkers.filter((marker) => {
           return this.props.polygons[i].layer.contains(marker.position)
             && !newMarkers.some((newMarker) => newMarker.data.id === marker.data.id)
+            && !sortedMarkers.some((oldMarker)=> oldMarker.data.id === marker.data.id)
         });
         Array.prototype.push.apply(sortedMarkers, markersInOnePoly);
 
@@ -202,12 +202,15 @@ class Main extends Component {
           let LatLng = {lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon)};
           return this.props.polygons[i].layer.contains(LatLng)
             && !newStations.some((repeat) => repeat.props.props.id === station.props.props.id)
+            && !sortedStations.some((oldStation)=> oldStation.props.props.id === station.props.props.id)
         });
         Array.prototype.push.apply(sortedStations, stationsInOnePoly);
       }
     }
-
+    console.log(newMarkers)
+    console.log(sortedMarkers)
     Array.prototype.push.apply(sortedMarkers, newMarkers);
+
     Array.prototype.push.apply(sortedStations, newStations);
     this.setState({
       MapMarkers: sortedMarkers,
@@ -274,6 +277,7 @@ class Main extends Component {
   };
 
   onStationsSelection = (station, poly) => {
+    const {stationsAll} = this.state;
     if (station.code === 33) return;
 
     let stations = Array.isArray(station.response) ? station.response.filter((i) => {
@@ -282,7 +286,9 @@ class Main extends Component {
 
     if (stations) {
       let cnt, mrk;
-      cnt = mrk = this.state.stationsAll.length;
+
+      cnt = mrk = stationsAll.length > 0 ? stationsAll[stationsAll.length - 1].key + 1 : 0;
+
       let newStations = stations.map((i) => createStation(i, cnt++, this.setCardItem));
 
       const newMarkers = [], area_latlon = [];
@@ -382,12 +388,12 @@ class Main extends Component {
           <StationsResultView/>
         </FlyoutContainer>
 
-        { this.state.stationsAll.length > 0 &&
-          <FlyoutContainer title="Aggregate weather" position="left" iconClassName="fa fa-filter"
-                           containerInnerClass={containerInnerClass}>
-            <WeatherAggregationComponent {...comp} />
-            <StatisticsAggregationComponent/>
-          </FlyoutContainer>
+        {this.state.stationsAll.length > 0 &&
+        <FlyoutContainer title="Aggregate weather" position="left" iconClassName="fa fa-filter"
+                         containerInnerClass={containerInnerClass}>
+          <WeatherAggregationComponent {...comp} />
+          <StatisticsAggregationComponent/>
+        </FlyoutContainer>
         }
 
         <FlyoutContainer title="Countries" position="left" iconClassName="fa fa-globe"

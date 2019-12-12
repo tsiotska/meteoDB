@@ -136,7 +136,9 @@ export class ApiController extends ControllerContext {
   };
 
   getWeatherByGeoJson = (payload) => {
-    return axios.post('/api/gsod/poly?type=mpoly', payload);
+    console.log("payload")
+    console.log(payload)
+    return axios.post(baseUrl + '/api/gsod/poly?type=mpoly', payload);
   };
 
   //fetch weather data if we already have stations

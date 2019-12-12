@@ -164,7 +164,6 @@ class MapComponent extends Component {
 
   renderMarkers = () => {
     if (this.props.currentSelected) {
-      console.log(this.props.currentSelected.map((w) => this.renderOne(w)));
       return this.props.currentSelected.map((w) => this.renderOne(w));
     } else if (this.props.markers) {
       return this.props.markers.map((w) => this.renderOne(w));
