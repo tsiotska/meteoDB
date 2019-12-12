@@ -1,6 +1,7 @@
 import {baseUrl} from "../js/const"
 import FetchController from "../js/Helpers/FetchController";
 import ControllerContext from "./ControllerContext";
+import axios from "axios";
 
 
 export class ApiController extends ControllerContext {
@@ -38,6 +39,7 @@ export class ApiController extends ControllerContext {
     return ('&since=' + this.time.startDate.format('DD.MM.YYYY') +
       '&until=' + this.time.endDate.format('DD.MM.YYYY'))
   }
+
   _getSingleTimeParams = (e) => {
     return (this._year ? "&years=" + this._year : '') +
       (this._months ? "&months=" + this._months : '') +
@@ -75,8 +77,7 @@ export class ApiController extends ControllerContext {
   };
   // Link builders
   createPolyRequest = (newPolygon) => {
-    let req = "";
-    console.log(newPolygon)
+    let req;
     if (newPolygon.options.radius) {
       //Ось тут можна правити
       let lat = newPolygon.hasOwnProperty("_latlng") ? newPolygon._latlng.lat : newPolygon.latlng.lat;
@@ -94,12 +95,13 @@ export class ApiController extends ControllerContext {
     let searchType = selectedField;
     let queryType = '&query=' + query;
     let queryValue = 'stations?field=' + searchType + queryType;
-    return baseUrl + '/api/' + this.database + '/' + queryValue;
+    let link =  baseUrl + '/api/' + this.database + '/' + queryValue;
+    console.log(link);
+    return link;
   }
 
-  // Final builder
-  fetchData = (link) => {
-    let req = link +
+  compileContext = (link) => {
+    return link +
       this.addLimiters() +
       this.addNearestStations() +
       this.addNeighbours() +
@@ -107,16 +109,18 @@ export class ApiController extends ControllerContext {
       this.addTime() +
       this.addStatistics() +
       this.addPack();
-
+  }
+  // Final builder
+  fetchData = (req) => {
     this.resetController();
     return this.api.Get(req)
-  }
+  };
 
   getDataForMapOrMarker(context) {
     this.setController(context);
     let link = this.createPolyRequest(context.e);
-    return this.fetchData(link);
-  }
+    return this.fetchData(this.compileContext(link));
+  };
 
   //Можеш просто викликати getDataForMapAndMarker і передавати контекст, а це видалити.
   getStationsFromMapEvent(context) {
@@ -125,24 +129,28 @@ export class ApiController extends ControllerContext {
 
   getWeatherFromMapEvent = (context) => {
     return this.getDataForMapOrMarker(context);
-  }
+  };
 
   getPackFromMapEvent = (context) => {
     return this.getDataForMapOrMarker(context);
-  }
+  };
+
+  getWeatherByGeoJson = (payload) => {
+    return axios.post('/api/gsod/poly?type=mpoly', payload);
+  };
 
   //fetch weather data if we already have stations
   getWeather = (context) => {
     this.setController(context);
-    return this.fetchData(context.markerRequest ? context.markerRequest : context.polyRequest)
-  }
+    console.log(this.compileContext(context.markerRequest || context.polyRequest || context.queryRequest ))
+    return this.fetchData(this.compileContext(context.markerRequest || context.polyRequest || context.queryRequest ))
+  };
 
   //simple query searching for stations
   getAllDataTypesByQuery = (context) => {
     this.setController(context);
-    return this.fetchData(this.createQueryLink(context.selectedField, context.queryParam));
+    return this.fetchData(this.compileContext(this.createQueryLink(context.selectedField, context.queryParam)));
   }
-
   //Can be simplified in one
   searchStationsByQuery = (context) => {
     return this.getAllDataTypesByQuery(context);
@@ -157,7 +165,7 @@ export class ApiController extends ControllerContext {
   }
 
   getStationsCount() {
-    return this.fetchData(baseUrl + "/api/" + this.database + "/countries/stationsCount")
+    return this.fetchData(this.compileContext(baseUrl + "/api/" + this.database + "/countries/stationsCount"))
   }
 
   //extractors 
@@ -170,6 +178,6 @@ export class ApiController extends ControllerContext {
       count = "&limit=" + countValue;
     }
     let link = baseUrl + "/api/" + this.database + "/stations?extract=" + type + offset + count;
-    return this.fetchData(link)
+    return this.fetchData(this.compileContext(link))
   }
 }

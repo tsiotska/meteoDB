@@ -2,11 +2,11 @@ import React from 'react';
 
 export default(props) => {
 
-  const handler = (e) => {
+  const handler = async(e) => {
     e.preventDefault();
-    props.onRefreshClick();
-    props.setQuery(props.e.name);
-    props.onSearchClick();
+    await props.onRefreshClick();
+    await props.setQuery(props.e.name);
+    await props.onSearchClick();
     return false;
   }, e = props.e;
 

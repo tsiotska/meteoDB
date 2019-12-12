@@ -41,17 +41,21 @@ export default class Sidebar extends Component {
             onClick={() => this.SetActive(this.state.localContext.active)}><span /><p>to map</p></Button>)
 
         this.props.children.forEach((value, index) => {
-            items.push(<Button color="outline" key={index} className={"sidebar-item " + value.props.iconClassName +
+            if(value) {
+                items.push(<Button color="outline" key={index} className={"sidebar-item " + value.props.iconClassName +
                 (this.state.localContext.active === value.props.title ? " active" : "")}
-                data-item-id={value.props.title}
-                data-toggle="tooltip" data-html="true" data-trigger="hover"
-                data-placement="left" title={"<div className='tooltip-info'> " + value.props.title + "</div>"}
-                onClick={(e) => this.SetActive(e.target.getAttribute('data-item-id'))}><span /> </Button>)
+                                   data-item-id={value.props.title}
+                                   data-toggle="tooltip" data-html="true" data-trigger="hover"
+                                   data-placement="left"
+                                   title={"<div className='tooltip-info'> " + value.props.title + "</div>"}
+                                   onClick={(e) => this.SetActive(e.target.getAttribute('data-item-id'))}><span/>
+                </Button>)
+            }
         })
         const childrenWithProps = React.Children.map(this.props.children, (child, index) =>
-            <Consumer key={"item" + index}>{value => React.cloneElement(child, {
-                isExpanded: this.state.localContext.isExpanded && child.props.title === value.active
-            })}</Consumer>
+          child && <Consumer key={"item" + index}>{value => React.cloneElement(child, {
+                  isExpanded: this.state.localContext.isExpanded && child.props.title === value.active
+              })}</Consumer>
         );
 
         return (

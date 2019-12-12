@@ -4,7 +4,6 @@ import {baseUrl} from '../../js/const';
 import $ from 'jquery';
 import {Button} from 'reactstrap';
 import CountryItem from '../Elements/CountryItemTemplate';
-import {Typeahead} from "react-bootstrap-typeahead";
 import StationSearchBar from './searchBars/stationSearchBar';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-daterangepicker/daterangepicker.css';
@@ -40,7 +39,8 @@ class StationsQueryComponent extends React.Component {
           });
           let cnt = 0;
           this.props.setCtrList(data.response.map((i) => {
-            return <CountryItem key={cnt++} onSearchClick={this.onSearchClick} onRefreshClick={this.onRefreshClick}
+            return <CountryItem key={cnt++} onSearchClick={this.onStationsSearchClick}
+                                onRefreshClick={this.onRefreshClick}
                                 setQuery={this.props.setQuery} e={i}/>;
 
           }))
@@ -48,78 +48,30 @@ class StationsQueryComponent extends React.Component {
       });
   }
 
-  onSearchClick = () => {
-    const {
-      markerRequest, polyRequest, queryParam,
-      date, years, months, days, offset, limit, neigh, nearest,
-    } = this.props;
-    //Якщо дозагрузка погоди/Лише для полі і маркера. Без query догрузки
-    if (markerRequest || polyRequest) {
-      this.props.api.getWeather({
-        date,
-        years,
-        months,
-        days,
-        polyRequest,
-        markerRequest
-      }).then((weather) => {
-        this.props.setWeatherForOneStation(weather.response);
-      }).catch((error) => console.log(error))
-    } //Якщо звичайний query запит.
-    else if (queryParam) {
-      this.props.api.searchStationsByQuery({
-        offset,
-        limit,
-        neigh,
-        nearest,
-        queryParam,
-        selectedField: this.selectorByField.current.value
-      }).then((stations) => {
-        console.log(stations);
-        this.props.onStationsData(stations);
-      }).catch((error) => console.log(error));
 
-      this.props.api.getPackByQuery({
-        offset, limit,
-        neigh, nearest,
-        queryParam,
-        selectedField: this.selectorByField.current.value,
-        pack: true
-      })
-        .then((pack) => {
-          this.props.setStationPackLink(pack.response[0]);
-        }).catch((error) => console.log(error));
+  onStationsSearchClick = () => {
+    const {queryParam, offset, limit, neigh, nearest, api} = this.props;
 
-      //FIX HERE
-      if (years || date.dateSet) {
-        this.props.api.getWeatherByQuery({
-          date, years,
-          offset, limit,
-          neigh, nearest,
-          queryParam,
-          selectedField: this.selectorByField.current.value
-        }).then((weather) => {
-          this.props.setWeather(weather.response);
-        }).catch((error) => console.log(error));
-
-        this.props.api.getPackByQuery({
-          date: date,
-          years: years,
-          months: months,
-          days: days,
-          offset: offset, limit: limit,
-          neighbors: neigh, nearest: nearest,
-          query: queryParam,
-          selectedField: this.selectorByField.current.value, pack: true
-        })
-          .then((pack) => {
-            console.log(pack)
-            this.props.setWeatherPackLink(pack.response[0]);
-          }).catch((error) => console.log(error));
-      }
-    } else {
-      alert("Please choose a query...")
-    }
+    this.props.api.searchStationsByQuery({
+      offset, limit, neigh,
+      nearest, queryParam,
+      selectedField: this.selectorByField.current.value
+    }).then((stations) => {
+      console.log(stations);
+      this.props.onStationsSelection(stations);
+    }).catch((error) => console.log(error));
+    /*
+          this.props.api.getPackByQuery({
+            offset, limit,
+            neigh, nearest,
+            queryParam,
+            selectedField: this.selectorByField.current.value,
+            pack: true
+          })
+            .then((pack) => {
+              this.props.setStationPackLink(pack.response[0]);
+            }).catch((error) => console.log(error));
+    */
   };
 
   onChangePage = (selectedPage, index) => {
@@ -137,8 +89,8 @@ class StationsQueryComponent extends React.Component {
 
   //Кнопка пошуку активується якщо є пошуковий параметр або виділені полігони з вказаною датою.
   enableButton = () => {
-    const {markerRequest, polyRequest, queryParam, date, years,} = this.props;
-    if ((queryParam.length > 0) || ((date.dateSet || years) && (polyRequest || markerRequest))) {
+    const {queryParam} = this.props;
+    if ((queryParam.length > 0)) {
       this.setState({enableSearchButton: true});
     } else {
       this.setState({enableSearchButton: false})
@@ -176,16 +128,9 @@ class StationsQueryComponent extends React.Component {
   onTypeChanged = () => {
     this.clearSource();
     let type = this.selectorByField.current.value;
-    //disable limit and offset
+
     this.props.disableLimitAndOffset(type === "stname" || type === "id" || type === "wban");
 
-    /* if (this.props.year) {
-       this.props.api.getByTypeAndYear(this.props.year, this.selectorByField.current.value)
-         .then((data) => {
-           console.log(data.response[0]);
-           //  this.setState({source: data.response})
-         }).catch((error) => console.log(error))
-     } else {*/
     this.props.api.getByType(this.selectorByField.current.value, this.state.offset, this.state.limit)
       .then((data) => {
         let array = data.response.filter((value) => {
@@ -201,7 +146,6 @@ class StationsQueryComponent extends React.Component {
         console.log(array);
         this.setState({source: array});
       }).catch((error) => console.log(error))
-    //}
   };
 
   onOffsetChange = (event) => {
@@ -220,33 +164,13 @@ class StationsQueryComponent extends React.Component {
     this.props.setLimiters(event.target.value, "limit")
   };
 
-  onYearsChange = async (event) => {
-    await this.props.setYears(event.target.value);
-    this.enableButton();
-  };
-
-  onMonthsChange = async (event) => {
-    await this.props.setMonths(event.target.value);
-    this.enableButton();
-  };
-
-  onDaysChange = async (event) => {
-    await this.props.setDays(event.target.value);
-    this.enableButton();
-  };
-
-  ApplyCalendarDate = async (e) => {
-    await this.props.setTime(e);
-    this.enableButton();
-  };
-
   unControlledInput = async (searchParam) => {
     await this.props.setQuery(searchParam);
     this.enableButton();
   };
 
   render() {
-    const {/* counter, */ stationPackLink, weatherPackLink} = this.props;
+    const {stationPackLink, weatherPackLink} = this.props;
     let toStationsBar = {
       areLimitAndOffsetDisabled: this.props.areLimitAndOffsetDisabled,
       ApplyCalendarDate: this.ApplyCalendarDate,
@@ -265,7 +189,7 @@ class StationsQueryComponent extends React.Component {
       source: this.state.source,
       unControlledInput: this.unControlledInput
     };
-    return (<div className={"" + this.props.className}>
+    return (<div /*className={"" + this.props.className}*/>
       <h2>Query stations</h2>
       <div className="panel flyn active mr-3 p-0">
         <div className="flyn-inputs-container">
@@ -299,12 +223,12 @@ class StationsQueryComponent extends React.Component {
 
             <StationSearchBar ref={this.typeahead} {...toStationsBar} />
 
-
             <div className="col-auto d-flex w-100 justify-content-center">
-              <Button id="reeval" onClick={this.onSearchClick}
+              <Button id="reeval" onClick={this.onStationsSearchClick}
                       color="primary"
                       className={(this.state.enableSearchButton ? "" : "disabled ") + "m-2 mb-1 mt-auto"}>Search
               </Button>
+
               <Button id="refresh" onClick={this.onRefreshClick}
                       color="secondary"
                       className="m-2 mb-1 mt-auto">Clear
@@ -391,6 +315,9 @@ const mapDispatchToProps = dispatch => ({
   },
   MarkerSelected: (flag, req) => {
     dispatch({type: "SET_MARKER_REQUEST", req: req})
+  },
+  QueryRequest: (req) => {
+    dispatch({type: "SET_QUERY_REQUEST", req: req})
   },
   setPolygons: (polygons) => {
     dispatch({type: "SET_POLYGONS", polygons: polygons})

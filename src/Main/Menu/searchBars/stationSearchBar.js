@@ -2,7 +2,7 @@ import React from "react";
 import {Typeahead} from "react-bootstrap-typeahead";
 import {Input} from "reactstrap";
 
-const StationSearchBar = React.forwardRef((props, ref) => {
+const StationSearchBar = ((props) => {
   const {
     areLimitAndOffsetDisabled,
     onTypeChanged, onLimitChange, onOffsetChange, onNearestChange,

@@ -17,6 +17,12 @@ const conditionReducer = (state = conditionState, action) => {
         ...state,
         markerRequest: action.req
       };
+    case types.SET_QUERY_REQUEST:
+      console.log(action.req);
+      return {
+        ...state,
+        queryRequest: action.req
+      };
     case types.DISABLE_OFFSET_AND_LIMIT_BUTTON:
       return {
         ...state,

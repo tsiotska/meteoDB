@@ -129,19 +129,16 @@ class MapComponent extends Component {
   };
 
   fetchMarkers = (e) => {
-    const { 
-       onStationsData, onWeatherData, setStationPackLink, setWeatherPackLink,
+    const {
+      onStationsSelection, onWeatherData, setStationPackLink, setWeatherPackLink,
       api, date, years, months, days /* neigh, nearest, offset, limit */
     } = this.props;
 
-    let req = api.createPolyRequest(e.layer);
-    //PolyRequest(req);
 
-//Погода добирається синхронно, це ще повільніше буде)
     api.getStationsFromMapEvent({
       e: e.layer,
     }).then((stations) => {
-      onStationsData(e, stations);
+      onStationsSelection(stations, e);
       }).catch((error) => console.log(error));
 
     if (date.dateSet || years) {
@@ -151,17 +148,17 @@ class MapComponent extends Component {
         }).catch((error) => console.log(error))
     }
 
-
+/*
     api.getPackFromMapEvent({e: e.layer, pack: true}).then((pack) => {
       setStationPackLink(pack.response[0])
     }).catch((error) => console.log(error));
-
 
     api.getPackFromMapEvent({
       e: e.layer, date, years, months, days, pack: true
     }).then((pack) => {
       setWeatherPackLink(pack.response[0])
     }).catch((error) => console.log(error));
+    */
   };
 
 

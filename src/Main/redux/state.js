@@ -1,6 +1,7 @@
 export const conditionState = {
   markerRequest: "",
   polyRequest: "",
+  queryRequest: "",
   areLimitAndOffsetDisabled: false,
 };
 
