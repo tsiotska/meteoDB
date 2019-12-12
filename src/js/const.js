@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 export const baseUrl = process.env.REACT_APP_LAMETSY_API_HOST;
 export const emptyContainer = <div className="text-center empt">

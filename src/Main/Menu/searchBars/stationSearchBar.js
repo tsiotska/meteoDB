@@ -1,6 +1,6 @@
 import React from "react";
-import {Typeahead} from "react-bootstrap-typeahead";
-import {Input} from "reactstrap";
+import { Typeahead } from "react-bootstrap-typeahead";
+import { Input } from "reactstrap";
 
 const StationSearchBar = ((props) => {
   const {

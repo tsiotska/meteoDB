@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Pagination from '../../Main/Controls/Pagination'
-import { emptyContainer } from '../../js/const' 
-import  {classJoin} from "../../js/const";
+import { emptyContainer } from '../../js/const'
+import { classJoin } from "../../js/const";
 
 export default class SelectedStationsList extends Component {
   constructor(props) {

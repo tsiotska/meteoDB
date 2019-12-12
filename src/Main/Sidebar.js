@@ -29,9 +29,9 @@ export default class Sidebar extends Component {
     SetActive = (e) => {
         let context = this.state.localContext;
         if (context.active === e)
-            this.setState({ localContext: { isExpanded: false, active: null } })
+            this.setState({ localContext: { isExpanded: false, active: null }})
         else
-            this.setState({ localContext: { isExpanded: true, active: e } })
+            this.setState({ localContext: { isExpanded: true, active: e }})
     }
     render() {
         let className = this.props.className ? this.props.className : "";

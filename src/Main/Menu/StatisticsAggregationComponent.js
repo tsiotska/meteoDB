@@ -1,7 +1,7 @@
 import React from "react";
 import DatePicker from '../Controls/DatePicker';
 import { Input } from "reactstrap";
-import  {classJoin} from "../../js/const";
+import  { classJoin } from "../../js/const";
 
 export default class StatisticsAggregationComponent extends React.Component {
     render() {

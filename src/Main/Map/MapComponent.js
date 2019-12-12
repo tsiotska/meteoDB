@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {TileLayer, Map, Marker, Tooltip} from 'react-leaflet';
+import React, { Component } from 'react';
+import { TileLayer, Map, Marker, Tooltip } from 'react-leaflet';
 import L from 'leaflet';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import $ from 'jquery';
@@ -104,7 +104,7 @@ class MapComponent extends Component {
       }
     }); */
     mymap.scrollWheelZoom.enable();
-    L.control.zoom({position: 'topright'}).addTo(mymap);
+    L.control.zoom({ position: 'topright' }).addTo(mymap);
     markerGroup = L.layerGroup().addTo(mymap);
   }
 
@@ -142,13 +142,12 @@ class MapComponent extends Component {
       }).catch((error) => console.log(error));
 
     if (date.dateSet || years) {
-      api.getWeatherFromMapEvent({e: e.layer, date: date, years: years, months: months, days: days})
+      api.getWeatherFromMapEvent({ e: e.layer, date: date, years: years, months: months, days: days })
         .then((weather) => {
           onWeatherData(weather.response)
         }).catch((error) => console.log(error))
     }
-
-/*
+    /*
     api.getPackFromMapEvent({e: e.layer, pack: true}).then((pack) => {
       setStationPackLink(pack.response[0])
     }).catch((error) => console.log(error));
@@ -182,7 +181,7 @@ class MapComponent extends Component {
   render() {
     const position = [this.state.lat, this.state.lng];
     const markers = this.renderMarkers();
-    let {counter} = this.props;
+    let { counter } = this.props;
     return ( 
       <div className="main_map container-fluid p-0"> 
         <div className="cur_count_wrapper">
@@ -220,19 +219,19 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   deleteLastPoly: (polygon) => {
-    dispatch({type: "DELETE_LAST_POLY", polygon: polygon})
+    dispatch({ type: "DELETE_LAST_POLY", polygon: polygon })
   },
   MarkerSelected: (req) => {
-    dispatch({type: "SET_MARKER_REQUEST", req: req})
+    dispatch({ type: "SET_MARKER_REQUEST", req: req })
   },
   PolyRequest: (req) => {
-    dispatch({type: "SET_POLY_REQUEST", req: req})
+    dispatch({ type: "SET_POLY_REQUEST", req: req })
   },
   setStationPackLink: (link) => {
-    dispatch({type: "SET_STATION_PACK_LINK", link: link})
+    dispatch({ type: "SET_STATION_PACK_LINK", link: link })
   },
   setWeatherPackLink: (link) => {
-    dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
+    dispatch({ type: "SET_WEATHER_PACK_LINK", link: link })
   },
 });
 
