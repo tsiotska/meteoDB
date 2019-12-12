@@ -142,27 +142,28 @@ export class ApiController extends ControllerContext {
   //fetch weather data if we already have stations
   getWeather = (context) => {
     this.setController(context);
-    console.log(this.compileContext(context.markerRequest || context.polyRequest || context.queryRequest ))
     return this.fetchData(this.compileContext(context.markerRequest || context.polyRequest || context.queryRequest ))
   };
 
-  //simple query searching for stations
-  getAllDataTypesByQuery = (context) => {
+  buildQueryRequest = (context) =>{
     this.setController(context);
-    return this.fetchData(this.compileContext(this.createQueryLink(context.selectedField, context.queryParam)));
-  }
+    let link = this.compileContext(this.createQueryLink(context.selectedField, context.queryParam));
+    this.resetController();
+    return link;
+  };
+
   //Can be simplified in one
   searchStationsByQuery = (context) => {
-    return this.getAllDataTypesByQuery(context);
+    return this.fetchData(this.buildQueryRequest(context));
   };
 
   getWeatherByQuery = (context) => {
-    return this.getAllDataTypesByQuery(context);
-  }
+    return this.fetchData(this.buildQueryRequest(context));
+  };
 
   getPackByQuery = (context) => {
-    return this.getAllDataTypesByQuery(context);
-  }
+    return this.fetchData(this.buildQueryRequest(context));
+  };
 
   getStationsCount() {
     return this.fetchData(this.compileContext(baseUrl + "/api/" + this.database + "/countries/stationsCount"))

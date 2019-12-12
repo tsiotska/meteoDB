@@ -6,10 +6,11 @@ import {connect} from "react-redux";
 class WeatherAggregationComponent extends React.Component {
   state = {enableWeatherSearchButton: false};
 
+  //Не можна прокидати тєкущі limit, offset, бо користувач міг їх змінити. Використовуємо збережений req
   onWeatherSearchClick = () => {
     const {
-      polyRequest, markerRequest, offset, limit, neigh,
-      nearest, days, months, date, years, api
+      polyRequest, markerRequest, queryRequest, offset, limit, neigh,
+      nearest, days, months, date, years, api,
     } = this.props;
 
     if (years || months || days || date.dateSet) {
@@ -30,10 +31,9 @@ class WeatherAggregationComponent extends React.Component {
           this.props.onWeatherData(weather.response);
         }).catch((error) => console.log(error))
       } else {
-        api.getWeatherByQuery({
+        api.getWeather({
           date, years, months, days,
-          offset, limit, neigh,
-          nearest
+          queryRequest
         }).then((weather) => {
           this.props.onWeatherData(weather.response);
         }).catch((error) => console.log(error));
@@ -55,7 +55,7 @@ class WeatherAggregationComponent extends React.Component {
            this.props.setWeatherPackLink(pack.response[0]);
          }).catch((error) => console.log(error));
          */
-    } else{
+    } else {
       alert("Please select date!")
     }
   };

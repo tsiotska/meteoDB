@@ -50,9 +50,16 @@ class StationsQueryComponent extends React.Component {
 
 
   onStationsSearchClick = () => {
-    const {queryParam, offset, limit, neigh, nearest, api} = this.props;
+    const {queryParam, offset, limit, neigh, nearest, api, QueryRequest} = this.props;
 
-    this.props.api.searchStationsByQuery({
+    QueryRequest(api.buildQueryRequest({
+      offset, limit, neigh,
+      nearest, queryParam,
+      selectedField: this.selectorByField.current.value
+    }));
+
+
+    api.searchStationsByQuery({
       offset, limit, neigh,
       nearest, queryParam,
       selectedField: this.selectorByField.current.value
