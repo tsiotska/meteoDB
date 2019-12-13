@@ -95,10 +95,8 @@ export class ApiController extends ControllerContext {
     let searchType = selectedField;
     let queryType = '&query=' + query;
     let queryValue = 'stations?field=' + searchType + queryType;
-    let link =  baseUrl + '/api/' + this.database + '/' + queryValue;
-    console.log(link);
-    return link;
-  }
+    return baseUrl + '/api/' + this.database + '/' + queryValue;
+  };
 
   compileContext = (link) => {
     return link +
@@ -109,8 +107,8 @@ export class ApiController extends ControllerContext {
       this.addTime() +
       this.addStatistics() +
       this.addPack();
-  }
-  // Final builder
+  };
+
   fetchData = (req) => {
     this.resetController();
     return this.api.Get(req)

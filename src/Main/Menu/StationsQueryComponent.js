@@ -88,9 +88,9 @@ class StationsQueryComponent extends React.Component {
   };
 
   currentStation = () => {
-    if (this.props.currentStation) {
+    if (this.props.selectedStation) {
       return (<div id="flyn_current_station" className="w-100 d-flex flex-column flyn_current_station">
-        {this.props.currentStation}</div>);
+        {this.props.selectedStation}</div>);
     } else return null;
   };
 
@@ -116,20 +116,17 @@ class StationsQueryComponent extends React.Component {
   };
 
   onRefreshClick = () => {
-    this.clearSource();
     this.props.polygons.forEach((poly) => {
       mymap.removeLayer(poly.layer)
     });
 
+    this.clearSource();
+
     mymap.setView([
       48.289559, 31.3205566 // Ukraine centered
     ], 6);
+
     //this.props.setCardItem([]);
-
-    this.props.clearMap();
-    this.props.PolySelected("");
-    this.props.MarkerSelected("");
-
     this.enableButton();
   };
 
@@ -273,9 +270,9 @@ class StationsQueryComponent extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  polyRequest: state.conditionReducer.polyRequest,
-  markerRequest: state.conditionReducer.markerRequest,
-  areLimitAndOffsetDisabled: state.conditionReducer.areLimitAndOffsetDisabled,
+  polyRequest: state.dataReducer.polyRequest,
+  markerRequest: state.dataReducer.markerRequest,
+  areLimitAndOffsetDisabled: state.dataReducer.areLimitAndOffsetDisabled,
 
   polygons: state.dataReducer.polygons,
   stationPackLink: state.dataReducer.stationPackLink,
@@ -288,7 +285,8 @@ const mapStateToProps = state => ({
   neigh: state.dataReducer.neigh,
   nearest: state.dataReducer.nearest,
   limit: state.dataReducer.limit,
-  offset: state.dataReducer.offset
+  offset: state.dataReducer.offset,
+  selectedStation: state.dataReducer.selectedStation
 });
 
 const mapDispatchToProps = dispatch => ({

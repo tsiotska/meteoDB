@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import Pagination from '../../Main/Controls/Pagination';
 import { emptyContainer } from '../../js/const'
+import {connect} from "react-redux";
 
-export default class DaysItemsList extends Component {
+class DaysItemsList extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -15,7 +16,7 @@ export default class DaysItemsList extends Component {
   };
 
   render() {
-    let array = this.props.daysItems.length > 0 ? this.props.daysItems : false;
+    let array = this.props.weather.length > 0 ? this.props.weather : false;
     let displayEmptyPage = (array);
     return (<div
       className="container" >
@@ -36,3 +37,10 @@ export default class DaysItemsList extends Component {
     </div>)
   }
 }
+
+const
+  mapStateToProps = state => ({
+    weather: state.dataReducer.weather,
+  });
+
+export default connect(mapStateToProps)(DaysItemsList);

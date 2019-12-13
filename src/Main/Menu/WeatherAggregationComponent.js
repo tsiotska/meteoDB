@@ -165,9 +165,9 @@ class WeatherAggregationComponent extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  polyRequest: state.conditionReducer.polyRequest,
-  markerRequest: state.conditionReducer.markerRequest,
-  queryRequest: state.conditionReducer.queryRequest,
+  polyRequest: state.dataReducer.polyRequest,
+  markerRequest: state.dataReducer.markerRequest,
+  queryRequest: state.dataReducer.queryRequest,
 
   stationPackLink: state.dataReducer.stationPackLink,
   weatherPackLink: state.dataReducer.weatherPackLink,

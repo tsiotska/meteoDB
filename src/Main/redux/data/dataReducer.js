@@ -3,6 +3,49 @@ import {types} from './dataActions';
 
 const dataReducer = (state = dataState, action) => {
   switch (action.type) {
+    case types.SET_STATIONS:
+      return {
+        ...state,
+        stations: action.stations
+      };
+    case types.SET_WEATHER:
+      return {
+        ...state,
+        weather: action.weather
+      };
+    case types.SET_MARKERS:
+      return {
+        ...state,
+        markers: action.markers
+      };
+    case types.SET_SELECTED_STATION:
+      return {
+        ...state,
+        selectedStation: action.selected
+      };
+    case types.SET_POLY_REQUEST:
+      let flag = (!!action.req);
+      console.log(action.req);
+      return {
+        ...state,
+        areLimitAndOffsetDisabled: flag,
+        polyRequest: action.req
+      };
+    case types.SET_MARKER_REQUEST:
+      return {
+        ...state,
+        markerRequest: action.req
+      };
+    case types.SET_QUERY_REQUEST:
+      return {
+        ...state,
+        queryRequest: action.req
+      };
+    case types.DISABLE_OFFSET_AND_LIMIT_BUTTON:
+      return {
+        ...state,
+        areLimitAndOffsetDisabled: action.flag
+      };
     case types.SET_QUERY:
       console.log(action.param)
       return {
@@ -76,8 +119,16 @@ const dataReducer = (state = dataState, action) => {
         offset: null,
         nearest: false,
         neigh: null,
+
         polygons: [],
-        geoPolygons: []
+        geoPolygons: [],
+        weather: [],
+        stations : [],
+        markers : [],
+        selectedStation: [],
+        markerRequest: "",
+        polyRequest: "",
+        queryRequest: "",
       };
     default:
       return state;

@@ -1,8 +1,5 @@
 export const conditionState = {
-  markerRequest: "",
-  polyRequest: "",
-  queryRequest: "",
-  areLimitAndOffsetDisabled: false,
+
 };
 
 export const dataState = {
@@ -19,13 +16,14 @@ export const dataState = {
   neigh: null,
 
   polygons: [],
-  geoPolygons: []
+  geoPolygons: [],
+  weather: [],
+  stations : [],
+  markers : [],
+  selectedStation: [],
+
+  markerRequest: "",
+  polyRequest: "",
+  queryRequest: "",
+  areLimitAndOffsetDisabled: false,
 };
-
-
-/* на очєрєді
-  currentWeather: [],
-  currentStation: [],
-    markerRequest: "",
-    polyRequest: ""
-    */

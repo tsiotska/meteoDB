@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Pagination from '../../Main/Controls/Pagination'
 import { emptyContainer } from '../../js/const'
 import { classJoin } from "../../js/const";
+import {connect} from "react-redux";
 
-export default class SelectedStationsList extends Component {
+class SelectedStationsList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -16,7 +17,7 @@ export default class SelectedStationsList extends Component {
   };
 
   render() {
-    let array = this.props.selectedStations.length > 0 ? this.props.selectedStations : false;
+    let array = this.props.stations.length > 0 ? this.props.stations : false;
     let displayEmptyPage = (array);
 
     return (<div className={"" + classJoin(this.props.className)}>
@@ -39,3 +40,8 @@ export default class SelectedStationsList extends Component {
     </div>);
   }
 }
+const
+  mapStateToProps = state => ({
+    stations: state.dataReducer.stations,
+  });
+export default connect(mapStateToProps)(SelectedStationsList);

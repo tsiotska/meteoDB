@@ -162,11 +162,9 @@ class MapComponent extends Component {
 
 
   renderMarkers = () => {
-    if (this.props.currentSelected) {
-      return this.props.currentSelected.map((w) => this.renderOne(w));
-    } else if (this.props.markers) {
+    if (this.props.markers) {
       return this.props.markers.map((w) => this.renderOne(w));
-    } else if (!this.props.currentSelected) {
+    } else if (!this.props.markers) {
       return null;
     }
   };
@@ -214,6 +212,7 @@ const mapStateToProps = state => ({
   nearest: state.dataReducer.nearest,
   offset: state.dataReducer.offset,
   limit: state.dataReducer.limit,
+  markers: state.dataReducer.markers
 });
 
 

@@ -33,15 +33,6 @@ export function createStation(e, cnt, click) {
   return <Station click={click} key={cnt} id={cnt} props={e}/>;
 }
 
-function flatten(arr) {
-  return arr.reduce((flat, toFlatten) => {
-    return flat.concat(
-      Array.isArray(toFlatten)
-        ? flatten(toFlatten)
-        : toFlatten);
-  }, []);
-}
-
 class Main extends Component {
   constructor(props) {
     super(props);
@@ -50,19 +41,15 @@ class Main extends Component {
         lat: null,
         lng: null
       },
-      stationsAll: [],
       DownloadList: [],
       ctr_list: [],
       togglerSelect: false,
       markerGroup: null,
       isVisible: false,
       api: new ApiController(this.loaderVisibility),
-      daysItems: [],
-      currentSelected: [],
+
       stationsCounter: null,
       lockM: true,
-      MapMarkers: [],
-      selectedPage: []
     };
 
     this.onMarkerClick = throttle(this.onMarkerClickBase, 500)
@@ -70,17 +57,6 @@ class Main extends Component {
 
   loaderVisibility = (flag) => {
     this.setState({isVisible: flag});
-  };
-
-  //Full clear
-  clearMap = () => {
-    this.props.setPolygons([]);
-    this.setState({
-      MapMarkers: [],
-      stationsAll: [],
-      daysItems: [],
-      currentStation: null
-    })
   };
 
   conglameratePolygons = () => {
@@ -92,15 +68,12 @@ class Main extends Component {
     let union;
     if (polygons.length > 1) {
       union = turf.union(...geoPolygons);
-      console.log(union)
       JSON.stringify(union)
       PolyRequest(union)
     } else {
       JSON.stringify(geoPolygons)
-      console.log(geoPolygons)
       PolyRequest(geoPolygons)
     }
-
   };
 
   partialClear = (poly) => {
@@ -111,35 +84,31 @@ class Main extends Component {
 
     let withoutRemovedMarkers = [], withoutRemovedStations = [], withoutRemovedWeather = [];
     for (let i in this.props.polygons) {
-      let markersInOnePoly = this.state.MapMarkers.filter((marker) => {
+      let markersInOnePoly = this.props.markers.filter((marker) => {
         return this.props.polygons[i].layer.contains(marker.position)
           && !withoutRemovedMarkers.some((repeat) => repeat.data.id === marker.data.id)
       });
       Array.prototype.push.apply(withoutRemovedMarkers, markersInOnePoly);
 
-      let stationsInOnePoly = this.state.stationsAll.filter((station) => {
+      let stationsInOnePoly = this.props.stations.filter((station) => {
         let LatLng = {lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon)};
         return this.props.polygons[i].layer.contains(LatLng)
           && !withoutRemovedStations.some((repeat) => repeat.props.props.id === station.props.props.id)
       });
       Array.prototype.push.apply(withoutRemovedStations, stationsInOnePoly);
     }
-    console.log(withoutRemovedStations)
+
     for (let i in withoutRemovedStations) {
-      let existingWeather = this.state.daysItems.filter((weather) => {
+      let existingWeather = this.props.weather.filter((weather) => {
         return weather.props.data.id === withoutRemovedStations[i].props.props.id
       });
       Array.prototype.push.apply(withoutRemovedWeather, existingWeather);
     }
-
-    console.log(withoutRemovedWeather)
-
-    this.setState({
-      MapMarkers: withoutRemovedMarkers,
-      stationsAll: withoutRemovedStations,
-      daysItems: withoutRemovedWeather,
-      currentStation: null
-    });
+    // can be simplified in one action
+    this.props.setMarkers(withoutRemovedMarkers);
+    this.props.setStations(withoutRemovedStations);
+    this.props.setWeather(withoutRemovedWeather);
+    this.props.setSelectedStation(null);
   };
 
   beforeMove = (poly) => {
@@ -150,23 +119,23 @@ class Main extends Component {
   };
 
   onWeatherData = (weather) => {
-    let wth = this.state.stationsAll.length;
+    let wth = this.props.stations.length;
     let newWeather = weather.map((i) => {
       return this.creativeDay(i, wth++);
     });
-    const sortedWeather = [], prevWeather = this.state.daysItems;
+    const sortedWeather = [], prevWeather = this.props.weather;
 
     if (prevWeather.length > 0) {
-      for (let i in this.state.stationsAll) {
+      for (let i in this.props.stations) {
         let weatherInOnePoly = prevWeather.filter((weather) => {
-          return weather.props.data.id === this.state.stationsAll[i].props.props.id;
+          return weather.props.data.id === this.props.stations[i].props.props.id;
         });
         Array.prototype.push.apply(sortedWeather, weatherInOnePoly);
       }
     }
 
     Array.prototype.push.apply(sortedWeather, newWeather);
-    this.setState({daysItems: sortedWeather})
+    this.props.setWeather(sortedWeather)
   };
 
   setStationsAndMarkersInPoly = (currentPoly, newMarkers, newStations) => {
@@ -186,15 +155,15 @@ class Main extends Component {
     console.log(this.props.polygons);
     this.conglameratePolygons();
 
-    const sortedMarkers = [], prevMarkers = this.state.MapMarkers, sortedStations = [],
-      prevStations = this.state.stationsAll;
+    const sortedMarkers = [], prevMarkers = this.props.markers, sortedStations = [],
+      prevStations = this.props.stations;
 
     if (prevMarkers.length > 0) {
       for (let i in this.props.polygons) {
         let markersInOnePoly = prevMarkers.filter((marker) => {
           return this.props.polygons[i].layer.contains(marker.position)
             && !newMarkers.some((newMarker) => newMarker.data.id === marker.data.id)
-            && !sortedMarkers.some((oldMarker)=> oldMarker.data.id === marker.data.id)
+            && !sortedMarkers.some((oldMarker) => oldMarker.data.id === marker.data.id)
         });
         Array.prototype.push.apply(sortedMarkers, markersInOnePoly);
 
@@ -202,20 +171,16 @@ class Main extends Component {
           let LatLng = {lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon)};
           return this.props.polygons[i].layer.contains(LatLng)
             && !newStations.some((repeat) => repeat.props.props.id === station.props.props.id)
-            && !sortedStations.some((oldStation)=> oldStation.props.props.id === station.props.props.id)
+            && !sortedStations.some((oldStation) => oldStation.props.props.id === station.props.props.id)
         });
         Array.prototype.push.apply(sortedStations, stationsInOnePoly);
       }
     }
-    console.log(newMarkers)
-    console.log(sortedMarkers)
     Array.prototype.push.apply(sortedMarkers, newMarkers);
-
     Array.prototype.push.apply(sortedStations, newStations);
-    this.setState({
-      MapMarkers: sortedMarkers,
-      stationsAll: sortedStations
-    })
+
+    this.props.setMarkers(sortedMarkers);
+    this.props.setStations(sortedStations);
   };
 
   getOneStationData = (e) => {
@@ -252,16 +217,20 @@ class Main extends Component {
   };
 
   setCardItem = (station) => {
-    this.setState({currentStation: createStation(station, 0)});
+    this.props.setSelectedStation(createStation(station, 0));
+    //this.setState({currentStation: createStation(station, 0)});
   };
 
   setWeatherForOneStation = (weather) => {
     let cnt = 0;
-    this.setState({
+    this.props.setWeather(weather.map((i) => {
+      return this.creativeDay(i, cnt++);
+    }))
+    /*this.setState({
       daysItems: weather.map((i) => {
         return this.creativeDay(i, cnt++);
       })
-    })
+    })*/
   };
 
   creativeDay = (e, cnt) => {
@@ -277,7 +246,6 @@ class Main extends Component {
   };
 
   onStationsSelection = (station, poly) => {
-    const {stationsAll} = this.state;
     if (station.code === 33) return;
 
     let stations = Array.isArray(station.response) ? station.response.filter((i) => {
@@ -287,7 +255,7 @@ class Main extends Component {
     if (stations) {
       let cnt, mrk;
 
-      cnt = mrk = stationsAll.length > 0 ? stationsAll[stationsAll.length - 1].key + 1 : 0;
+      cnt = mrk = this.props.stations.length > 0 ? this.props.stations[this.props.stations.length - 1].key + 1 : 0;
 
       let newStations = stations.map((i) => createStation(i, cnt++, this.setCardItem));
 
@@ -302,10 +270,8 @@ class Main extends Component {
       if (poly) {
         this.setStationsAndMarkersInPoly(poly, newMarkers, newStations);
       } else {
-        this.setState({
-          MapMarkers: newMarkers,
-          stationsAll: newStations
-        })
+        this.props.setMarkers(newMarkers);
+        this.props.setStations(newStations);
       }
       mymap.fitBounds(L.latLngBounds(area_latlon).pad(.3));
     } else alert("No data, sorry");
@@ -352,10 +318,7 @@ class Main extends Component {
   render() {
     let comp = {
       api: this.state.api,
-      currentSelected: this.state.currentSelected,
-      currentStation: this.state.currentStation,
       counter: this.state.stationsCounter,
-      markers: this.state.MapMarkers,
       setCtrList: this.setCtrList,
       mapSelectedIndex: this.selectedIndexChange,
       setWeatherForOneStation: this.setWeatherForOneStation,
@@ -364,7 +327,6 @@ class Main extends Component {
       PageChanged: this.onMapPageChanged,
       onMarkerClick: this.onMarkerClick,
       onToolRemove: this.onToolRemove,
-      clearMap: this.clearMap,
       setCardItem: this.setCardItem,
       beforeMove: this.beforeMove,
       onWeatherData: this.onWeatherData
@@ -374,10 +336,8 @@ class Main extends Component {
       ctr_list: this.state.ctr_list,
       mapSelectedIndex: this.state.mapSelectedIndex,
       DownloadList: this.state.DownloadList,
-      selectedStations: this.state.stationsAll,
-      stations: this.state.stationsAll,
-      daysItems: this.state.daysItems,
     };
+
     let containerInnerClass = "m-2";
     return (<div className="d-flex container-fluid p-0">
       {this.state.isVisible && <Loader isVisible={this.state.isVisible}/>}
@@ -388,7 +348,7 @@ class Main extends Component {
           <StationsResultView/>
         </FlyoutContainer>
 
-        {this.state.stationsAll.length > 0 &&
+        {this.props.stations.length > 0 &&
         <FlyoutContainer title="Aggregate weather" position="left" iconClassName="fa fa-filter"
                          containerInnerClass={containerInnerClass}>
           <WeatherAggregationComponent {...comp} />
@@ -406,19 +366,17 @@ class Main extends Component {
           <SelectedStationsList
             onStationsChange={conts.onStationsChange}
             index={conts.mapSelectedIndex}
-            selectedStations={conts.selectedStations}/>
+          />
         </FlyoutContainer>
 
         <FlyoutContainer title="Results" position="left" iconClassName="fa fa-sun-o">
-          <DaysItemsList
-            daysItems={conts.daysItems}/>
+          <DaysItemsList/>
         </FlyoutContainer>
       </Sidebar>
 
       <MapComponent api={comp.api} onWeatherData={comp.onWeatherData}
                     activeMarker={comp.activeMarker}
-                    onStationsSelection={comp.onStationsSelection} markers={this.state.selectedPage}
-                    currentSelected={comp.markers}
+                    onStationsSelection={comp.onStationsSelection}
                     setCardItem={comp.setCardItem} onToolRemove={comp.onToolRemove}
                     beforeMove={comp.beforeMove}/>
       <Footer/>
@@ -430,7 +388,9 @@ const
   mapStateToProps = state => ({
     years: state.dataReducer.years,
     date: state.dataReducer.date,
-    polygons: state.dataReducer.polygons
+    polygons: state.dataReducer.polygons,
+    stations: state.dataReducer.stations,
+    weather: state.dataReducer.weather,
   });
 
 const
@@ -452,6 +412,18 @@ const
     },
     setPolygonsInGeo: (polygons) => {
       dispatch({type: "SET_GEO_POLYGONS", polygons: polygons})
+    },
+    setStations: (stations) => {
+      dispatch({type: "SET_STATIONS", stations: stations})
+    },
+    setWeather: (weather) => {
+      dispatch({type: "SET_WEATHER", weather: weather})
+    },
+    setMarkers: (markers) => {
+      dispatch({type: "SET_MARKERS", markers: markers})
+    },
+    setSelectedStation: (selected) => {
+      dispatch({type: "SET_SELECTED_STATION", selected: selected})
     }
   });
 
