@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button } from 'reactstrap';
 import $ from 'jquery';
+import { classJoin } from 'js/const';
 
 const { Provider, Consumer } = React.createContext();
 
@@ -29,9 +30,9 @@ export default class Sidebar extends Component {
     SetActive = (e) => {
         let context = this.state.localContext;
         if (context.active === e)
-            this.setState({ localContext: { isExpanded: false, active: null }})
+            this.setState({ localContext: { isExpanded: false, active: null } })
         else
-            this.setState({ localContext: { isExpanded: true, active: e }})
+            this.setState({ localContext: { isExpanded: true, active: e } })
     }
     render() {
         let className = this.props.className ? this.props.className : "";
@@ -41,25 +42,29 @@ export default class Sidebar extends Component {
             onClick={() => this.SetActive(this.state.localContext.active)}><span /><p>to map</p></Button>)
 
         this.props.children.forEach((value, index) => {
-            if(value) {
-                items.push(<Button color="outline" key={index} className={"sidebar-item " + value.props.iconClassName +
-                (this.state.localContext.active === value.props.title ? " active" : "")}
-                                   data-item-id={value.props.title}
-                                   data-toggle="tooltip" data-html="true" data-trigger="hover"
-                                   data-placement="left"
-                                   title={"<div className='tooltip-info'> " + value.props.title + "</div>"}
-                                   onClick={(e) => this.SetActive(e.target.getAttribute('data-item-id'))}><span/>
+            if (value) {
+                var isVisible = typeof value.props.isVisible !== 'undefined' ? value.props.isVisible  : true; 
+                items.push(<Button color="outline" key={index}
+                    className={classJoin("sidebar-item",
+                        value.props.iconClassName,
+                        (isVisible ? "" : "fade"),
+                        (this.state.localContext.active === value.props.title ? "active" : ""))}
+                    data-item-id={value.props.title}
+                    data-toggle="tooltip" data-html="true" data-trigger="hover"
+                    data-placement="left"
+                    title={"<div className='tooltip-info'> " + value.props.title + "</div>"}
+                    onClick={(e) => this.SetActive(e.target.getAttribute('data-item-id'))}><span />
                 </Button>)
             }
         })
         const childrenWithProps = React.Children.map(this.props.children, (child, index) =>
-          child && <Consumer key={"item" + index}>{value => React.cloneElement(child, {
-                  isExpanded: this.state.localContext.isExpanded && child.props.title === value.active
-              })}</Consumer>
+            child && <Consumer key={"item" + index}>{value => React.cloneElement(child, {
+                isExpanded: this.state.localContext.isExpanded && child.props.title === value.active
+            })}</Consumer>
         );
 
         return (
-            <div className={"sidebar " + className}>
+            <div className={classJoin("sidebar", className)}>
                 <div className="sidebar-asside">
                     {items}
                     <span key="ind" className="sidebar-indicator" />

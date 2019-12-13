@@ -1,10 +1,10 @@
 import React from "react";
 import DatePicker from '../Controls/DatePicker';
-import {Button, Input} from "reactstrap";
-import {connect} from "react-redux";
+import { Button, Input } from "reactstrap";
+import { connect } from "react-redux";
 
 class WeatherAggregationComponent extends React.Component {
-  state = {enableWeatherSearchButton: false};
+  state = { enableWeatherSearchButton: false };
 
   //Не можна прокидати тєкущі limit, offset, бо користувач міг їх змінити. Використовуємо збережений req
   onWeatherSearchClick = () => {
@@ -60,11 +60,11 @@ class WeatherAggregationComponent extends React.Component {
     }
   };
   enableButton = () => {
-    const {date, days, months, years} = this.props;
+    const { date, days, months, years } = this.props;
     if (date.dateSet || (years || months || days)) {
-      this.setState({enableWeatherSearchButton: true});
+      this.setState({ enableWeatherSearchButton: true });
     } else {
-      this.setState({enableWeatherSearchButton: false})
+      this.setState({ enableWeatherSearchButton: false })
     }
   };
 
@@ -86,14 +86,14 @@ class WeatherAggregationComponent extends React.Component {
   ApplyCalendarDate = async (e) => {
     await this.props.setTime(e);
     if (e.dateSet)
-      this.setState({enableWeatherSearchButton: true});
+      this.setState({ enableWeatherSearchButton: true });
     else {
-      this.setState({enableWeatherSearchButton: false})
+      this.setState({ enableWeatherSearchButton: false })
     }
   };
 
   render() {
-    const {onDaysChange, onYearsChange, onMonthsChange,} = this.props;
+    const { onDaysChange, onYearsChange, onMonthsChange, } = this.props;
     return (<div className={"" + this.props.className}>
       <h2>Aggregate weather</h2>
       <div className="time-selector-tabs w-100 mx-auto justify-content-center">
@@ -180,22 +180,22 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   setStationPackLink: (link) => {
-    dispatch({type: "SET_STATION_PACK_LINK", link: link})
+    dispatch({ type: "SET_STATION_PACK_LINK", link: link })
   },
   setWeatherPackLink: (link) => {
-    dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
+    dispatch({ type: "SET_WEATHER_PACK_LINK", link: link })
   },
   setYears: (years) => {
-    dispatch({type: "SET_YEARS", years: years})
+    dispatch({ type: "SET_YEARS", years: years })
   },
   setMonths: (months) => {
-    dispatch({type: "SET_MONTHS", months: months})
+    dispatch({ type: "SET_MONTHS", months: months })
   },
   setDays: (days) => {
-    dispatch({type: "SET_DAYS", days: days})
+    dispatch({ type: "SET_DAYS", days: days })
   },
   setTime: (date) => {
-    dispatch({type: "SET_TIME", date: date})
+    dispatch({ type: "SET_TIME", date: date })
   },
 });
 

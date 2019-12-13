@@ -1,8 +1,8 @@
-import React, {Component} from 'react';
-import {mymap} from './Map/MapComponent';
+import React, { Component } from 'react';
+import { mymap } from './Map/MapComponent';
 import MapComponent from './Map/MapComponent';
 import Sidebar from './Sidebar';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import L from 'leaflet';
 import WeatherControl from "./Elements/WeatherControl";
 import Station from './Elements/StationTemplate';
@@ -18,7 +18,7 @@ import SelectedStationsList from './Containers/SelectedStationsList'
 import CountCircle from './Elements/CountCircle';
 import 'leaflet.pm';
 import Footer from './Elements/Footer'
-import {ApiController} from '../js/apicontroller'
+import { ApiController } from '../js/apicontroller'
 import 'js/map_extensions'
 import FlyoutContainer from "./Containers/FlyoutContainer"
 import turf from 'turf';
@@ -26,7 +26,7 @@ import turf from 'turf';
 var markerGroup = null;
 
 function createMaker(e, click, content, cnt, i) {
-  return {position: e, click, content, id_cnt: cnt, data: i}
+  return { position: e, click, content, id_cnt: cnt, data: i }
 }
 
 export function createStation(e, cnt, click) {
@@ -56,11 +56,11 @@ class Main extends Component {
   }
 
   loaderVisibility = (flag) => {
-    this.setState({isVisible: flag});
+    this.setState({ isVisible: flag });
   };
 
   conglameratePolygons = () => {
-    const {polygons, PolyRequest} = this.props;
+    const { polygons, PolyRequest } = this.props;
     let geoPolygons = polygons.map((poly) => {
       return poly.layer.toGeoJSON()
     });
@@ -91,7 +91,7 @@ class Main extends Component {
       Array.prototype.push.apply(withoutRemovedMarkers, markersInOnePoly);
 
       let stationsInOnePoly = this.props.stations.filter((station) => {
-        let LatLng = {lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon)};
+        let LatLng = { lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon) };
         return this.props.polygons[i].layer.contains(LatLng)
           && !withoutRemovedStations.some((repeat) => repeat.props.props.id === station.props.props.id)
       });
@@ -168,7 +168,7 @@ class Main extends Component {
         Array.prototype.push.apply(sortedMarkers, markersInOnePoly);
 
         let stationsInOnePoly = prevStations.filter((station) => {
-          let LatLng = {lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon)};
+          let LatLng = { lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon) };
           return this.props.polygons[i].layer.contains(LatLng)
             && !newStations.some((repeat) => repeat.props.props.id === station.props.props.id)
             && !sortedStations.some((oldStation) => oldStation.props.props.id === station.props.props.id)
@@ -184,7 +184,7 @@ class Main extends Component {
   };
 
   getOneStationData = (e) => {
-    const {MarkerSelected, date, year} = this.props;
+    const { MarkerSelected, date, year } = this.props;
 
     let data = e;
     data.options = {};
@@ -193,7 +193,7 @@ class Main extends Component {
     let req = this.state.api.createPolyRequest(data);
     MarkerSelected(req);
 
-    this.state.api.getStationsFromMapEvent({e: data}).then((station) => {
+    this.state.api.getStationsFromMapEvent({ e: data }).then((station) => {
       this.setCardItem(station.response[0]);
     }).catch((error) => console.log(error));
 
@@ -279,7 +279,7 @@ class Main extends Component {
 
   onMapPageChanged = (e) => {
     if (this.state.lockM) {
-      this.setState({lockM: false});
+      this.setState({ lockM: false });
       return;
     }
     let t = e.map((r) => r.position);
@@ -297,11 +297,11 @@ class Main extends Component {
   };
 
   setCtrList = (list) => {
-    this.setState({ctr_list: list})
+    this.setState({ ctr_list: list })
   };
 
   selectedIndexChange = (e) => {
-    this.setState({mapSelectedIndex: e})
+    this.setState({ mapSelectedIndex: e })
   };
 
 
@@ -347,14 +347,13 @@ class Main extends Component {
           <StationsQueryComponent {...comp}  />
           <StationsResultView/>
         </FlyoutContainer>
-
-        {this.props.stations.length > 0 &&
+ 
         <FlyoutContainer title="Aggregate weather" position="left" iconClassName="fa fa-filter"
+                         isVisible={this.props.stations.length > 0}
                          containerInnerClass={containerInnerClass}>
           <WeatherAggregationComponent {...comp} />
           <StatisticsAggregationComponent/>
-        </FlyoutContainer>
-        }
+        </FlyoutContainer> 
 
         <FlyoutContainer title="Countries" position="left" iconClassName="fa fa-globe"
                          containerInnerClass={containerInnerClass}>
@@ -396,34 +395,34 @@ const
 const
   mapDispatchToProps = dispatch => ({
     PolyRequest: (req) => {
-      dispatch({type: "SET_POLY_REQUEST", req: req})
+      dispatch({ type: "SET_POLY_REQUEST", req: req })
     },
     MarkerSelected: (req) => {
-      dispatch({type: "SET_MARKER_REQUEST", req: req})
+      dispatch({ type: "SET_MARKER_REQUEST", req: req })
     },
     setStationPackLink: (link) => {
-      dispatch({type: "SET_STATION_PACK_LINK", link: link})
+      dispatch({ type: "SET_STATION_PACK_LINK", link: link })
     },
     setWeatherPackLink: (link) => {
-      dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
+      dispatch({ type: "SET_WEATHER_PACK_LINK", link: link })
     },
     setPolygons: (polygons) => {
-      dispatch({type: "SET_POLYGONS", polygons: polygons})
+      dispatch({ type: "SET_POLYGONS", polygons: polygons })
     },
     setPolygonsInGeo: (polygons) => {
-      dispatch({type: "SET_GEO_POLYGONS", polygons: polygons})
+      dispatch({ type: "SET_GEO_POLYGONS", polygons: polygons })
     },
     setStations: (stations) => {
-      dispatch({type: "SET_STATIONS", stations: stations})
+      dispatch({ type: "SET_STATIONS", stations: stations })
     },
     setWeather: (weather) => {
-      dispatch({type: "SET_WEATHER", weather: weather})
+      dispatch({ type: "SET_WEATHER", weather: weather })
     },
     setMarkers: (markers) => {
-      dispatch({type: "SET_MARKERS", markers: markers})
+      dispatch({ type: "SET_MARKERS", markers: markers })
     },
     setSelectedStation: (selected) => {
-      dispatch({type: "SET_SELECTED_STATION", selected: selected})
+      dispatch({ type: "SET_SELECTED_STATION", selected: selected })
     }
   });
 

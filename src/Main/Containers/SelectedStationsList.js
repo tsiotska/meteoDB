@@ -2,7 +2,7 @@ import React from 'react';
 import Pagination from '../../Main/Controls/Pagination'
 import { emptyContainer } from '../../js/const'
 import { classJoin } from "../../js/const";
-import {connect} from "react-redux";
+import { connect } from "react-redux";
 
 class SelectedStationsList extends React.Component {
   constructor(props) {

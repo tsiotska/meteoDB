@@ -50,7 +50,7 @@ class StationsQueryComponent extends React.Component {
 
 
   onStationsSearchClick = () => {
-    const {queryParam, offset, limit, neigh, nearest, api, QueryRequest} = this.props;
+    const { queryParam, offset, limit, neigh, nearest, api, QueryRequest } = this.props;
 
     QueryRequest(api.buildQueryRequest({
       offset, limit, neigh,
@@ -97,9 +97,9 @@ class StationsQueryComponent extends React.Component {
   //Кнопка пошуку активується якщо є пошуковий параметр або виділені полігони з вказаною датою.
   enableButton = () => {
 
-    const {queryParam} = this.props;
+    const { queryParam } = this.props;
     if ((queryParam.length > 0)) {
-      this.setState({enableSearchButton: true});
+      this.setState({ enableSearchButton: true });
     } else {
       this.setState({ enableSearchButton: false })
     }
@@ -176,7 +176,7 @@ class StationsQueryComponent extends React.Component {
 
   render() {
 
-    const {stationPackLink, weatherPackLink} = this.props;
+    const { stationPackLink, weatherPackLink } = this.props;
 
     let toStationsBar = {
       areLimitAndOffsetDisabled: this.props.areLimitAndOffsetDisabled,
@@ -325,7 +325,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch({ type: "SET_MARKER_REQUEST", req: req })
   },
   QueryRequest: (req) => {
-    dispatch({type: "SET_QUERY_REQUEST", req: req})
+    dispatch({ type: "SET_QUERY_REQUEST", req: req })
   },
   setPolygons: (polygons) => {
     dispatch({ type: "SET_POLYGONS", polygons: polygons })
