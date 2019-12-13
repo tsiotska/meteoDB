@@ -15,7 +15,7 @@ export default class FlyoutContainer extends Component {
         );
 
         return (
-            <div className={"d-flex flyout " + [active, position, className, isVisible].join(" ")}>
+            <div className={classJoin("d-flex flyout", active, position, className)}>
                 <div className="flyout-content">
                     <div className="flyout-content-inner">
                         {childrenWithProps}

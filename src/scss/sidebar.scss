@@ -101,9 +101,9 @@
         @for $i from 1 through 10 {
             #{selectAllFrom($i, '.sidebar-item:not(.fade)')}.active~.sidebar-indicator {
                 transform: translateY(#{5em *$i});
-                    background-color: #0c6ef7;
-                    opacity: 1;
-            } 
+                background-color: #0c6ef7;
+                opacity: 1;
+            }
         }
 
     }

@@ -2,6 +2,11 @@
 
 @import "~compass-mixins/lib/compass/_css3";
 
+.stations-view {
+    height: 85vh;
+    width: 25em;
+}
+
 .bottom-container {
     position: absolute;
     z-index: 10000;

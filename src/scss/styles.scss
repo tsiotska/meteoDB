@@ -53,7 +53,7 @@ button {
 .st_card {
   cursor: pointer;
 }
-
+@import "animate.scss";
 @import "typeahead.scss";
 @import "map.scss";
 @import "coutry-list.scss";
@@ -70,3 +70,4 @@ button {
 @import "navbar-main-top.scss";
 @import "footer.scss";
 @import "container.scss";
+@import "conditional-container.scss";

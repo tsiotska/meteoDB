@@ -7,6 +7,7 @@ import L from 'leaflet';
 import WeatherControl from "./Elements/WeatherControl";
 import Station from './Elements/StationTemplate';
 import StationsQueryComponent from './Menu/StationsQueryComponent'
+import ConditionalContainer from './Containers/ConditionalContainer'
 import StatisticsAggregationComponent from './Menu/StatisticsAggregationComponent'
 import StationsResultView from './Menu/StationsResultView'
 import WeatherAggregationComponent from './Menu/WeatherAggregationComponent'
@@ -30,7 +31,7 @@ function createMaker(e, click, content, cnt, i) {
 }
 
 export function createStation(e, cnt, click) {
-  return <Station click={click} key={cnt} id={cnt} props={e}/>;
+  return <Station click={click} key={cnt} id={cnt} props={e} />;
 }
 
 class Main extends Component {
@@ -47,7 +48,6 @@ class Main extends Component {
       markerGroup: null,
       isVisible: false,
       api: new ApiController(this.loaderVisibility),
-
       stationsCounter: null,
       lockM: true,
     };
@@ -234,7 +234,7 @@ class Main extends Component {
   };
 
   creativeDay = (e, cnt) => {
-    return <WeatherControl key={cnt} data={e}/>;
+    return <WeatherControl key={cnt} data={e} />;
   };
 
   onMarkerClick() {
@@ -340,45 +340,41 @@ class Main extends Component {
 
     let containerInnerClass = "m-2";
     return (<div className="d-flex container-fluid p-0">
-      {this.state.isVisible && <Loader isVisible={this.state.isVisible}/>}
+      {this.state.isVisible && <Loader isVisible={this.state.isVisible} />}
       <Sidebar>
         <FlyoutContainer title="Search stations" position="left" iconClassName="fa fa-search"
-                         containerInnerClass={containerInnerClass}>
+          containerInnerClass={containerInnerClass}>
           <StationsQueryComponent {...comp}  />
-          <StationsResultView/>
+          <ConditionalContainer visibleWhen={this.props.stations.length > 0}>
+            <StationsResultView />
+          </ConditionalContainer>
         </FlyoutContainer>
- 
+
         <FlyoutContainer title="Aggregate weather" position="left" iconClassName="fa fa-filter"
-                         isVisible={this.props.stations.length > 0}
-                         containerInnerClass={containerInnerClass}>
+          isVisible={this.props.stations.length > 0}
+          containerInnerClass={containerInnerClass}>
           <WeatherAggregationComponent {...comp} />
-          <StatisticsAggregationComponent/>
-        </FlyoutContainer> 
+          <ConditionalContainer visibleWhen={this.props.weather.length > 0}>
+            <StatisticsAggregationComponent className={containerInnerClass} />
+          </ConditionalContainer>
+        </FlyoutContainer>
 
         <FlyoutContainer title="Countries" position="left" iconClassName="fa fa-globe"
-                         containerInnerClass={containerInnerClass}>
-          <CountryList ctr_list={conts.ctr_list}/>
-        </FlyoutContainer>
-
-        <FlyoutContainer title="Stations by country" position="left" iconClassName="fa fa-map-marker"
-                         containerInnerClass={containerInnerClass}>
-          <SelectedStationsList
-            onStationsChange={conts.onStationsChange}
-            index={conts.mapSelectedIndex}
-          />
+          containerInnerClass={containerInnerClass}>
+          <CountryList ctr_list={conts.ctr_list} />
         </FlyoutContainer>
 
         <FlyoutContainer title="Results" position="left" iconClassName="fa fa-sun-o">
-          <DaysItemsList/>
+          <DaysItemsList />
         </FlyoutContainer>
       </Sidebar>
 
       <MapComponent api={comp.api} onWeatherData={comp.onWeatherData}
-                    activeMarker={comp.activeMarker}
-                    onStationsSelection={comp.onStationsSelection}
-                    setCardItem={comp.setCardItem} onToolRemove={comp.onToolRemove}
-                    beforeMove={comp.beforeMove}/>
-      <Footer/>
+        activeMarker={comp.activeMarker}
+        onStationsSelection={comp.onStationsSelection}
+        setCardItem={comp.setCardItem} onToolRemove={comp.onToolRemove}
+        beforeMove={comp.beforeMove} />
+      <Footer />
     </div>)
   }
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { mymap } from '../Map/MapComponent';
-import { baseUrl } from '../../js/const';
+import { baseUrl, classJoin } from '../../js/const';
 import $ from 'jquery';
 import { Button } from 'reactstrap';
 import CountryItem from '../Elements/CountryItemTemplate';
@@ -40,8 +40,8 @@ class StationsQueryComponent extends React.Component {
           let cnt = 0;
           this.props.setCtrList(data.response.map((i) => {
             return <CountryItem key={cnt++} onSearchClick={this.onStationsSearchClick}
-                                onRefreshClick={this.onRefreshClick}
-                                setQuery={this.props.setQuery} e={i}/>;
+              onRefreshClick={this.onRefreshClick}
+              setQuery={this.props.setQuery} e={i} />;
 
           }))
         }
@@ -196,7 +196,7 @@ class StationsQueryComponent extends React.Component {
       source: this.state.source,
       unControlledInput: this.unControlledInput
     };
-    return (<div /*className={"" + this.props.className}*/>
+    return (<div className={classJoin(this.props.className)}>
       <h2>Query stations</h2>
       <div className="panel flyn active mr-3 p-0">
         <div className="flyn-inputs-container">
@@ -213,16 +213,16 @@ class StationsQueryComponent extends React.Component {
                     // api/weather/databases
                   }
                   <option defaultValue value="gsod" data-toggle="tooltip"
-                          title="Global Summary Of Day (GSOD, NOAA)">GSOD
+                    title="Global Summary Of Day (GSOD, NOAA)">GSOD
                   </option>
                   <option disabled value="gh" data-toggle="tooltip" title="Global Hourly dataset (GH, NOAA)">Global
                     Hourly
                   </option>
                   <option disabled value="isd-lite" data-toggle="tooltip"
-                          title="Integrated surface data Lite (ISD, NOAA)">ISD Lite
+                    title="Integrated surface data Lite (ISD, NOAA)">ISD Lite
                   </option>
                   <option disabled value="isd" data-toggle="tooltip"
-                          title="Integrated surface data FULL (ISD, NOAA)">ISD
+                    title="Integrated surface data FULL (ISD, NOAA)">ISD
                   </option>
                 </select>
               </div>
@@ -231,29 +231,29 @@ class StationsQueryComponent extends React.Component {
             <StationSearchBar ref={this.typeahead} {...toStationsBar} />
 
             <div className="col-auto d-flex w-100 justify-content-center">
-              <Button id="reeval" onClick={this.onStationsSearchClick}
-                      color="primary"
-                      className={(this.state.enableSearchButton ? "" : "disabled ") + "m-2 mb-1 mt-auto"}>Search
+              <Button id="reeval" onClick={this.state.enableSearchButton && this.onStationsSearchClick}
+                color="primary"
+                className={(this.state.enableSearchButton ? "" : "disabled ") + "m-2 mb-1 mt-auto"}>Search
               </Button>
 
               <Button id="refresh" onClick={this.onRefreshClick}
-                      color="secondary"
-                      className="m-2 mb-1 mt-auto">Clear
+                color="secondary"
+                className="m-2 mb-1 mt-auto">Clear
               </Button>
             </div>
 
           </div>
 
           {stationPackLink &&
-          <Button download target="_blank"
-                  href={baseUrl + stationPackLink + "?saveas=stations.json"}>
-            Stations
+            <Button download target="_blank"
+              href={baseUrl + stationPackLink + "?saveas=stations.json"}>
+              Stations
           </Button>}
 
           {weatherPackLink &&
-          <Button download target="_blank"
-                  href={baseUrl + weatherPackLink + "?saveas=weather.json"}>
-            Weather
+            <Button download target="_blank"
+              href={baseUrl + weatherPackLink + "?saveas=weather.json"}>
+              Weather
           </Button>}
 
           {this.currentStation()}

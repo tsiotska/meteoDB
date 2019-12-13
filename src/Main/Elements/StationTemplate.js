@@ -53,6 +53,7 @@ export default (props) => {
           <div
             className='st_ra d-flex w_footer justify-content-center  px-4 flex-row mx-auto mb-0 w_s w-75 text-center'>
             <p className='m-0 mr-2'>{e.beg}</p>
+            <span>-</span>
             <p className='m-0 ml-2'>{e.end}</p>
           </div>
           : null
