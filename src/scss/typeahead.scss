@@ -2,7 +2,7 @@
 
 .rbt {
     .rbt-token {
-        background-color: $button-accent;
+        border: 2px solid $button-accent;
         border-radius: $app-input-border-radius;
         padding: 0 .5em;
         margin: 3px 3px;
@@ -24,9 +24,11 @@
     .rbt-input-wrapper {
         display: inline-flex;
         flex-wrap: wrap;
+        align-items: center;
 
         .rbt-input-main {
             // margin-top: 5px;
+            text-align: initial;
         }
     }
 
@@ -57,7 +59,8 @@
                 min-height: 1em;
                 white-space: normal;
             }
-            &:hover{
+
+            &:hover {
                 box-shadow: 0 0 6px 1px #dcdcdc;
             }
         }
