@@ -130,7 +130,7 @@ class MapComponent extends Component {
 
   fetchMarkers = (e) => {
     const {
-      onStationsSelection, onWeatherData, setStationPackLink, setWeatherPackLink,
+      onStationsSelection, onWeatherData,
       api, date, years, months, days /* neigh, nearest, offset, limit */
     } = this.props;
 
@@ -147,21 +147,11 @@ class MapComponent extends Component {
           onWeatherData(weather.response)
         }).catch((error) => console.log(error))
     }
-    /*
-    api.getPackFromMapEvent({e: e.layer, pack: true}).then((pack) => {
-      setStationPackLink(pack.response[0])
-    }).catch((error) => console.log(error));
-
-    api.getPackFromMapEvent({
-      e: e.layer, date, years, months, days, pack: true
-    }).then((pack) => {
-      setWeatherPackLink(pack.response[0])
-    }).catch((error) => console.log(error));
-    */
   };
 
 
   renderMarkers = () => {
+    console.log("Render...")
     if (this.props.markers) {
       return this.props.markers.map((w) => this.renderOne(w));
     } else if (!this.props.markers) {
@@ -169,12 +159,12 @@ class MapComponent extends Component {
     }
   };
 
-  shouldComponentUpdate(nextProps, nextState) {
+ /* shouldComponentUpdate(nextProps, nextState) {
     return !(
       nextProps.markers && nextProps.markers[0] &&
       this.props.markers[0] === nextProps.markers[0]
     )
-  }
+  }*/
 
   render() {
     const position = [this.state.lat, this.state.lng];
@@ -219,19 +209,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   deleteLastPoly: (polygon) => {
     dispatch({ type: "DELETE_LAST_POLY", polygon: polygon })
-  },
-  MarkerSelected: (req) => {
-    dispatch({ type: "SET_MARKER_REQUEST", req: req })
-  },
-  PolyRequest: (req) => {
-    dispatch({ type: "SET_POLY_REQUEST", req: req })
-  },
-  setStationPackLink: (link) => {
-    dispatch({ type: "SET_STATION_PACK_LINK", link: link })
-  },
-  setWeatherPackLink: (link) => {
-    dispatch({ type: "SET_WEATHER_PACK_LINK", link: link })
-  },
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(MapComponent);

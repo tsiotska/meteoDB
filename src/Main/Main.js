@@ -41,13 +41,11 @@ class Main extends Component {
         lat: null,
         lng: null
       },
-      DownloadList: [],
       ctr_list: [],
       togglerSelect: false,
       markerGroup: null,
       isVisible: false,
       api: new ApiController(this.loaderVisibility),
-
       stationsCounter: null,
       lockM: true,
     };
@@ -60,7 +58,7 @@ class Main extends Component {
   };
 
   conglameratePolygons = () => {
-    const {polygons, PolyRequest} = this.props;
+    const {polygons, setPolyPayload} = this.props;
     let geoPolygons = polygons.map((poly) => {
       return poly.layer.toGeoJSON()
     });
@@ -68,11 +66,11 @@ class Main extends Component {
     let union;
     if (polygons.length > 1) {
       union = turf.union(...geoPolygons);
-      JSON.stringify(union)
-      PolyRequest(union)
+      union = JSON.stringify(union)
+      setPolyPayload(union)
     } else {
-      JSON.stringify(geoPolygons)
-      PolyRequest(geoPolygons)
+      geoPolygons = JSON.stringify(geoPolygons)
+      setPolyPayload(geoPolygons)
     }
   };
 
@@ -109,6 +107,7 @@ class Main extends Component {
     this.props.setStations(withoutRemovedStations);
     this.props.setWeather(withoutRemovedWeather);
     this.props.setSelectedStation(null);
+    this.conglameratePolygons();
   };
 
   beforeMove = (poly) => {
@@ -158,7 +157,9 @@ class Main extends Component {
     const sortedMarkers = [], prevMarkers = this.props.markers, sortedStations = [],
       prevStations = this.props.stations;
 
-    if (prevMarkers.length > 0) {
+    console.log(this.props.polygons);
+
+    if (this.props.stations.length > 0) {
       for (let i in this.props.polygons) {
         let markersInOnePoly = prevMarkers.filter((marker) => {
           return this.props.polygons[i].layer.contains(marker.position)
@@ -179,12 +180,13 @@ class Main extends Component {
     Array.prototype.push.apply(sortedMarkers, newMarkers);
     Array.prototype.push.apply(sortedStations, newStations);
 
+    console.log(sortedMarkers)
     this.props.setMarkers(sortedMarkers);
     this.props.setStations(sortedStations);
   };
 
   getOneStationData = (e) => {
-    const {MarkerSelected, date, year} = this.props;
+    const {MarkerSelected} = this.props;
 
     let data = e;
     data.options = {};
@@ -196,24 +198,6 @@ class Main extends Component {
     this.state.api.getStationsFromMapEvent({e: data}).then((station) => {
       this.setCardItem(station.response[0]);
     }).catch((error) => console.log(error));
-
-    /*
-    this.state.api.getPackFromMapEvent({e: data, pack: true})
-      .then((pack) => {
-        this.props.setStationPackLink(pack.response[0]);
-      }).catch((error) => console.log(error));
-
-    if (date.dateSet || year) {
-      this.state.api.getWeatherFromMapEvent({e: data, date: date, year: year})
-        .then((weather) => {
-          this.setWeatherForOneStation(weather.response);
-        }).catch((error) => console.log(error));
-
-      this.state.api.getPackFromMapEvent({e: data, date: date, year: year, pack: true})
-        .then((pack) => {
-          this.props.setWeatherPackLink(pack.response[0]);
-        }).catch((error) => console.log(error));
-    }*/
   };
 
   setCardItem = (station) => {
@@ -309,7 +293,7 @@ class Main extends Component {
     this.partialClear(event);
 
     if (this.props.polygons.length === 0) {
-      this.props.PolyRequest("");
+      this.props.setPolyPayload("");
       this.props.MarkerSelected("");
     }
   };
@@ -335,7 +319,6 @@ class Main extends Component {
     let conts = {
       ctr_list: this.state.ctr_list,
       mapSelectedIndex: this.state.mapSelectedIndex,
-      DownloadList: this.state.DownloadList,
     };
 
     let containerInnerClass = "m-2";
@@ -384,47 +367,46 @@ class Main extends Component {
   }
 }
 
-const
-  mapStateToProps = state => ({
-    years: state.dataReducer.years,
-    date: state.dataReducer.date,
-    polygons: state.dataReducer.polygons,
-    stations: state.dataReducer.stations,
-    weather: state.dataReducer.weather,
-  });
+const mapStateToProps = state => ({
+  years: state.dataReducer.years,
+  date: state.dataReducer.date,
+  polygons: state.dataReducer.polygons,
+  stations: state.dataReducer.stations,
+  weather: state.dataReducer.weather,
+  markers: state.dataReducer.markers
+});
 
-const
-  mapDispatchToProps = dispatch => ({
-    PolyRequest: (req) => {
-      dispatch({type: "SET_POLY_REQUEST", req: req})
-    },
-    MarkerSelected: (req) => {
-      dispatch({type: "SET_MARKER_REQUEST", req: req})
-    },
-    setStationPackLink: (link) => {
-      dispatch({type: "SET_STATION_PACK_LINK", link: link})
-    },
-    setWeatherPackLink: (link) => {
-      dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
-    },
-    setPolygons: (polygons) => {
-      dispatch({type: "SET_POLYGONS", polygons: polygons})
-    },
-    setPolygonsInGeo: (polygons) => {
-      dispatch({type: "SET_GEO_POLYGONS", polygons: polygons})
-    },
-    setStations: (stations) => {
-      dispatch({type: "SET_STATIONS", stations: stations})
-    },
-    setWeather: (weather) => {
-      dispatch({type: "SET_WEATHER", weather: weather})
-    },
-    setMarkers: (markers) => {
-      dispatch({type: "SET_MARKERS", markers: markers})
-    },
-    setSelectedStation: (selected) => {
-      dispatch({type: "SET_SELECTED_STATION", selected: selected})
-    }
-  });
+const mapDispatchToProps = dispatch => ({
+  setPolyPayload: (req) => {
+    dispatch({type: "SET_POLY_REQUEST", req: req})
+  },
+  MarkerSelected: (req) => {
+    dispatch({type: "SET_MARKER_REQUEST", req: req})
+  },
+  setStationPackLink: (link) => {
+    dispatch({type: "SET_STATION_PACK_LINK", link: link})
+  },
+  setWeatherPackLink: (link) => {
+    dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
+  },
+  setPolygons: (polygons) => {
+    dispatch({type: "SET_POLYGONS", polygons: polygons})
+  },
+  setPolygonsInGeo: (polygons) => {
+    dispatch({type: "SET_GEO_POLYGONS", polygons: polygons})
+  },
+  setStations: (stations) => {
+    dispatch({type: "SET_STATIONS", stations: stations})
+  },
+  setWeather: (weather) => {
+    dispatch({type: "SET_WEATHER", weather: weather})
+  },
+  setMarkers: (markers) => {
+    dispatch({type: "SET_MARKERS", markers: markers})
+  },
+  setSelectedStation: (selected) => {
+    dispatch({type: "SET_SELECTED_STATION", selected: selected})
+  }
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(Main);

@@ -1,13 +1,12 @@
 import React from 'react';
-import { mymap } from '../Map/MapComponent';
-import { baseUrl } from '../../js/const';
+import {mymap} from '../Map/MapComponent';
 import $ from 'jquery';
-import { Button } from 'reactstrap';
+import {Button} from 'reactstrap';
 import CountryItem from '../Elements/CountryItemTemplate';
 import StationSearchBar from './searchBars/stationSearchBar';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-daterangepicker/daterangepicker.css';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 
 class StationsQueryComponent extends React.Component {
   constructor(props) {
@@ -48,6 +47,32 @@ class StationsQueryComponent extends React.Component {
       });
   }
 
+  onStationPackClick = () => {
+    const {api, queryRequest, markerRequest, polyPayload} = this.props;
+
+    console.log(polyPayload);
+    if (polyPayload) {
+      console.log("POLY REQUEST")
+      api.getPackByGeoJson({
+        polyPayload,
+        pack: true
+      }).then(() => window.location.href = "http://www.w3schools.com")
+        .then((pack) => {
+          this.props.setStationPackLink(pack.response[0]);
+        })
+        .catch((error) => console.log(error));
+    } else {
+      api.getPack({
+        queryRequest, markerRequest,
+        pack: true
+      })
+        .then((pack) => {
+          this.props.setStationPackLink(pack.response[0]);
+        }).then(() => window.location.href = "http://www.w3schools.com")
+        .catch((error) => console.log(error));
+    }
+  };
+
 
   onStationsSearchClick = () => {
     const {queryParam, offset, limit, neigh, nearest, api, QueryRequest} = this.props;
@@ -67,24 +92,12 @@ class StationsQueryComponent extends React.Component {
       console.log(stations);
       this.props.onStationsSelection(stations);
     }).catch((error) => console.log(error));
-    /*
-          this.props.api.getPackByQuery({
-            offset, limit,
-            neigh, nearest,
-            queryParam,
-            selectedField: this.selectorByField.current.value,
-            pack: true
-          })
-            .then((pack) => {
-              this.props.setStationPackLink(pack.response[0]);
-            }).catch((error) => console.log(error));
-    */
   };
 
   onChangePage = (selectedPage, index) => {
     this.props.PageChanged(selectedPage);
     this.props.mapSelectedIndex(index);
-    this.setState({ selectedPage });
+    this.setState({selectedPage});
   };
 
   currentStation = () => {
@@ -94,14 +107,14 @@ class StationsQueryComponent extends React.Component {
     } else return null;
   };
 
-  //Кнопка пошуку активується якщо є пошуковий параметр або виділені полігони з вказаною датою.
+//Кнопка пошуку активується якщо є пошуковий параметр або виділені полігони з вказаною датою.
   enableButton = () => {
 
     const {queryParam} = this.props;
     if ((queryParam.length > 0)) {
       this.setState({enableSearchButton: true});
     } else {
-      this.setState({ enableSearchButton: false })
+      this.setState({enableSearchButton: false})
     }
   };
 
@@ -149,7 +162,7 @@ class StationsQueryComponent extends React.Component {
         });
 
         console.log(array);
-        this.setState({ source: array });
+        this.setState({source: array});
       }).catch((error) => console.log(error))
   };
 
@@ -176,7 +189,7 @@ class StationsQueryComponent extends React.Component {
 
   render() {
 
-    const {stationPackLink, weatherPackLink} = this.props;
+    const {stations} = this.props;
 
     let toStationsBar = {
       areLimitAndOffsetDisabled: this.props.areLimitAndOffsetDisabled,
@@ -189,7 +202,7 @@ class StationsQueryComponent extends React.Component {
       onOffsetChange: this.onOffsetChange,
       onNearestChange: this.onNearestChange,
       onNeighChange: this.onNeighChange,
-      polyRequest: this.props.polyRequest,
+      polyPayload: this.props.polyPayload,
       selectorByField: this.selectorByField,
       changeInputRef: this.changeInputRef,
       isLoading: this.state.isLoading,
@@ -244,16 +257,9 @@ class StationsQueryComponent extends React.Component {
 
           </div>
 
-          {stationPackLink &&
-          <Button download target="_blank"
-                  href={baseUrl + stationPackLink + "?saveas=stations.json"}>
+          {stations.length > 0 &&
+          <Button onClick={this.onStationPackClick}>
             Stations
-          </Button>}
-
-          {weatherPackLink &&
-          <Button download target="_blank"
-                  href={baseUrl + weatherPackLink + "?saveas=weather.json"}>
-            Weather
           </Button>}
 
           {this.currentStation()}
@@ -270,68 +276,69 @@ class StationsQueryComponent extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  polyRequest: state.dataReducer.polyRequest,
+  polyPayload: state.dataReducer.polyPayload,
   markerRequest: state.dataReducer.markerRequest,
   areLimitAndOffsetDisabled: state.dataReducer.areLimitAndOffsetDisabled,
 
-  polygons: state.dataReducer.polygons,
   stationPackLink: state.dataReducer.stationPackLink,
-  weatherPackLink: state.dataReducer.weatherPackLink,
+
   queryParam: state.dataReducer.queryParam,
-  years: state.dataReducer.years,
-  months: state.dataReducer.months,
-  days: state.dataReducer.days,
-  date: state.dataReducer.date,
   neigh: state.dataReducer.neigh,
   nearest: state.dataReducer.nearest,
   limit: state.dataReducer.limit,
   offset: state.dataReducer.offset,
-  selectedStation: state.dataReducer.selectedStation
+
+  years: state.dataReducer.years,
+  months: state.dataReducer.months,
+  days: state.dataReducer.days,
+  date: state.dataReducer.date,
+
+  selectedStation: state.dataReducer.selectedStation,
+  polygons: state.dataReducer.polygons,
+  stations: state.dataReducer.stations,
+
 });
 
 const mapDispatchToProps = dispatch => ({
   setQuery: (param) => {
-    dispatch({ type: "SET_QUERY", param: param })
+    dispatch({type: "SET_QUERY", param: param})
   },
   disableLimitAndOffset: (flag) => {
-    dispatch({ type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag })
+    dispatch({type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag})
   },
   setStationPackLink: (link) => {
-    dispatch({ type: "SET_STATION_PACK_LINK", link: link })
-  },
-  setWeatherPackLink: (link) => {
-    dispatch({ type: "SET_WEATHER_PACK_LINK", link: link })
+    dispatch({type: "SET_STATION_PACK_LINK", link: link})
   },
   setYears: (years) => {
-    dispatch({ type: "SET_YEARS", years: years })
+    dispatch({type: "SET_YEARS", years: years})
   },
   setMonths: (months) => {
-    dispatch({ type: "SET_MONTHS", months: months })
+    dispatch({type: "SET_MONTHS", months: months})
   },
   setDays: (days) => {
-    dispatch({ type: "SET_DAYS", days: days })
+    dispatch({type: "SET_DAYS", days: days})
   },
   setTime: (date) => {
-    dispatch({ type: "SET_TIME", date: date })
+    dispatch({type: "SET_TIME", date: date})
   },
   //Працює для  limit offset nearest neigh
   setLimiters: (data, kind) => {
-    dispatch({ type: "SET_ANY_INPUT_DATA", data: data, kind: kind })
+    dispatch({type: "SET_ANY_INPUT_DATA", data: data, kind: kind})
   },
   PolySelected: (req) => {
-    dispatch({ type: "SET_POLY_SELECTED", req: req })
+    dispatch({type: "SET_POLY_SELECTED", req: req})
   },
   MarkerSelected: (flag, req) => {
-    dispatch({ type: "SET_MARKER_REQUEST", req: req })
+    dispatch({type: "SET_MARKER_REQUEST", req: req})
   },
   QueryRequest: (req) => {
     dispatch({type: "SET_QUERY_REQUEST", req: req})
   },
   setPolygons: (polygons) => {
-    dispatch({ type: "SET_POLYGONS", polygons: polygons })
+    dispatch({type: "SET_POLYGONS", polygons: polygons})
   },
   refreshSearchParams: () => {
-    dispatch({ type: "REFRESH_EVERYTHING" })
+    dispatch({type: "REFRESH_EVERYTHING"})
   }
 });
 

@@ -29,7 +29,7 @@ const dataReducer = (state = dataState, action) => {
       return {
         ...state,
         areLimitAndOffsetDisabled: flag,
-        polyRequest: action.req
+        polyPayload: action.req
       };
     case types.SET_MARKER_REQUEST:
       return {
@@ -82,7 +82,6 @@ const dataReducer = (state = dataState, action) => {
         ...state,
         date: action.date,
       };
-    //It sets neight nearest offset limit. And can do it with many others if its required and doesnt make you confused
     case types.SET_ANY_INPUT_DATA:
       return {
         ...state,
@@ -117,6 +116,7 @@ const dataReducer = (state = dataState, action) => {
         days: null,
         limit: null,
         offset: null,
+        offset: null,
         nearest: false,
         neigh: null,
 
@@ -127,8 +127,13 @@ const dataReducer = (state = dataState, action) => {
         markers : [],
         selectedStation: [],
         markerRequest: "",
-        polyRequest: "",
+        polyPayload: "",
         queryRequest: "",
+      };
+    case types.ENABLE_WEATHER_SEARCH_BUTTON:
+      return {
+        ...state,
+        enableWeatherSearchButton: action.flag,
       };
     default:
       return state;
