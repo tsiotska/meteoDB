@@ -1,0 +1,52 @@
+@keyframes fadeIn {
+    0% {
+        display: none;
+        position: absolute;
+        max-width: 0;
+        opacity: 0;
+        transform: rotateY(90deg) translateX(-100%);
+    }
+
+    1% {
+        display: initial;
+        opacity: 0;
+        max-width: 0;
+        position: initial;
+        transform: rotateY(0) translateX(-100%);
+    }
+
+    100% {
+        opacity: 1;
+        max-width: 100vh;
+        display: initial;
+        position: initial;
+        transform: rotateY(0) translateX(0);
+    }
+}
+
+
+@keyframes fadeOut {
+    0% {
+        max-width: 100vh;
+        opacity: 1;
+        display: initial;
+        position: initial;
+        transform: rotateY(0) translateX(0);
+    }
+
+    99% {
+        opacity: 0;
+        max-width: 0;
+        display: initial;
+        position: initial;
+        transform: rotateY(0) translateX(-100%);
+    }
+
+    100% {
+        opacity: 0;
+        max-width: 0;
+        display: none;
+        position: absolute;
+        transform: rotateY(90deg) translateX(-100%);
+    }
+}

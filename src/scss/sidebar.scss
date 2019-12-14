@@ -87,8 +87,19 @@
             transition: .6s cubic-bezier(0.55, 1.09, 0.81, 1.06);
         }
 
+        @function selectAllFrom($n, $selector) {
+            $classes: ();
+
+            @for $i from 1 through $n {
+                $className: if($i==1, #{$selector}, #{"~ " + $selector});
+                $classes: join($classes, unquote($className), space);
+            }
+
+            @return $classes;
+        }
+
         @for $i from 1 through 10 {
-            .sidebar-item:nth-of-type(#{$i}).active~.sidebar-indicator {
+            #{selectAllFrom($i, '.sidebar-item:not(.fade)')}.active~.sidebar-indicator {
                 transform: translateY(#{5em *$i});
                 background-color: #0c6ef7;
                 opacity: 1;

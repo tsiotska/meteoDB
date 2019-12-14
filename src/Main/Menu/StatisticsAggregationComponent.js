@@ -1,9 +1,8 @@
-import React from "react";
-import DatePicker from '../Controls/DatePicker';
-import { Input } from "reactstrap";
-import  { classJoin } from "../../js/const";
+import React from "react"; 
+import { classJoin } from "../../js/const";
+import { connect } from "react-redux";
 
-export default class StatisticsAggregationComponent extends React.Component {
+export class StatisticsAggregationComponent extends React.Component {
     render() {
         return (<div className={classJoin(this.props.className)}>
             <h2>Analize aggregated result</h2>
@@ -13,3 +12,10 @@ export default class StatisticsAggregationComponent extends React.Component {
         </div>);
     }
 }
+
+
+const mapStateToProps = state => ({
+    weather: state.dataReducer.weather
+});
+
+export default connect(mapStateToProps)(StatisticsAggregationComponent);

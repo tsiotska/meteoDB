@@ -1,12 +1,13 @@
-import React, {Component} from 'react';
-import {mymap} from './Map/MapComponent';
+import React, { Component } from 'react';
+import { mymap } from './Map/MapComponent';
 import MapComponent from './Map/MapComponent';
 import Sidebar from './Sidebar';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import L from 'leaflet';
 import WeatherControl from "./Elements/WeatherControl";
 import Station from './Elements/StationTemplate';
 import StationsQueryComponent from './Menu/StationsQueryComponent'
+import ConditionalContainer from './Containers/ConditionalContainer'
 import StatisticsAggregationComponent from './Menu/StatisticsAggregationComponent'
 import StationsResultView from './Menu/StationsResultView'
 import WeatherAggregationComponent from './Menu/WeatherAggregationComponent'
@@ -18,7 +19,7 @@ import SelectedStationsList from './Containers/SelectedStationsList'
 import CountCircle from './Elements/CountCircle';
 import 'leaflet.pm';
 import Footer from './Elements/Footer'
-import {ApiController} from '../js/apicontroller'
+import { ApiController } from '../js/apicontroller'
 import 'js/map_extensions'
 import FlyoutContainer from "./Containers/FlyoutContainer"
 import turf from 'turf';
@@ -26,11 +27,11 @@ import turf from 'turf';
 var markerGroup = null;
 
 function createMaker(e, click, content, cnt, i) {
-  return {position: e, click, content, id_cnt: cnt, data: i}
+  return { position: e, click, content, id_cnt: cnt, data: i }
 }
 
 export function createStation(e, cnt, click) {
-  return <Station click={click} key={cnt} id={cnt} props={e}/>;
+  return <Station click={click} key={cnt} id={cnt} props={e} />;
 }
 
 class Main extends Component {
@@ -54,11 +55,12 @@ class Main extends Component {
   }
 
   loaderVisibility = (flag) => {
-    this.setState({isVisible: flag});
+    this.setState({ isVisible: flag });
   };
 
   conglameratePolygons = () => {
     const {polygons, setPolyPayload} = this.props;
+
     let geoPolygons = polygons.map((poly) => {
       return poly.layer.toGeoJSON()
     });
@@ -89,7 +91,7 @@ class Main extends Component {
       Array.prototype.push.apply(withoutRemovedMarkers, markersInOnePoly);
 
       let stationsInOnePoly = this.props.stations.filter((station) => {
-        let LatLng = {lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon)};
+        let LatLng = { lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon) };
         return this.props.polygons[i].layer.contains(LatLng)
           && !withoutRemovedStations.some((repeat) => repeat.props.props.id === station.props.props.id)
       });
@@ -169,7 +171,7 @@ class Main extends Component {
         Array.prototype.push.apply(sortedMarkers, markersInOnePoly);
 
         let stationsInOnePoly = prevStations.filter((station) => {
-          let LatLng = {lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon)};
+          let LatLng = { lat: parseFloat(station.props.props.lat), lng: parseFloat(station.props.props.lon) };
           return this.props.polygons[i].layer.contains(LatLng)
             && !newStations.some((repeat) => repeat.props.props.id === station.props.props.id)
             && !sortedStations.some((oldStation) => oldStation.props.props.id === station.props.props.id)
@@ -195,7 +197,7 @@ class Main extends Component {
     let req = this.state.api.createPolyRequest(data);
     MarkerSelected(req);
 
-    this.state.api.getStationsFromMapEvent({e: data}).then((station) => {
+    this.state.api.getStationsFromMapEvent({ e: data }).then((station) => {
       this.setCardItem(station.response[0]);
     }).catch((error) => console.log(error));
   };
@@ -218,7 +220,7 @@ class Main extends Component {
   };
 
   creativeDay = (e, cnt) => {
-    return <WeatherControl key={cnt} data={e}/>;
+    return <WeatherControl key={cnt} data={e} />;
   };
 
   onMarkerClick() {
@@ -263,7 +265,7 @@ class Main extends Component {
 
   onMapPageChanged = (e) => {
     if (this.state.lockM) {
-      this.setState({lockM: false});
+      this.setState({ lockM: false });
       return;
     }
     let t = e.map((r) => r.position);
@@ -281,11 +283,11 @@ class Main extends Component {
   };
 
   setCtrList = (list) => {
-    this.setState({ctr_list: list})
+    this.setState({ ctr_list: list })
   };
 
   selectedIndexChange = (e) => {
-    this.setState({mapSelectedIndex: e})
+    this.setState({ mapSelectedIndex: e })
   };
 
 
@@ -323,46 +325,41 @@ class Main extends Component {
 
     let containerInnerClass = "m-2";
     return (<div className="d-flex container-fluid p-0">
-      {this.state.isVisible && <Loader isVisible={this.state.isVisible}/>}
+      {this.state.isVisible && <Loader isVisible={this.state.isVisible} />}
       <Sidebar>
         <FlyoutContainer title="Search stations" position="left" iconClassName="fa fa-search"
-                         containerInnerClass={containerInnerClass}>
+          containerInnerClass={containerInnerClass}>
           <StationsQueryComponent {...comp}  />
-          <StationsResultView/>
+          <ConditionalContainer visibleWhen={this.props.stations.length > 0}>
+            <StationsResultView />
+          </ConditionalContainer>
         </FlyoutContainer>
 
-        {this.props.stations.length > 0 &&
         <FlyoutContainer title="Aggregate weather" position="left" iconClassName="fa fa-filter"
-                         containerInnerClass={containerInnerClass}>
+          isVisible={this.props.stations.length > 0}
+          containerInnerClass={containerInnerClass}>
           <WeatherAggregationComponent {...comp} />
-          <StatisticsAggregationComponent/>
+          <ConditionalContainer visibleWhen={this.props.weather.length > 0}>
+            <StatisticsAggregationComponent className={containerInnerClass} />
+          </ConditionalContainer>
         </FlyoutContainer>
-        }
 
         <FlyoutContainer title="Countries" position="left" iconClassName="fa fa-globe"
-                         containerInnerClass={containerInnerClass}>
-          <CountryList ctr_list={conts.ctr_list}/>
-        </FlyoutContainer>
-
-        <FlyoutContainer title="Stations by country" position="left" iconClassName="fa fa-map-marker"
-                         containerInnerClass={containerInnerClass}>
-          <SelectedStationsList
-            onStationsChange={conts.onStationsChange}
-            index={conts.mapSelectedIndex}
-          />
+          containerInnerClass={containerInnerClass}>
+          <CountryList ctr_list={conts.ctr_list} />
         </FlyoutContainer>
 
         <FlyoutContainer title="Results" position="left" iconClassName="fa fa-sun-o">
-          <DaysItemsList/>
+          <DaysItemsList />
         </FlyoutContainer>
       </Sidebar>
 
       <MapComponent api={comp.api} onWeatherData={comp.onWeatherData}
-                    activeMarker={comp.activeMarker}
-                    onStationsSelection={comp.onStationsSelection}
-                    setCardItem={comp.setCardItem} onToolRemove={comp.onToolRemove}
-                    beforeMove={comp.beforeMove}/>
-      <Footer/>
+        activeMarker={comp.activeMarker}
+        onStationsSelection={comp.onStationsSelection}
+        setCardItem={comp.setCardItem} onToolRemove={comp.onToolRemove}
+        beforeMove={comp.beforeMove} />
+      <Footer />
     </div>)
   }
 }

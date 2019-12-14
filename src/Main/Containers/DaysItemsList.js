@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Pagination from '../../Main/Controls/Pagination';
 import { emptyContainer } from '../../js/const'
-import {connect} from "react-redux";
+import { connect } from "react-redux";
 
 class DaysItemsList extends Component {
   constructor(props) {

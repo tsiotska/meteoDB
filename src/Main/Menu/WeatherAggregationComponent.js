@@ -1,7 +1,7 @@
 import React from "react";
 import DatePicker from '../Controls/DatePicker';
-import {Button, Input} from "reactstrap";
-import {connect} from "react-redux";
+import { Button, Input } from "reactstrap";
+import { connect } from "react-redux";
 
 class WeatherAggregationComponent extends React.Component {
 
@@ -110,6 +110,7 @@ class WeatherAggregationComponent extends React.Component {
 
   render() {
     const {weather} = this.props;
+
     return (<div className={"" + this.props.className}>
       <h2>Aggregate weather</h2>
       <div className="time-selector-tabs w-100 mx-auto justify-content-center">
@@ -210,19 +211,19 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   setWeatherPackLink: (link) => {
-    dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
+    dispatch({ type: "SET_WEATHER_PACK_LINK", link: link })
   },
   setYears: (years) => {
-    dispatch({type: "SET_YEARS", years: years})
+    dispatch({ type: "SET_YEARS", years: years })
   },
   setMonths: (months) => {
-    dispatch({type: "SET_MONTHS", months: months})
+    dispatch({ type: "SET_MONTHS", months: months })
   },
   setDays: (days) => {
-    dispatch({type: "SET_DAYS", days: days})
+    dispatch({ type: "SET_DAYS", days: days })
   },
   setTime: (date) => {
-    dispatch({type: "SET_TIME", date: date})
+    dispatch({ type: "SET_TIME", date: date })
   },
   setWeather: (weather) => {
     dispatch({type: "SET_WEATHER", weather: weather})
@@ -230,7 +231,6 @@ const mapDispatchToProps = dispatch => ({
   enableSearchButton: (flag) => {
     dispatch({type: "ENABLE_WEATHER_SEARCH_BUTTON", flag: flag})
   },
-
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WeatherAggregationComponent)
