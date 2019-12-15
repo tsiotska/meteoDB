@@ -23,6 +23,7 @@ import { ApiController } from '../js/apicontroller'
 import 'js/map_extensions'
 import FlyoutContainer from "./Containers/FlyoutContainer"
 import turf from 'turf';
+import $ from "jquery";
 
 var markerGroup = null;
 
@@ -105,8 +106,7 @@ class Main extends Component {
       Array.prototype.push.apply(withoutRemovedWeather, existingWeather);
     }
     // can be simplified in one action
-    this.props.setMarkers(withoutRemovedMarkers);
-    this.props.setStations(withoutRemovedStations);
+    this.props.setMarkersAndStations(withoutRemovedMarkers, withoutRemovedStations);
     this.props.setWeather(withoutRemovedWeather);
     this.props.setSelectedStation(null);
     this.conglameratePolygons();
@@ -179,12 +179,10 @@ class Main extends Component {
         Array.prototype.push.apply(sortedStations, stationsInOnePoly);
       }
     }
-    Array.prototype.push.apply(sortedMarkers, newMarkers);
     Array.prototype.push.apply(sortedStations, newStations);
+    Array.prototype.push.apply(sortedMarkers, newMarkers);
 
-    console.log(sortedMarkers)
-    this.props.setMarkers(sortedMarkers);
-    this.props.setStations(sortedStations);
+    this.props.setMarkersAndStations(sortedMarkers, sortedStations);
   };
 
   getOneStationData = (e) => {
@@ -256,8 +254,7 @@ class Main extends Component {
       if (poly) {
         this.setStationsAndMarkersInPoly(poly, newMarkers, newStations);
       } else {
-        this.props.setMarkers(newMarkers);
-        this.props.setStations(newStations);
+        this.props.setMarkersAndStations(newMarkers, newStations);
       }
       mymap.fitBounds(L.latLngBounds(area_latlon).pad(.3));
     } else alert("No data, sorry");
@@ -275,7 +272,11 @@ class Main extends Component {
   };
 
   activeMarker = (e) => {
-    console.log("Active: " + e.options.position)
+    console.log(e)
+    console.log(this.props.selectedStation)
+    $('.leaflet-marker-icon').removeClass('coloredUnselectedMarker');
+    $(e.target._icon).addClass("coloredSelectedMarker")
+    console.log("Active: " + e.target.options.position)
   };
 
   onMouseMove = (e) => {
@@ -370,7 +371,8 @@ const mapStateToProps = state => ({
   polygons: state.dataReducer.polygons,
   stations: state.dataReducer.stations,
   weather: state.dataReducer.weather,
-  markers: state.dataReducer.markers
+  markers: state.dataReducer.markers,
+  selectedStation: state.dataReducer.selectedStation
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -398,8 +400,8 @@ const mapDispatchToProps = dispatch => ({
   setWeather: (weather) => {
     dispatch({type: "SET_WEATHER", weather: weather})
   },
-  setMarkers: (markers) => {
-    dispatch({type: "SET_MARKERS", markers: markers})
+  setMarkersAndStations: (markers, stations) => {
+    dispatch({type: "SET_MARKERS_AND_STATIONS", markers: markers, stations: stations})
   },
   setSelectedStation: (selected) => {
     dispatch({type: "SET_SELECTED_STATION", selected: selected})

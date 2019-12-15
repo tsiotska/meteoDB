@@ -102,6 +102,8 @@ class StationsQueryComponent extends React.Component {
   };
 
   currentStation = () => {
+    console.log("RERENDER TEMPLATE")
+    console.log(this.props.selectedStation)
     if (this.props.selectedStation) {
       return (<div id="flyn_current_station" className="w-100 d-flex flex-column flyn_current_station">
         {this.props.selectedStation}</div>);

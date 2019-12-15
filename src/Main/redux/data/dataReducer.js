@@ -13,10 +13,11 @@ const dataReducer = (state = dataState, action) => {
         ...state,
         weather: action.weather
       };
-    case types.SET_MARKERS:
+    case types.SET_MARKERS_AND_STATIONS:
       return {
         ...state,
-        markers: action.markers
+        markers: action.markers,
+        stations: action.stations
       };
     case types.SET_SELECTED_STATION:
       return {
