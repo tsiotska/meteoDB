@@ -2,6 +2,7 @@ import React from "react";
 import DatePicker from '../Controls/DatePicker';
 import { Button, Input } from "reactstrap";
 import { connect } from "react-redux";
+import {baseUrl} from "../../js/const";
 
 class WeatherAggregationComponent extends React.Component {
 
@@ -52,19 +53,22 @@ class WeatherAggregationComponent extends React.Component {
         polyPayload, days, months, date, years,
         pack: true
       })
-        .then((pack) => {
-          this.props.setWeatherPackLink(pack.response[0]);
-        }).then(() => window.location.href = "http://www.w3schools.com")
+        .then((pack) => {  console.log(pack.response[0]);
+          console.log("Redirect to " + baseUrl + pack.response[0] + "?saveas=weather.json");
+          window.location.replace(baseUrl + pack.response[0] + "?saveas=weather.json")
+        })
         .catch((error) => console.log(error));
     } else {
+
       api.getPack({
         queryRequest, markerRequest, days, months,
         date, years,
         pack: true
       })
-        .then((pack) => {
-          this.props.setStationPackLink(pack.response[0]);
-        }).then(() => window.location.href = "http://www.w3schools.com")
+        .then((pack) => {  console.log(pack.response[0]);
+          console.log("Redirect to " + baseUrl + pack.response[0] + "?saveas=weather.json");
+          window.location.replace(baseUrl + pack.response[0] + "?saveas=weather.json")
+        })
         .catch((error) => console.log(error));
     }
   };
@@ -210,9 +214,6 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  setWeatherPackLink: (link) => {
-    dispatch({ type: "SET_WEATHER_PACK_LINK", link: link })
-  },
   setYears: (years) => {
     dispatch({ type: "SET_YEARS", years: years })
   },

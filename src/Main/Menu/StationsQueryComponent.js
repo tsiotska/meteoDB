@@ -1,6 +1,6 @@
 import React from 'react';
-import { mymap } from '../Map/MapComponent';
-import { baseUrl, classJoin } from '../../js/const';
+import {mymap} from '../Map/MapComponent';
+import {baseUrl, classJoin} from '../../js/const';
 import $ from 'jquery';
 import {Button} from 'reactstrap';
 import CountryItem from '../Elements/CountryItemTemplate';
@@ -40,8 +40,8 @@ class StationsQueryComponent extends React.Component {
           let cnt = 0;
           this.props.setCtrList(data.response.map((i) => {
             return <CountryItem key={cnt++} onSearchClick={this.onStationsSearchClick}
-              onRefreshClick={this.onRefreshClick}
-              setQuery={this.props.setQuery} e={i} />;
+                                onRefreshClick={this.onRefreshClick}
+                                setQuery={this.props.setQuery} e={i}/>;
 
           }))
         }
@@ -51,37 +51,42 @@ class StationsQueryComponent extends React.Component {
   onStationPackClick = () => {
     const {api, queryRequest, markerRequest, polyPayload} = this.props;
 
-    console.log(polyPayload);
     if (polyPayload) {
       api.getPackByGeoJson({
         polyPayload,
         pack: true
-      }).then(() => window.location.href = "http://www.w3schools.com")
-        .then((pack) => {
-          this.props.setStationPackLink(pack.response[0]);
-        })
+      }).then((pack) => {  console.log(pack.response[0]);
+        console.log("Redirect to " + baseUrl + pack.response[0] + "?saveas=stations.json");
+        window.location.replace(baseUrl + pack.response[0] + "?saveas=stations.json")
+      })
         .catch((error) => console.log(error));
     } else {
       api.getPack({
         queryRequest, markerRequest,
         pack: true
+      }).then((pack) => {  console.log(pack.response[0]);
+        console.log("Redirect to " + baseUrl + pack.response[0] + "?saveas=stations.json");
+        window.location.replace(baseUrl + pack.response[0] + "?saveas=stations.json")
       })
-        .then((pack) => {
-          this.props.setStationPackLink(pack.response[0]);
-        }).then(() => window.location.href = "http://www.w3schools.com")
         .catch((error) => console.log(error));
     }
   };
 
 
   onStationsSearchClick = () => {
-    const { queryParam, offset, limit, neigh, nearest, api, QueryRequest } = this.props;
-
-    QueryRequest(api.buildQueryRequest({
+    const {queryParam, offset, limit, neigh, nearest, api, QueryRequest} = this.props;
+    console.log(api.buildQueryRequest({
       offset, limit, neigh,
       nearest, queryParam,
       selectedField: this.selectorByField.current.value
     }));
+    let link = api.buildQueryRequest({
+      offset, limit, neigh,
+      nearest, queryParam,
+      selectedField: this.selectorByField.current.value
+    });
+    console.log(link);
+    QueryRequest(link);
 
 
     api.searchStationsByQuery({
@@ -101,8 +106,6 @@ class StationsQueryComponent extends React.Component {
   };
 
   currentStation = () => {
-    console.log("RERENDER ONE STATION TEMPLATE")
-    console.log(this.props.selectedStation)
     if (this.props.selectedStation) {
       return (<div id="flyn_current_station" className="w-100 d-flex flex-column flyn_current_station">
         {this.props.selectedStation}</div>);
@@ -112,9 +115,9 @@ class StationsQueryComponent extends React.Component {
 //Кнопка пошуку активується якщо є пошуковий параметр або виділені полігони з вказаною датою.
   enableButton = () => {
 
-    const { queryParam } = this.props;
+    const {queryParam} = this.props;
     if ((queryParam.length > 0)) {
-      this.setState({ enableSearchButton: true });
+      this.setState({enableSearchButton: true});
     } else {
       this.setState({enableSearchButton: false})
     }
@@ -227,16 +230,16 @@ class StationsQueryComponent extends React.Component {
                     // api/weather/databases
                   }
                   <option defaultValue value="gsod" data-toggle="tooltip"
-                    title="Global Summary Of Day (GSOD, NOAA)">GSOD
+                          title="Global Summary Of Day (GSOD, NOAA)">GSOD
                   </option>
                   <option disabled value="gh" data-toggle="tooltip" title="Global Hourly dataset (GH, NOAA)">Global
                     Hourly
                   </option>
                   <option disabled value="isd-lite" data-toggle="tooltip"
-                    title="Integrated surface data Lite (ISD, NOAA)">ISD Lite
+                          title="Integrated surface data Lite (ISD, NOAA)">ISD Lite
                   </option>
                   <option disabled value="isd" data-toggle="tooltip"
-                    title="Integrated surface data FULL (ISD, NOAA)">ISD
+                          title="Integrated surface data FULL (ISD, NOAA)">ISD
                   </option>
                 </select>
               </div>
@@ -246,13 +249,13 @@ class StationsQueryComponent extends React.Component {
 
             <div className="col-auto d-flex w-100 justify-content-center">
               <Button id="reeval" onClick={this.state.enableSearchButton && this.onStationsSearchClick}
-                color="primary"
-                className={(this.state.enableSearchButton ? "" : "disabled ") + "m-2 mb-1 mt-auto"}>Search
+                      color="primary"
+                      className={(this.state.enableSearchButton ? "" : "disabled ") + "m-2 mb-1 mt-auto"}>Search
               </Button>
 
               <Button id="refresh" onClick={this.onRefreshClick}
-                color="secondary"
-                className="m-2 mb-1 mt-auto">Clear
+                      color="secondary"
+                      className="m-2 mb-1 mt-auto">Clear
               </Button>
             </div>
 
@@ -281,9 +284,9 @@ class StationsQueryComponent extends React.Component {
 const mapStateToProps = state => ({
   polyPayload: state.dataReducer.polyPayload,
   markerRequest: state.dataReducer.markerRequest,
-  areLimitAndOffsetDisabled: state.dataReducer.areLimitAndOffsetDisabled,
+  queryRequest: state.dataReducer.queryRequest,
 
-  stationPackLink: state.dataReducer.stationPackLink,
+  areLimitAndOffsetDisabled: state.dataReducer.areLimitAndOffsetDisabled,
 
   queryParam: state.dataReducer.queryParam,
   neigh: state.dataReducer.neigh,
@@ -309,9 +312,6 @@ const mapDispatchToProps = dispatch => ({
   disableLimitAndOffset: (flag) => {
     dispatch({type: "DISABLE_OFFSET_AND_LIMIT_BUTTON", flag: flag})
   },
-  setStationPackLink: (link) => {
-    dispatch({type: "SET_STATION_PACK_LINK", link: link})
-  },
   setYears: (years) => {
     dispatch({type: "SET_YEARS", years: years})
   },
@@ -335,7 +335,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch({type: "SET_MARKER_REQUEST", req: req})
   },
   QueryRequest: (req) => {
-    dispatch({ type: "SET_QUERY_REQUEST", req: req })
+    dispatch({type: "SET_QUERY_REQUEST", req: req})
   },
   setPolygons: (polygons) => {
     dispatch({type: "SET_POLYGONS", polygons: polygons})

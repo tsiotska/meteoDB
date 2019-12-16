@@ -27,7 +27,6 @@ const dataReducer = (state = dataState, action) => {
       };
     case types.SET_POLY_REQUEST:
       let flag = (!!action.req);
-      console.log(action.req);
       return {
         ...state,
         areLimitAndOffsetDisabled: flag,
@@ -39,6 +38,7 @@ const dataReducer = (state = dataState, action) => {
         markerRequest: action.req
       };
     case types.SET_QUERY_REQUEST:
+      console.log(action.req);
       return {
         ...state,
         queryRequest: action.req
