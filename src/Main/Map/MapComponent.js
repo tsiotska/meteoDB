@@ -159,7 +159,6 @@ class MapComponent extends Component {
     return (<Marker icon={customMarkerIcon} onClick={
       (e) => {
         this.onMarkerClick(e);
-        w.click(e)
       }
     } key={w.id_cnt} position={w.position}>
       <Tooltip className="XCustTooltip">

@@ -20,6 +20,7 @@ const dataReducer = (state = dataState, action) => {
         stations: action.stations
       };
     case types.SET_SELECTED_STATION:
+      console.log(action.selected)
       return {
         ...state,
         selectedStation: action.selected
@@ -116,7 +117,6 @@ const dataReducer = (state = dataState, action) => {
         months: null,
         days: null,
         limit: null,
-        offset: null,
         offset: null,
         nearest: false,
         neigh: null,

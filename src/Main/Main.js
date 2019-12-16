@@ -25,10 +25,8 @@ import FlyoutContainer from "./Containers/FlyoutContainer"
 import turf from 'turf';
 import $ from "jquery";
 
-var markerGroup = null;
-
-function createMaker(e, click, content, cnt, i) {
-  return { position: e, click, content, id_cnt: cnt, data: i }
+function createMaker(e,  content, cnt, i) {
+  return { position: e,  content, id_cnt: cnt, data: i }
 }
 
 export function createStation(e, cnt, click) {
@@ -108,7 +106,13 @@ class Main extends Component {
     // can be simplified in one action
     this.props.setMarkersAndStations(withoutRemovedMarkers, withoutRemovedStations);
     this.props.setWeather(withoutRemovedWeather);
-    this.props.setSelectedStation(null);
+
+    let LatLng = { lat: parseFloat(this.props.selectedStation.props.props.lat),
+      lng: parseFloat(this.props.selectedStation.props.props.lon) };
+    if(poly.layer.contains(LatLng)){
+      this.props.setSelectedStation(null);
+    }
+
     this.conglameratePolygons();
   };
 
@@ -184,7 +188,7 @@ class Main extends Component {
     }
     Array.prototype.push.apply(sortedStations, newStations);
     Array.prototype.push.apply(sortedMarkers, newMarkers);
-
+   // this.props.setSelectedStation(null);
     this.props.setMarkersAndStations(sortedMarkers, sortedStations);
   };
 
@@ -250,7 +254,7 @@ class Main extends Component {
         let location = stations[i];
         let coords = L.latLng(location.lat, location.lon);
         area_latlon.push(coords);
-        newMarkers.push(createMaker(coords, this.onMarkerClick, createStation(location), mrk++, location));
+        newMarkers.push(createMaker(coords, createStation(location), mrk++, location));
       }
 
       if (poly) {
@@ -277,8 +281,9 @@ class Main extends Component {
     if($(e.target._icon).hasClass("coloredSelectedMarker")){
       $(e.target._icon).removeClass("coloredSelectedMarker")
         .addClass("coloredUnselectedMarker");
-      this.props.setSelectedStation([]);
+      this.props.setSelectedStation(null);
     } else {
+      this.onMarkerClickBase(e);
       $('.leaflet-marker-icon').removeClass('coloredSelectedMarker')
         .addClass('coloredUnselectedMarker');
       $(e.target._icon).removeClass("coloredUnselectedMarker")
