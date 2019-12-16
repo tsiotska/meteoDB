@@ -3,7 +3,6 @@ import React from 'react';
 export default (props) => {
 
     const e = props.props;
-    console.log(props.props)
     return (<div onClick={ () => props.click(e) } id={'XMarker' + props.id}
                  className="cur_station m-2 d-flex flex-column">
       <div className='st_card col-auto d-flex w_cont flex-column  b-0 st_item text-center'>

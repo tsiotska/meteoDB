@@ -140,16 +140,21 @@ class Main extends Component {
   };
 
   setStationsAndMarkersInPoly = (currentPoly, newMarkers, newStations) => {
+    console.log(currentPoly);
+    console.log(this.props.polygons);
+
     let withoutRepeatingPoly = this.props.polygons.filter((poly) => {
       return poly.layer._leaflet_id !== currentPoly.layer._leaflet_id;
     });
 
     if (withoutRepeatingPoly.length === this.props.polygons.length) {
+      console.log("New poly!")
       let withNewPoly = [];
       withNewPoly.push(currentPoly);
       Array.prototype.push.apply(withNewPoly, this.props.polygons);
       this.props.setPolygons(withNewPoly);
     } else {
+      console.log("Old poly!")
       withoutRepeatingPoly.push(currentPoly);
       this.props.setPolygons(withoutRepeatingPoly);
     }
@@ -158,8 +163,6 @@ class Main extends Component {
 
     const sortedMarkers = [], prevMarkers = this.props.markers, sortedStations = [],
       prevStations = this.props.stations;
-
-    console.log(this.props.polygons);
 
     if (this.props.stations.length > 0) {
       for (let i in this.props.polygons) {
@@ -202,7 +205,6 @@ class Main extends Component {
 
   setCardItem = (station) => {
     this.props.setSelectedStation(createStation(station, 0));
-    //this.setState({currentStation: createStation(station, 0)});
   };
 
   setWeatherForOneStation = (weather) => {
@@ -272,11 +274,16 @@ class Main extends Component {
   };
 
   activeMarker = (e) => {
-    console.log(e)
-    console.log(this.props.selectedStation)
-    $('.leaflet-marker-icon').removeClass('coloredUnselectedMarker');
-    $(e.target._icon).addClass("coloredSelectedMarker")
-    console.log("Active: " + e.target.options.position)
+    if($(e.target._icon).hasClass("coloredSelectedMarker")){
+      $(e.target._icon).removeClass("coloredSelectedMarker")
+        .addClass("coloredUnselectedMarker");
+      this.props.setSelectedStation([]);
+    } else {
+      $('.leaflet-marker-icon').removeClass('coloredSelectedMarker')
+        .addClass('coloredUnselectedMarker');
+      $(e.target._icon).removeClass("coloredUnselectedMarker")
+        .addClass("coloredSelectedMarker");
+    }
   };
 
   onMouseMove = (e) => {
@@ -390,12 +397,6 @@ const mapDispatchToProps = dispatch => ({
   },
   setPolygons: (polygons) => {
     dispatch({type: "SET_POLYGONS", polygons: polygons})
-  },
-  setPolygonsInGeo: (polygons) => {
-    dispatch({type: "SET_GEO_POLYGONS", polygons: polygons})
-  },
-  setStations: (stations) => {
-    dispatch({type: "SET_STATIONS", stations: stations})
   },
   setWeather: (weather) => {
     dispatch({type: "SET_WEATHER", weather: weather})

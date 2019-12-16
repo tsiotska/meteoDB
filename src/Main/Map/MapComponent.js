@@ -3,7 +3,7 @@ import {TileLayer, Map, Marker, Tooltip} from 'react-leaflet';
 import L from 'leaflet';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import $ from 'jquery';
-/* import MarkerClusterGroup from 'react-leaflet-markercluster'; */
+import MarkerClusterGroup from 'react-leaflet-markercluster';
 import connect from "react-redux/es/connect/connect";
 import 'leaflet.pm';
 import {renderToStaticMarkup} from 'react-dom/server';
@@ -16,14 +16,14 @@ export var mymap = null,
 //NOTICE:
 // This map Component (currently leaflet)
 // may be replaced with D3 map or other based on WebGL
-
-/* const createClusterCustomIcon = function (cluster) {
+/*
+ const createClusterCustomIcon = function (cluster) {
   return L.divIcon({
     html: `<span>${cluster.getChildCount()}</span>`,
     className: 'marker-cluster-custom',
     iconSize: L.point(40, 40, true)
   });
-}; */
+};*/
 
 class MapComponent extends Component {
   constructor(props) {
@@ -122,7 +122,6 @@ class MapComponent extends Component {
       api, date, years, months, days /* neigh, nearest, offset, limit */
     } = this.props;
 
-
     api.getStationsFromMapEvent({
       e: e.layer,
     }).then((stations) => {
@@ -139,6 +138,7 @@ class MapComponent extends Component {
 
 
   renderMarkers = () => {
+    console.log("Render markers...")
     const {markers, setSelectedStation, stations} = this.props;
     if (markers.length === 1) {
       let style = "fas fa-map-marker-alt coloredSelectedMarker fa-3x";
@@ -190,7 +190,11 @@ class MapComponent extends Component {
              }} zoom={this.state.zoom} preferCanvas="True"
              scrollWheelZoom={false} zoomControl={false}>
           <TileLayer attribution={this.state.attribution} url={this.state.tiles}/>
-          {markers}
+          {markers &&
+          <MarkerClusterGroup chunkedLoadind={true} showCoverageOnHover={true}>
+            {markers}
+          </MarkerClusterGroup>
+          }
         </Map>
       </div>);
   }
