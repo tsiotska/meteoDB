@@ -208,7 +208,11 @@ class Main extends Component {
   };
 
   setCardItem = (station) => {
-    this.props.setSelectedStation(createStation(station, 0));
+    if(!(this.props.selectedStation && station.id === this.props.selectedStation.props.props.id)) {
+      this.props.setSelectedStation(createStation(station, 0));
+      //Тут нада зближення зробити
+      //mymap.fitBounds(L.latLngBounds([station.lat, station.lon]).pad(.3));
+    }
   };
 
   setWeatherForOneStation = (weather) => {
@@ -216,11 +220,6 @@ class Main extends Component {
     this.props.setWeather(weather.map((i) => {
       return this.creativeDay(i, cnt++);
     }))
-    /*this.setState({
-      daysItems: weather.map((i) => {
-        return this.creativeDay(i, cnt++);
-      })
-    })*/
   };
 
   creativeDay = (e, cnt) => {
@@ -393,12 +392,6 @@ const mapDispatchToProps = dispatch => ({
   },
   MarkerSelected: (req) => {
     dispatch({type: "SET_MARKER_REQUEST", req: req})
-  },
-  setStationPackLink: (link) => {
-    dispatch({type: "SET_STATION_PACK_LINK", link: link})
-  },
-  setWeatherPackLink: (link) => {
-    dispatch({type: "SET_WEATHER_PACK_LINK", link: link})
   },
   setPolygons: (polygons) => {
     dispatch({type: "SET_POLYGONS", polygons: polygons})

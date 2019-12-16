@@ -20,7 +20,7 @@ export const dataState = {
   weather: [],
   stations : [],
   markers : [],
-  selectedStation: [],
+  selectedStation: null,
 
   markerRequest: "",
   polyPayload: "",

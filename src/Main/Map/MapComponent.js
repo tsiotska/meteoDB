@@ -66,7 +66,6 @@ class MapComponent extends Component {
       console.log(!e.layer.options.hasOwnProperty("position"))
 
       if (!e.layer.options.hasOwnProperty("position")) {
-        this.props.deleteLastPoly(e);
         this.props.onToolRemove(e);
       }
     });
@@ -142,8 +141,7 @@ class MapComponent extends Component {
     const {markers, setSelectedStation, stations} = this.props;
     if (markers.length === 1) {
       let style = "fas fa-map-marker-alt coloredSelectedMarker fa-3x";
-      console.log(stations[0])
-      setSelectedStation(createStation(stations[0].props.props, 0));
+      setSelectedStation(createStation(stations[0], 0));
       return this.renderOne(markers[0], style);
 
     } else if (markers.length > 1) {
@@ -217,9 +215,6 @@ const mapStateToProps = state => ({
 
 
 const mapDispatchToProps = dispatch => ({
-  deleteLastPoly: (polygon) => {
-    dispatch({type: "DELETE_LAST_POLY", polygon: polygon})
-  },
   setSelectedStation: (selected) => {
     dispatch({type: "SET_SELECTED_STATION", selected: selected})
   }

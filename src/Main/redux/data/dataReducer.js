@@ -54,16 +54,6 @@ const dataReducer = (state = dataState, action) => {
         ...state,
         queryParam: action.param,
       };
-    case types.SET_STATION_PACK_LINK:
-      return {
-        ...state,
-        stationPackLink: action.link,
-      };
-    case types.SET_WEATHER_PACK_LINK:
-      return {
-        ...state,
-        weatherPackLink: action.link,
-      };
     case types.SET_YEARS:
       return {
         ...state,
@@ -99,13 +89,6 @@ const dataReducer = (state = dataState, action) => {
         ...state,
         geoPolygons: action.polygons
       };
-    case types.DELETE_LAST_POLY:
-      console.log(state.polygons)
-      let rest = state.polygons.filter((poly) => poly.layer !== action.polygon.layer);
-      return {
-        ...state,
-        polygons: rest,
-      };
     case types.REFRESH_EVERYTHING:
       return {
         ...state,
@@ -126,7 +109,7 @@ const dataReducer = (state = dataState, action) => {
         weather: [],
         stations : [],
         markers : [],
-        selectedStation: [],
+        selectedStation: null,
         markerRequest: "",
         polyPayload: "",
         queryRequest: "",
