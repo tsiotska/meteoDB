@@ -24,7 +24,12 @@ class FetchController {
     console.log(link);
     console.log(payload);
     try {
-      const response = await axios.post(link, payload);
+      const options = {
+        headers: {
+            'Content-Type': 'application/json',
+        }
+      };
+      const response = await axios.post(link, payload, options);
       console.log(response);
       this.Status = response.data.code;
       this.Result = response.data.response;
