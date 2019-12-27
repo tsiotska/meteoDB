@@ -19,21 +19,42 @@ class FetchController {
     this.Errors = null;
   }
 
-  Get = async (link) => {
+  Post = async (link, payload) => {
     this.loaderVisibility(true);
     console.log(link);
-
-   /* return axios.get(link) .then((response) =>{
+    console.log(payload);
+    try {
+      const response = await axios.post(link, payload);
       console.log(response);
       this.Status = response.data.code;
       this.Result = response.data.response;
       this.Errors = response.data.error;
       this.loaderVisibility(false);
       return response.data;
-    }).catch ((error)=> {
+    } catch (error) {
       console.log(error);
-    })
-    */
+    }
+
+    if (this.Errors !== null && this.Errors.length) {
+      console.log(this.Errors)
+    }
+  };
+
+  Get = async (link) => {
+    this.loaderVisibility(true);
+    console.log(link);
+
+    /* return axios.get(link) .then((response) =>{
+       console.log(response);
+       this.Status = response.data.code;
+       this.Result = response.data.response;
+       this.Errors = response.data.error;
+       this.loaderVisibility(false);
+       return response.data;
+     }).catch ((error)=> {
+       console.log(error);
+     })
+     */
 
     try {
       const response = await axios.get(link);
@@ -43,8 +64,7 @@ class FetchController {
       this.Errors = response.data.error;
       this.loaderVisibility(false);
       return response.data;
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
     }
     // TODO: use a human readable error when schema ready

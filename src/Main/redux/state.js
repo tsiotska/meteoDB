@@ -7,7 +7,7 @@ export const dataState = {
   stationPackLink: null,
   weatherPackLink: null,
   date: {dateSet: false, startDate: null, endDate: null},
-  years: null,
+  years: "",
   months: null,
   days: null,
   limit: null,
@@ -20,10 +20,11 @@ export const dataState = {
   weather: [],
   stations : [],
   markers : [],
-  selectedStation: [],
+  selectedStation: null,
 
   markerRequest: "",
-  polyRequest: "",
+  polyPayload: "",
   queryRequest: "",
   areLimitAndOffsetDisabled: false,
+  enableWeatherSearchButton: false
 };

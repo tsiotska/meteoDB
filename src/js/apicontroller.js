@@ -13,7 +13,6 @@ export class ApiController extends ControllerContext {
   }
 
   setController = (context) => {
-    console.log(context.date);
     this.database = context.database || "gsod";
     context.date && (this.time = context.date);
     context.years && (this.years = context.years);
@@ -114,6 +113,11 @@ export class ApiController extends ControllerContext {
     return this.api.Get(req)
   };
 
+  postData = (req, payload) => {
+    this.resetController();
+    return this.api.Post(req, payload)
+  };
+
   getDataForMapOrMarker(context) {
     this.setController(context);
     let link = this.createPolyRequest(context.e);
@@ -133,19 +137,30 @@ export class ApiController extends ControllerContext {
     return this.getDataForMapOrMarker(context);
   };
 
-  getWeatherByGeoJson = (payload) => {
-    console.log("payload")
-    console.log(payload)
-    return axios.post(baseUrl + '/api/gsod/poly?type=mpoly', payload);
+  getWeatherByGeoJson = (context) => {
+    this.setController(context);
+    let request = this.compileContext(baseUrl + '/api/gsod/poly?type=mpoly');
+    return this.postData(request, context.polyPayload);
   };
 
-  //fetch weather data if we already have stations
+  //fetch weather data if we already have stations. using saved request on stations
   getWeather = (context) => {
     this.setController(context);
-    return this.fetchData(this.compileContext(context.markerRequest || context.polyRequest || context.queryRequest ))
+    return this.fetchData(this.compileContext(context.markerRequest || context.queryRequest))
   };
 
-  buildQueryRequest = (context) =>{
+  getPack = (context) => {
+    this.setController(context);
+    return this.fetchData(this.compileContext(context.markerRequest || context.queryRequest))
+  };
+
+  getPackByGeoJson = (context) => {
+    this.setController(context);
+    let request = this.compileContext(baseUrl + '/api/gsod/poly?type=mpoly');
+    return this.postData(request, context.polyPayload);
+  };
+
+  buildQueryRequest = (context) => {
     this.setController(context);
     let link = this.compileContext(this.createQueryLink(context.selectedField, context.queryParam));
     this.resetController();

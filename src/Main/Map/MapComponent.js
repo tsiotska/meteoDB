@@ -1,11 +1,14 @@
-import React, { Component } from 'react';
-import { TileLayer, Map, Marker, Tooltip } from 'react-leaflet';
+import React, {Component} from 'react';
+import {TileLayer, Map, Marker, Tooltip} from 'react-leaflet';
 import L from 'leaflet';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import $ from 'jquery';
-/* import MarkerClusterGroup from 'react-leaflet-markercluster'; */
+import MarkerClusterGroup from 'react-leaflet-markercluster';
 import connect from "react-redux/es/connect/connect";
 import 'leaflet.pm';
+import {renderToStaticMarkup} from 'react-dom/server';
+import {divIcon} from 'leaflet';
+import {createStation} from "../Main";
 
 export var mymap = null,
   markerGroup;
@@ -13,14 +16,14 @@ export var mymap = null,
 //NOTICE:
 // This map Component (currently leaflet)
 // may be replaced with D3 map or other based on WebGL
-
-/* const createClusterCustomIcon = function (cluster) {
+/*
+ const createClusterCustomIcon = function (cluster) {
   return L.divIcon({
     html: `<span>${cluster.getChildCount()}</span>`,
     className: 'marker-cluster-custom',
     iconSize: L.point(40, 40, true)
   });
-}; */
+};*/
 
 class MapComponent extends Component {
   constructor(props) {
@@ -63,7 +66,6 @@ class MapComponent extends Component {
       console.log(!e.layer.options.hasOwnProperty("position"))
 
       if (!e.layer.options.hasOwnProperty("position")) {
-        this.props.deleteLastPoly(e);
         this.props.onToolRemove(e);
       }
     });
@@ -104,22 +106,57 @@ class MapComponent extends Component {
       }
     }); */
     mymap.scrollWheelZoom.enable();
-    L.control.zoom({ position: 'topright' }).addTo(mymap);
+    L.control.zoom({position: 'topright'}).addTo(mymap);
     markerGroup = L.layerGroup().addTo(mymap);
   }
 
   onMarkerClick = (e) => {
-    console.log("ON MARKER CLICK!");
-    this.props.activeMarker(e.target);
-    $('.leaflet-marker-icon').removeClass('marker-active');
-    $(e.target._icon).addClass("marker-active")
+    this.props.activeMarker(e);
   };
 
-  renderOne = (w) => {
-    return (<Marker onClick={
+
+  fetchMarkers = (e) => {
+    const {
+      onStationsSelection, onWeatherData,
+      api, date, years, months, days /* neigh, nearest, offset, limit */
+    } = this.props;
+
+    api.getStationsFromMapEvent({
+      e: e.layer,
+    }).then((stations) => {
+      onStationsSelection(stations, e);
+    }).catch((error) => console.log(error));
+
+    if (date.dateSet || years) {
+      api.getWeatherFromMapEvent({e: e.layer, date: date, years: years, months: months, days: days})
+        .then((weather) => {
+          onWeatherData(weather.response)
+        }).catch((error) => console.log(error))
+    }
+  };
+
+
+  renderMarkers = () => {
+    console.log("Render markers...")
+    const {markers, setSelectedStation, stations} = this.props;
+    if (markers.length === 1) {
+      let style = "fas fa-map-marker-alt coloredSelectedMarker fa-3x";
+      setSelectedStation(createStation(stations[0], 0));
+      return this.renderOne(markers[0], style);
+
+    } else if (markers.length > 1) {
+      let style = "fas fa-map-marker-alt coloredUnselectedMarker fa-3x";
+      return markers.map((w) => this.renderOne(w, style));
+    } else {
+      return null;
+    }
+  };
+
+  renderOne = (w, markerStyle) => {
+    const customMarkerIcon = divIcon({className: markerStyle});
+    return (<Marker icon={customMarkerIcon} onClick={
       (e) => {
         this.onMarkerClick(e);
-        w.click(e)
       }
     } key={w.id_cnt} position={w.position}>
       <Tooltip className="XCustTooltip">
@@ -128,60 +165,13 @@ class MapComponent extends Component {
     </Marker>);
   };
 
-  fetchMarkers = (e) => {
-    const {
-      onStationsSelection, onWeatherData, setStationPackLink, setWeatherPackLink,
-      api, date, years, months, days /* neigh, nearest, offset, limit */
-    } = this.props;
-
-
-    api.getStationsFromMapEvent({
-      e: e.layer,
-    }).then((stations) => {
-      onStationsSelection(stations, e);
-      }).catch((error) => console.log(error));
-
-    if (date.dateSet || years) {
-      api.getWeatherFromMapEvent({ e: e.layer, date: date, years: years, months: months, days: days })
-        .then((weather) => {
-          onWeatherData(weather.response)
-        }).catch((error) => console.log(error))
-    }
-    /*
-    api.getPackFromMapEvent({e: e.layer, pack: true}).then((pack) => {
-      setStationPackLink(pack.response[0])
-    }).catch((error) => console.log(error));
-
-    api.getPackFromMapEvent({
-      e: e.layer, date, years, months, days, pack: true
-    }).then((pack) => {
-      setWeatherPackLink(pack.response[0])
-    }).catch((error) => console.log(error));
-    */
-  };
-
-
-  renderMarkers = () => {
-    if (this.props.markers) {
-      return this.props.markers.map((w) => this.renderOne(w));
-    } else if (!this.props.markers) {
-      return null;
-    }
-  };
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return !(
-      nextProps.markers && nextProps.markers[0] &&
-      this.props.markers[0] === nextProps.markers[0]
-    )
-  }
 
   render() {
     const position = [this.state.lat, this.state.lng];
-    const markers = this.renderMarkers();
-    let { counter } = this.props;
-    return ( 
-      <div className="main_map container-fluid p-0"> 
+    let markers = this.renderMarkers();
+    let {counter} = this.props;
+    return (
+      <div className="main_map container-fluid p-0">
         <div className="cur_count_wrapper">
           <div className={"cur_count " + (
             counter
@@ -197,7 +187,11 @@ class MapComponent extends Component {
              }} zoom={this.state.zoom} preferCanvas="True"
              scrollWheelZoom={false} zoomControl={false}>
           <TileLayer attribution={this.state.attribution} url={this.state.tiles}/>
-          {markers}
+          {markers &&
+          <MarkerClusterGroup chunkedLoadind={true} showCoverageOnHover={true}>
+            {markers}
+          </MarkerClusterGroup>
+          }
         </Map>
       </div>);
   }
@@ -208,30 +202,24 @@ const mapStateToProps = state => ({
   months: state.dataReducer.months,
   days: state.dataReducer.days,
   date: state.dataReducer.date,
+
   neigh: state.dataReducer.neigh,
   nearest: state.dataReducer.nearest,
   offset: state.dataReducer.offset,
   limit: state.dataReducer.limit,
-  markers: state.dataReducer.markers
+
+  markers: state.dataReducer.markers,
+  polygons: state.dataReducer.polygons,
+  stations: state.dataReducer.stations
 });
 
 
 const mapDispatchToProps = dispatch => ({
-  deleteLastPoly: (polygon) => {
-    dispatch({ type: "DELETE_LAST_POLY", polygon: polygon })
-  },
-  MarkerSelected: (req) => {
-    dispatch({ type: "SET_MARKER_REQUEST", req: req })
-  },
-  PolyRequest: (req) => {
-    dispatch({ type: "SET_POLY_REQUEST", req: req })
-  },
-  setStationPackLink: (link) => {
-    dispatch({ type: "SET_STATION_PACK_LINK", link: link })
-  },
-  setWeatherPackLink: (link) => {
-    dispatch({ type: "SET_WEATHER_PACK_LINK", link: link })
-  },
+  setSelectedStation: (selected) => {
+    dispatch({type: "SET_SELECTED_STATION", selected: selected})
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(MapComponent);
+
+

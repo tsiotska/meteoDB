@@ -13,23 +13,24 @@ const dataReducer = (state = dataState, action) => {
         ...state,
         weather: action.weather
       };
-    case types.SET_MARKERS:
+    case types.SET_MARKERS_AND_STATIONS:
       return {
         ...state,
-        markers: action.markers
+        markers: action.markers,
+        stations: action.stations
       };
     case types.SET_SELECTED_STATION:
+      console.log(action.selected)
       return {
         ...state,
         selectedStation: action.selected
       };
     case types.SET_POLY_REQUEST:
       let flag = (!!action.req);
-      console.log(action.req);
       return {
         ...state,
         areLimitAndOffsetDisabled: flag,
-        polyRequest: action.req
+        polyPayload: action.req
       };
     case types.SET_MARKER_REQUEST:
       return {
@@ -37,6 +38,7 @@ const dataReducer = (state = dataState, action) => {
         markerRequest: action.req
       };
     case types.SET_QUERY_REQUEST:
+      console.log(action.req);
       return {
         ...state,
         queryRequest: action.req
@@ -51,16 +53,6 @@ const dataReducer = (state = dataState, action) => {
       return {
         ...state,
         queryParam: action.param,
-      };
-    case types.SET_STATION_PACK_LINK:
-      return {
-        ...state,
-        stationPackLink: action.link,
-      };
-    case types.SET_WEATHER_PACK_LINK:
-      return {
-        ...state,
-        weatherPackLink: action.link,
       };
     case types.SET_YEARS:
       return {
@@ -82,7 +74,6 @@ const dataReducer = (state = dataState, action) => {
         ...state,
         date: action.date,
       };
-    //It sets neight nearest offset limit. And can do it with many others if its required and doesnt make you confused
     case types.SET_ANY_INPUT_DATA:
       return {
         ...state,
@@ -97,13 +88,6 @@ const dataReducer = (state = dataState, action) => {
       return {
         ...state,
         geoPolygons: action.polygons
-      };
-    case types.DELETE_LAST_POLY:
-      console.log(state.polygons)
-      let rest = state.polygons.filter((poly) => poly.layer !== action.polygon.layer);
-      return {
-        ...state,
-        polygons: rest,
       };
     case types.REFRESH_EVERYTHING:
       return {
@@ -125,10 +109,15 @@ const dataReducer = (state = dataState, action) => {
         weather: [],
         stations : [],
         markers : [],
-        selectedStation: [],
+        selectedStation: null,
         markerRequest: "",
-        polyRequest: "",
+        polyPayload: "",
         queryRequest: "",
+      };
+    case types.ENABLE_WEATHER_SEARCH_BUTTON:
+      return {
+        ...state,
+        enableWeatherSearchButton: action.flag,
       };
     default:
       return state;

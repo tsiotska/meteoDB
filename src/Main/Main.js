@@ -23,11 +23,10 @@ import { ApiController } from '../js/apicontroller'
 import 'js/map_extensions'
 import FlyoutContainer from "./Containers/FlyoutContainer"
 import turf from 'turf';
+import $ from "jquery";
 
-var markerGroup = null;
-
-function createMaker(e, click, content, cnt, i) {
-  return { position: e, click, content, id_cnt: cnt, data: i }
+function createMaker(e,  content, cnt, i) {
+  return { position: e,  content, id_cnt: cnt, data: i }
 }
 
 export function createStation(e, cnt, click) {
@@ -42,7 +41,6 @@ class Main extends Component {
         lat: null,
         lng: null
       },
-      DownloadList: [],
       ctr_list: [],
       togglerSelect: false,
       markerGroup: null,
@@ -60,7 +58,8 @@ class Main extends Component {
   };
 
   conglameratePolygons = () => {
-    const { polygons, PolyRequest } = this.props;
+    const {polygons, setPolyPayload} = this.props;
+
     let geoPolygons = polygons.map((poly) => {
       return poly.layer.toGeoJSON()
     });
@@ -68,11 +67,11 @@ class Main extends Component {
     let union;
     if (polygons.length > 1) {
       union = turf.union(...geoPolygons);
-      JSON.stringify(union)
-      PolyRequest(union)
+      union = JSON.stringify(union)
+      setPolyPayload(union)
     } else {
-      JSON.stringify(geoPolygons)
-      PolyRequest(geoPolygons)
+      geoPolygons = JSON.stringify(geoPolygons)
+      setPolyPayload(geoPolygons)
     }
   };
 
@@ -105,10 +104,16 @@ class Main extends Component {
       Array.prototype.push.apply(withoutRemovedWeather, existingWeather);
     }
     // can be simplified in one action
-    this.props.setMarkers(withoutRemovedMarkers);
-    this.props.setStations(withoutRemovedStations);
+    this.props.setMarkersAndStations(withoutRemovedMarkers, withoutRemovedStations);
     this.props.setWeather(withoutRemovedWeather);
-    this.props.setSelectedStation(null);
+
+    let LatLng = { lat: parseFloat(this.props.selectedStation.props.props.lat),
+      lng: parseFloat(this.props.selectedStation.props.props.lon) };
+    if(poly.layer.contains(LatLng)){
+      this.props.setSelectedStation(null);
+    }
+
+    this.conglameratePolygons();
   };
 
   beforeMove = (poly) => {
@@ -139,16 +144,21 @@ class Main extends Component {
   };
 
   setStationsAndMarkersInPoly = (currentPoly, newMarkers, newStations) => {
+    console.log(currentPoly);
+    console.log(this.props.polygons);
+
     let withoutRepeatingPoly = this.props.polygons.filter((poly) => {
       return poly.layer._leaflet_id !== currentPoly.layer._leaflet_id;
     });
 
     if (withoutRepeatingPoly.length === this.props.polygons.length) {
+      console.log("New poly!")
       let withNewPoly = [];
       withNewPoly.push(currentPoly);
       Array.prototype.push.apply(withNewPoly, this.props.polygons);
       this.props.setPolygons(withNewPoly);
     } else {
+      console.log("Old poly!")
       withoutRepeatingPoly.push(currentPoly);
       this.props.setPolygons(withoutRepeatingPoly);
     }
@@ -158,7 +168,7 @@ class Main extends Component {
     const sortedMarkers = [], prevMarkers = this.props.markers, sortedStations = [],
       prevStations = this.props.stations;
 
-    if (prevMarkers.length > 0) {
+    if (this.props.stations.length > 0) {
       for (let i in this.props.polygons) {
         let markersInOnePoly = prevMarkers.filter((marker) => {
           return this.props.polygons[i].layer.contains(marker.position)
@@ -176,15 +186,14 @@ class Main extends Component {
         Array.prototype.push.apply(sortedStations, stationsInOnePoly);
       }
     }
-    Array.prototype.push.apply(sortedMarkers, newMarkers);
     Array.prototype.push.apply(sortedStations, newStations);
-
-    this.props.setMarkers(sortedMarkers);
-    this.props.setStations(sortedStations);
+    Array.prototype.push.apply(sortedMarkers, newMarkers);
+   // this.props.setSelectedStation(null);
+    this.props.setMarkersAndStations(sortedMarkers, sortedStations);
   };
 
   getOneStationData = (e) => {
-    const { MarkerSelected, date, year } = this.props;
+    const {MarkerSelected} = this.props;
 
     let data = e;
     data.options = {};
@@ -196,29 +205,14 @@ class Main extends Component {
     this.state.api.getStationsFromMapEvent({ e: data }).then((station) => {
       this.setCardItem(station.response[0]);
     }).catch((error) => console.log(error));
-
-    /*
-    this.state.api.getPackFromMapEvent({e: data, pack: true})
-      .then((pack) => {
-        this.props.setStationPackLink(pack.response[0]);
-      }).catch((error) => console.log(error));
-
-    if (date.dateSet || year) {
-      this.state.api.getWeatherFromMapEvent({e: data, date: date, year: year})
-        .then((weather) => {
-          this.setWeatherForOneStation(weather.response);
-        }).catch((error) => console.log(error));
-
-      this.state.api.getPackFromMapEvent({e: data, date: date, year: year, pack: true})
-        .then((pack) => {
-          this.props.setWeatherPackLink(pack.response[0]);
-        }).catch((error) => console.log(error));
-    }*/
   };
 
   setCardItem = (station) => {
-    this.props.setSelectedStation(createStation(station, 0));
-    //this.setState({currentStation: createStation(station, 0)});
+    if(!(this.props.selectedStation && station.id === this.props.selectedStation.props.props.id)) {
+      this.props.setSelectedStation(createStation(station, 0));
+      //Тут нада зближення зробити
+      //mymap.fitBounds(L.latLngBounds([station.lat, station.lon]).pad(.3));
+    }
   };
 
   setWeatherForOneStation = (weather) => {
@@ -226,11 +220,6 @@ class Main extends Component {
     this.props.setWeather(weather.map((i) => {
       return this.creativeDay(i, cnt++);
     }))
-    /*this.setState({
-      daysItems: weather.map((i) => {
-        return this.creativeDay(i, cnt++);
-      })
-    })*/
   };
 
   creativeDay = (e, cnt) => {
@@ -264,14 +253,13 @@ class Main extends Component {
         let location = stations[i];
         let coords = L.latLng(location.lat, location.lon);
         area_latlon.push(coords);
-        newMarkers.push(createMaker(coords, this.onMarkerClick, createStation(location), mrk++, location));
+        newMarkers.push(createMaker(coords, createStation(location), mrk++, location));
       }
 
       if (poly) {
         this.setStationsAndMarkersInPoly(poly, newMarkers, newStations);
       } else {
-        this.props.setMarkers(newMarkers);
-        this.props.setStations(newStations);
+        this.props.setMarkersAndStations(newMarkers, newStations);
       }
       mymap.fitBounds(L.latLngBounds(area_latlon).pad(.3));
     } else alert("No data, sorry");
@@ -289,7 +277,17 @@ class Main extends Component {
   };
 
   activeMarker = (e) => {
-    console.log("Active: " + e.options.position)
+    if($(e.target._icon).hasClass("coloredSelectedMarker")){
+      $(e.target._icon).removeClass("coloredSelectedMarker")
+        .addClass("coloredUnselectedMarker");
+      this.props.setSelectedStation(null);
+    } else {
+      this.onMarkerClickBase(e);
+      $('.leaflet-marker-icon').removeClass('coloredSelectedMarker')
+        .addClass('coloredUnselectedMarker');
+      $(e.target._icon).removeClass("coloredUnselectedMarker")
+        .addClass("coloredSelectedMarker");
+    }
   };
 
   onMouseMove = (e) => {
@@ -309,7 +307,7 @@ class Main extends Component {
     this.partialClear(event);
 
     if (this.props.polygons.length === 0) {
-      this.props.PolyRequest("");
+      this.props.setPolyPayload("");
       this.props.MarkerSelected("");
     }
   };
@@ -335,7 +333,6 @@ class Main extends Component {
     let conts = {
       ctr_list: this.state.ctr_list,
       mapSelectedIndex: this.state.mapSelectedIndex,
-      DownloadList: this.state.DownloadList,
     };
 
     let containerInnerClass = "m-2";
@@ -379,47 +376,35 @@ class Main extends Component {
   }
 }
 
-const
-  mapStateToProps = state => ({
-    years: state.dataReducer.years,
-    date: state.dataReducer.date,
-    polygons: state.dataReducer.polygons,
-    stations: state.dataReducer.stations,
-    weather: state.dataReducer.weather,
-  });
+const mapStateToProps = state => ({
+  years: state.dataReducer.years,
+  date: state.dataReducer.date,
+  polygons: state.dataReducer.polygons,
+  stations: state.dataReducer.stations,
+  weather: state.dataReducer.weather,
+  markers: state.dataReducer.markers,
+  selectedStation: state.dataReducer.selectedStation
+});
 
-const
-  mapDispatchToProps = dispatch => ({
-    PolyRequest: (req) => {
-      dispatch({ type: "SET_POLY_REQUEST", req: req })
-    },
-    MarkerSelected: (req) => {
-      dispatch({ type: "SET_MARKER_REQUEST", req: req })
-    },
-    setStationPackLink: (link) => {
-      dispatch({ type: "SET_STATION_PACK_LINK", link: link })
-    },
-    setWeatherPackLink: (link) => {
-      dispatch({ type: "SET_WEATHER_PACK_LINK", link: link })
-    },
-    setPolygons: (polygons) => {
-      dispatch({ type: "SET_POLYGONS", polygons: polygons })
-    },
-    setPolygonsInGeo: (polygons) => {
-      dispatch({ type: "SET_GEO_POLYGONS", polygons: polygons })
-    },
-    setStations: (stations) => {
-      dispatch({ type: "SET_STATIONS", stations: stations })
-    },
-    setWeather: (weather) => {
-      dispatch({ type: "SET_WEATHER", weather: weather })
-    },
-    setMarkers: (markers) => {
-      dispatch({ type: "SET_MARKERS", markers: markers })
-    },
-    setSelectedStation: (selected) => {
-      dispatch({ type: "SET_SELECTED_STATION", selected: selected })
-    }
-  });
+const mapDispatchToProps = dispatch => ({
+  setPolyPayload: (req) => {
+    dispatch({type: "SET_POLY_REQUEST", req: req})
+  },
+  MarkerSelected: (req) => {
+    dispatch({type: "SET_MARKER_REQUEST", req: req})
+  },
+  setPolygons: (polygons) => {
+    dispatch({type: "SET_POLYGONS", polygons: polygons})
+  },
+  setWeather: (weather) => {
+    dispatch({type: "SET_WEATHER", weather: weather})
+  },
+  setMarkersAndStations: (markers, stations) => {
+    dispatch({type: "SET_MARKERS_AND_STATIONS", markers: markers, stations: stations})
+  },
+  setSelectedStation: (selected) => {
+    dispatch({type: "SET_SELECTED_STATION", selected: selected})
+  }
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(Main);

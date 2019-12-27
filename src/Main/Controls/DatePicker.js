@@ -2,7 +2,9 @@ import React from 'react';
 import DateRangePicker from 'react-bootstrap-daterangepicker';
 import { Button } from 'reactstrap';
 import 'bootstrap-daterangepicker/daterangepicker.css';
-export default class DatePicker extends React.Component {
+import {connect} from "react-redux";
+
+ class DatePicker extends React.Component {
   constructor(props) {
     super(props)
 
@@ -50,27 +52,26 @@ export default class DatePicker extends React.Component {
   }
 
   handleChange = (event, date) => {
-    var e = {
+    let e = {
       startDate: date.startDate,
       endDate: date.endDate,
       dateSet: true
     };
-    this.props.OnApply(e)
-    this.setState(e);
-  }
+    this.props.setTime(e);
+  };
 
   dateName() {
-    var date = this.state.startDate && "since " + this.state.startDate.format('DD.MM.YYYY') + " until " + this.state.endDate.format('DD.MM.YYYY')
+    let date = this.props.date.startDate && "since " + this.props.date.startDate.format('DD.MM.YYYY') + " until " + this.props.date.endDate.format('DD.MM.YYYY')
     return date || "Select dates range"
   }
+
   onEraseClick = () => {
-    var e = {
+    let e = {
       dateSet: false,
       startDate: null,
       endDate: null
     }
-    this.setState(e)
-    this.props.OnClear(e)
+    this.props.setTime(e);
   }
   render() {
     return (<div className={"drp " + this.props.className}>
@@ -78,10 +79,21 @@ export default class DatePicker extends React.Component {
         <button className="drp_btn btn btn-secondary">{this.dateName()}</button>
       </DateRangePicker>
       {
-        this.state.dateSet
+        this.props.date.dateSet
           ? <Button onClick={this.onEraseClick} className="drp_close border-0 btn btn-outline-dark">X</Button>
           : null
       }
     </div>);
   }
 }
+
+const mapStateToProps = state => ({
+  date: state.dataReducer.date,
+});
+
+const mapDispatchToProps = dispatch => ({
+  setTime: (date) => {
+    dispatch({type: "SET_TIME", date: date})
+  }
+  });
+export default connect(mapStateToProps, mapDispatchToProps)(DatePicker);
