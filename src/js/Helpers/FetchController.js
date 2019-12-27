@@ -26,7 +26,7 @@ class FetchController {
     try {
       const options = {
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'text/plain',
         }
       };
       const response = await axios.post(link, payload, options);
