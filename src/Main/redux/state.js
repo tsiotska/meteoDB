@@ -1,6 +1,4 @@
-export const conditionState = {
 
-};
 
 export const dataState = {
   queryParam: [],

@@ -109,6 +109,10 @@ class Main extends Component {
 
     let LatLng = { lat: parseFloat(this.props.selectedStation.props.props.lat),
       lng: parseFloat(this.props.selectedStation.props.props.lon) };
+
+    console.log("SELECTED STATION")
+    console.log(this.props.selectedStation);
+
     if(poly.layer.contains(LatLng)){
       this.props.setSelectedStation(null);
     }
@@ -277,16 +281,13 @@ class Main extends Component {
   };
 
   activeMarker = (e) => {
-    if($(e.target._icon).hasClass("coloredSelectedMarker")){
+   if($(e.target._icon).hasClass("coloredSelectedMarker")){
       $(e.target._icon).removeClass("coloredSelectedMarker")
-        .addClass("coloredUnselectedMarker");
       this.props.setSelectedStation(null);
     } else {
       this.onMarkerClickBase(e);
       $('.leaflet-marker-icon').removeClass('coloredSelectedMarker')
-        .addClass('coloredUnselectedMarker');
-      $(e.target._icon).removeClass("coloredUnselectedMarker")
-        .addClass("coloredSelectedMarker");
+      $(e.target._icon).addClass("coloredSelectedMarker");
     }
   };
 

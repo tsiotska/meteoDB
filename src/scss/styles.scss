@@ -54,15 +54,8 @@ button {
   cursor: pointer;
 }
 
-.coloredSelectedMarker{
-  color: #50de92;
-  opacity: 0.9;
-}
 
-.coloredUnselectedMarker{
-  color: #104fad;
-  opacity: 0.9;
-}
+
 @import "animate.scss";
 @import "typeahead.scss";
 @import "map.scss";
