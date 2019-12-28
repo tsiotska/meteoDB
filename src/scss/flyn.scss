@@ -196,27 +196,33 @@ $flyn-animation-dur: .7s;
 }
 
 .flyn {
-  .input-group input {
-    @include border-radius($app-input-border-radius);
+  .input-group {
+    margin-top: .5rem;
 
-    &:focus {
-      outline: none;
-      border-color: transparent;
-      box-shadow: 0 0 0 0.1rem rgba(0, 123, 255, 0.25)
+    input {
+      @include border-radius($app-input-border-radius);
+
+      &:focus {
+        outline: none;
+        border-color: transparent;
+        box-shadow: 0 0 0 0.1rem rgba(0, 123, 255, 0.25)
+      }
+
+      text-align: center;
     }
-
-    text-align: center;
   }
 
   .flyn-input-controls {
-    > div,
-    .top-group > div{
+
+    /* >div,
+    .top-group>div {
       margin-top: .4rem;
       margin-bottom: .4rem;
     }
-    .top-group{
+
+    .top-group {
       margin-bottom: 0;
-    }
+    } */
   }
 
   .input-group-text {
@@ -224,15 +230,17 @@ $flyn-animation-dur: .7s;
 
     input[type="checkbox"] {
       margin: .3rem;
-      &:focus{
+
+      &:focus {
         outline: none;
         box-shadow: none;
       }
     }
   }
-  .time-selector-tabs{
-     .nav-item{
-       border: none;
-     }
+
+  .time-selector-tabs {
+    .nav-item {
+      border: none;
+    }
   }
 }

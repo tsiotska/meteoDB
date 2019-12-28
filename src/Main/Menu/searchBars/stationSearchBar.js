@@ -5,11 +5,11 @@ import { Input } from "reactstrap";
 const StationSearchBar = ((props) => {
   const {
     areLimitAndOffsetDisabled,
-    onTypeChanged, onLimitChange, onOffsetChange, onNearestChange,
+    onTypeChanged, onLimitChange, onOffsetChange, onNearestChange, onBufferChange,
     onNeighChange, polyRequest, selectorByField, isLoading, source, unControlledInput, changeInputRef
   } = props;
   return (
-    <div className="input-group">
+    <div className="d-flex flex-wrap">
       <div className="form-inline row top-group">
         <div className="input-group col">
           <div className="input-group-prepend">
@@ -20,8 +20,8 @@ const StationSearchBar = ((props) => {
             // api/gsod/stations/types
           }
           <select defaultValue="ctry_full" className="form-control custom-select" ref={selectorByField}
-                  disabled={polyRequest}
-                  onChange={onTypeChanged} id="type">
+            disabled={polyRequest}
+            onChange={onTypeChanged} id="type">
             <option>id</option>
             <option>wban</option>
             <option>stname</option>
@@ -43,12 +43,12 @@ const StationSearchBar = ((props) => {
       <div className={polyRequest ? "disabledQueryInput" : "input-group  w-100"}>
         <div className={" w-100"}>
           <Typeahead id="typeahead" disabled={!!polyRequest}
-                     ref={(typeahead) => changeInputRef(typeahead)}
-                     multiple={true}
-                     isLoading={isLoading}
-                     placeholder="Query parameter"
-                     onChange={unControlledInput}
-                     options={source}/>
+            ref={(typeahead) => changeInputRef(typeahead)}
+            multiple={true}
+            isLoading={isLoading}
+            placeholder="Query parameter"
+            onChange={unControlledInput}
+            options={source} />
         </div>
       </div>
 
@@ -58,17 +58,30 @@ const StationSearchBar = ((props) => {
         </div>
         <div className="input-group-append">
           <div className="input-group-text">
-            <Input type="checkbox" id="nbs_chk" className="" onChange={onNeighChange}/>
+            <Input type="checkbox" id="nbs_chk" className="" onChange={onNeighChange} />
           </div>
         </div>
       </div>
 
       <div className={polyRequest ? "disabledQueryInput" : "input-group"}>
-
         <div className="input-group-prepend">
-          <label className="input-group-text" htmlFor="exampleCheck1">Nearest N stations</label>
+          <label className="input-group-text" htmlFor="nearest_chk">Nearest N stations</label>
         </div>
-        <Input type="text" className="form-control" id="nearest_chk" onChange={onNearestChange}/>
+        <Input type="text" className="form-control" id="nearest_chk" onChange={onNearestChange} />
+      </div>
+
+      <div className={polyRequest ? "disabledQueryInput" : "input-group"}>
+        <div className="input-group-prepend">
+          <label className="input-group-text" htmlFor="buffer">Buffer</label>
+        </div>
+        {
+          // TODO: Connect buffer inputs
+        }
+        <Input type="text" className="form-control" id="buffer" onChange={onBufferChange} />
+        <select className="custom-select input-group-append" id="bufferUnitSelect" >
+          <option selected value="km">Kilometers</option>
+          <option value="m">Meters</option>
+        </select>
       </div>
 
       <div className="form-inline">
@@ -78,14 +91,14 @@ const StationSearchBar = ((props) => {
               <span className="input-group-text">Count</span>
             </div>
             <Input type="text" id="count" className="form-control typeahead" placeholder="Count"
-                   data-provide="typeahead" onChange={onLimitChange} disabled={areLimitAndOffsetDisabled}/>
+              data-provide="typeahead" onChange={onLimitChange} disabled={areLimitAndOffsetDisabled} />
           </div>
           <div className="input-group col-6">
             <div className="input-group-prepend">
               <span className="input-group-text">Offset</span>
             </div>
             <Input type="text" id="offset" className="form-control typeahead" placeholder="Offset"
-                   data-provide="typeahead" onChange={onOffsetChange} disabled={areLimitAndOffsetDisabled}/>
+              data-provide="typeahead" onChange={onOffsetChange} disabled={areLimitAndOffsetDisabled} />
           </div>
         </div>
       </div>
