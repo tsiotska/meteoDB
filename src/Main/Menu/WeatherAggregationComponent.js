@@ -2,7 +2,7 @@ import React from "react";
 import DatePicker from '../Controls/DatePicker';
 import { Button, Input } from "reactstrap";
 import { connect } from "react-redux";
-import {baseUrl} from "../../js/const";
+import { baseUrl } from "../../js/const";
 
 class WeatherAggregationComponent extends React.Component {
 
@@ -37,10 +37,10 @@ class WeatherAggregationComponent extends React.Component {
       api.getWeather({
         date, years, months, days,
         queryRequest
-      }).then((weather) => {
-        this.props.onWeatherData(weather.response);
-      }).catch((error) => console.log(error));
-
+      })
+        .then((weather) => {
+          this.props.onWeatherData(weather.response);
+        }).catch((error) => console.log(error));
     }
   };
 
@@ -53,7 +53,8 @@ class WeatherAggregationComponent extends React.Component {
         polyPayload, days, months, date, years,
         pack: true
       })
-        .then((pack) => {  console.log(pack.response[0]);
+        .then((pack) => {
+          console.log(pack.response[0]);
           console.log("Redirect to " + baseUrl + pack.response[0] + "?saveas=weather.json");
           window.location.replace(baseUrl + pack.response[0] + "?saveas=weather.json")
         })
@@ -65,7 +66,8 @@ class WeatherAggregationComponent extends React.Component {
         date, years,
         pack: true
       })
-        .then((pack) => {  console.log(pack.response[0]);
+        .then((pack) => {
+          console.log(pack.response[0]);
           console.log("Redirect to " + baseUrl + pack.response[0] + "?saveas=weather.json");
           window.location.replace(baseUrl + pack.response[0] + "?saveas=weather.json")
         })
@@ -215,16 +217,16 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   setYears: (years) => {
-    dispatch({ type: "SET_YEARS", years: years })
+    dispatch({type: "SET_YEARS", years: years})
   },
   setMonths: (months) => {
-    dispatch({ type: "SET_MONTHS", months: months })
+    dispatch({type: "SET_MONTHS", months: months})
   },
   setDays: (days) => {
-    dispatch({ type: "SET_DAYS", days: days })
+    dispatch({type: "SET_DAYS", days: days})
   },
   setTime: (date) => {
-    dispatch({ type: "SET_TIME", date: date })
+    dispatch({type: "SET_TIME", date: date})
   },
   setWeather: (weather) => {
     dispatch({type: "SET_WEATHER", weather: weather})

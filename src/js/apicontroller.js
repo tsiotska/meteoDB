@@ -184,7 +184,6 @@ export class ApiController extends ControllerContext {
     return this.fetchData(this.compileContext(baseUrl + "/api/" + this.database + "/countries/stationsCount"))
   }
 
-  //extractors 
   getByType = (type, offsetValue, countValue) => {
     let offset = "", count = "";
     if (offsetValue) {
